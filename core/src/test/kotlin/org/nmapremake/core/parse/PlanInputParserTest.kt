@@ -10,10 +10,10 @@ import kotlin.test.assertTrue
 
 class PlanInputParserTest {
     private fun success(input: PlanInputParser.Input): PlanInputParser.ParseOutcome.Success =
-        assertIs(PlanInputParser.ParseOutcome.Success::class, PlanInputParser.parse(input))
+        assertIs(PlanInputParser.parse(input))
 
     private fun failure(input: PlanInputParser.Input): PlanInputParser.ParseOutcome.Failure =
-        assertIs(PlanInputParser.ParseOutcome.Failure::class, PlanInputParser.parse(input))
+        assertIs(PlanInputParser.parse(input))
 
     @Test
     fun `happy path with top-100`() {

@@ -55,6 +55,7 @@ jobs:
 
       # 'shell: bash' runs with -o pipefail so gradlew's exit code survives
       # the | tee (the default shell would report tee's status: always 0).
+      # --continue makes one run report every failing task at once.
       - name: Verify pure-JVM modules (core, engine)
         shell: bash
         run: >
@@ -65,6 +66,7 @@ jobs:
           :engine:ktlintCheck
           :core:detekt
           :engine:detekt
+          --continue
           --stacktrace
           2>&1 | tee /tmp/gradle-jvm.log
 
@@ -76,6 +78,7 @@ jobs:
           :app:lintDebug
           :app:ktlintCheck
           :app:detekt
+          --continue
           --stacktrace
           2>&1 | tee /tmp/gradle-app.log
 

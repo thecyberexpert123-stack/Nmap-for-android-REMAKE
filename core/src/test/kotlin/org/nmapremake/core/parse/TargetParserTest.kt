@@ -7,10 +7,10 @@ import kotlin.test.assertNull
 
 class TargetParserTest {
     private fun success(raw: String): TargetParser.ParseOutcome.Success =
-        assertIs(TargetParser.ParseOutcome.Success::class, TargetParser.parse(raw))
+        assertIs(TargetParser.parse(raw))
 
     private fun failure(raw: String): TargetParser.ParseOutcome.Failure =
-        assertIs(TargetParser.ParseOutcome.Failure::class, TargetParser.parse(raw))
+        assertIs(TargetParser.parse(raw))
 
     @Test
     fun `ipv4 literal`() {
