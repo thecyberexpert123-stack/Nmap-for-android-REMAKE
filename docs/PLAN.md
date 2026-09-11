@@ -183,37 +183,155 @@ Policy derived for this project:
 
 ## 5. Deliverables and Acceptance Criteria
 
-### Milestone 1 — Phase 0 + Phase 1 (proposed scope)
+Detailed API sketches and sequence diagrams live in
+[`docs/ARCHITECTURE.md`](ARCHITECTURE.md). This section defines what *passing*
+means for each milestone. All values marked "default" are design decisions
+recorded here; they become locked constants in code and are unit-tested.
+
+### 5.1 Milestone 1 — Phase 0 + Phase 1
 
 | # | Deliverable | Acceptance criteria (testable) |
 |---|---|---|
-| D1 | Multi-module Gradle project builds clean (`./gradlew build` green) | CI passes; no warnings; reproducible wrapper |
+| D1 | Multi-module Gradle project builds clean (`./gradlew build` green) | CI passes; zero warnings (`allWarningsAsErrors`); reproducible wrapper |
 | D2 | `core` domain model (`ScanPlan`, `Target`, `PortSpec`, `PortState`, `PortResult`, `HostResult`, `ScanError`, `CapabilityProfile`, `ExecutorNode`) | Unit tests cover parsing (valid + invalid + edge cases), equality, serialization round-trip |
-| D3 | Target/port parser (`192.168.1.10`, `example.com`, `22,80,443`, `1-1000`, CIDR later) | Unit tests: all syntaxes; rejects malformed input with typed `ScanError` |
-| D4 | `ScanScheduler` with bounded concurrency, per-probe timeout, cooperative cancellation, progress via `Flow` | Tests: max in-flight ≤ limit (instrumented counter); timeout honored (blocking listener); cancel stops promptly with no leaked coroutines |
-| D5 | `TcpConnectProber` with honest classification: `OPEN` / `CLOSED` / `TIMEOUT` / `UNREACHABLE` / `INCONCLUSIVE` + latency + evidence | JVM tests against real loopback sockets (listener = OPEN, refused = CLOSED, unroutable/black-hole = TIMEOUT, no fake states) |
-| D6 | `ResultAggregator` + JSON formatter (schema-versioned) | Round-trip tests; JSON validates against defined schema |
-| D7 | Compose app: target/ports input, scan, live progress, per-port results, **capability banner** ("TCP Connect — available locally; Service detection — Phase 2; Raw packet — unavailable on stock Android") | Manual + emulator verification; banner is data-driven from `CapabilityProfile` (no hardcoded lies) |
-| D8 | CI workflow (build + test + lint on push) | Green run on this branch |
-| D9 | Docs: this plan, CHANGELOG, AGENT-EXPERIENCE, README | Present and maintained |
+| D3 | Target/port parser (`192.168.1.10`, `example.com`, `22,80,443`, `1-1000`, `all`, `top-100`) | Parsing tables 5.1.1 pass; malformed input rejected with typed `ScanError` |
+| D4 | `ScanScheduler` with bounded concurrency, per-probe timeout, cooperative cancellation, progress via `Flow` | Async invariants 5.1.3 pass (deterministic, fake-transport tests) |
+| D5 | `TcpConnectProber` with honest classification (`OPEN`/`CLOSED`/`TIMEOUT`/`UNREACHABLE`/`INCONCLUSIVE`) + latency + evidence | Classification matrix 5.1.2 passes against real loopback sockets + fakes |
+| D6 | `ResultAggregator` + JSON formatter (schema-versioned) | Round-trip tests; output validates against schema v1 (ARCHITECTURE.md §5) |
+| D7 | Compose app: target/ports input, scan, live progress, per-port results, capability banner | UI checks 5.1.5; banner data-driven from `CapabilityProfile` |
+| D8 | CI workflow (build + test + lint on push) | Green on this branch; coverage gate 5.1.6 enforced |
+| D9 | Docs: plan, ARCHITECTURE.md, CHANGELOG, AGENT-EXPERIENCE, README | Present and maintained |
 
-### Later milestones (outline only — planned, not started)
+#### 5.1.1 Target & port parsing (D3) — input/output tables
 
-- **M2 (Phase 2)**: HTTP/TLS/SSH/… probes; service identification; basic version
-  inference with confidence and evidence. AC: identification only from observed
-  responses; false-positive rate measured on a local test-lab of known services.
-- **M3 (Phase 3)**: selected UDP probes (DNS, mDNS, …); conservative states; no
-  claims about "closed UDP ports".
-- **M4 (Phase 4)**: clean-room fingerprint DB (our own probe set and format),
-  candidate matching, confidence scoring, evidence storage.
-- **M5 (Phase 5)**: device capability detection (interfaces, APIs, restrictions)
-  driving the router and UI.
-- **M6 (Phase 6)**: on-device experiments: raw sockets w/o root (expect `EPERM`),
-  VpnService tun behavior — documented as measured results, not assumptions.
-- **M7 (Phase 7)**: authenticated remote executor protocol (mTLS/HTTPS, capability
-  negotiation, structured results) — designed with least privilege.
-- **M8 (Phase 8)**: feature-by-feature comparison table vs. Nmap, with honest
-  labels for delegated/unavailable capabilities.
+`PortSpec` grammar (M1): single port · comma list · inclusive range ·
+`top-100` (our own curated list — self-authored data constant, not Nmap's) ·
+`all` (= 1–65535). Whitespace tolerated around tokens. A spec is parsed
+atomically: any invalid token rejects the entire spec.
+
+| Input | Expected result |
+|---|---|
+| `"22"` | `[22]` |
+| `"22,80,443"` | `[22, 80, 443]` (order preserved, duplicates removed) |
+| `" 22 , 80 "` | `[22, 80]` |
+| `"1-1000"` | `[1..1000]` (1000 entries) |
+| `"80-80"` | `[80]` |
+| `"top-100"` | our curated list: exactly 100 distinct ports, all in 1–65535 |
+| `"all"` | `[1..65535]` (65535 entries) |
+| `""` | `ScanError(EMPTY_PORT_SPEC)` |
+| `"0"` | `ScanError(PORT_OUT_OF_RANGE)` — valid range is 1–65535 |
+| `"65536"` | `ScanError(PORT_OUT_OF_RANGE)` |
+| `"1-0"` | `ScanError(INVALID_RANGE_ORDER)` |
+| `"1-70000"` | `ScanError(PORT_OUT_OF_RANGE)` |
+| `"abc"`, `"-5"`, `"22,abc"` | `ScanError(INVALID_PORT)` |
+| `"192.168.1.0/24"` | `ScanError(CIDR_NOT_SUPPORTED_YET)` — honest; CIDR expansion is a planned later milestone (see RECOMMENDATIONS) |
+
+`Target` parsing:
+
+| Input | Expected result |
+|---|---|
+| `"127.0.0.1"` | IPv4 literal target (always permitted) |
+| `"::1"` | IPv6 literal target (loopback; connect supported) |
+| `"192.168.1.10"` | IPv4 literal target |
+| `"localhost"` | resolved via `InetAddress` at scan start; stored with original label |
+| `"example.com"` | resolution at scan start; failure → whole-scan `ScanError(UNRESOLVABLE_HOST)` |
+| `"256.256.256.256"` | `ScanError(INVALID_TARGET)` |
+| `"10.0.0.0/8"` | `ScanError(CIDR_NOT_SUPPORTED_YET)` |
+
+#### 5.1.2 TCP result classification (D5) — matrix
+
+Defaults: per-probe connect timeout **5 000 ms** (clamped to 100–60 000 ms),
+single attempt per port in M1 (no retries — retry policy is a recorded
+recommendation, not silently added).
+
+| Observation | `PortState` | `latencyMs` | Evidence (exact format, tested) |
+|---|---|---|---|
+| `connect()` returns | `OPEN` | measured elapsed | `"TCP connect completed in {n} ms"` |
+| `ConnectException` / ECONNREFUSED | `CLOSED` | measured elapsed | `"Connection refused (ECONNREFUSED)"` |
+| `SocketTimeoutException` / ETIMEDOUT | `TIMEOUT` | `null` | `"No response within {timeout} ms"` |
+| `NoRouteToHostException` (EHOSTUNREACH) / ENETUNREACH | `UNREACHABLE` | `null` | `"No route to host (EHOSTUNREACH)"` |
+| any other `IOException` | `INCONCLUSIVE` | `null` | exception class + message, truncated to 256 chars |
+| `SecurityException` (missing INTERNET permission) | `INCONCLUSIVE` | `null` | `"Permission denied: INTERNET"` (+ typed `ScanError`) |
+
+Rules tested explicitly: no synthetic states are ever produced; every non-OPEN
+result carries a non-null `error`; `evidence` is never empty.
+
+#### 5.1.3 Scheduler & async invariants (D4)
+
+Deterministic tests use a **fake `TcpTransport`** (scriptable outcomes, gated
+latches) so timing paths are not dependent on the test network; real-socket
+tests are reserved for the classification matrix on loopback only.
+
+1. **Concurrency cap**: scan 64 ports with `concurrency = 8` → observed maximum
+   in-flight probes == 8 (instrumented counter in fake), exactly 64 results.
+2. **Timeout enforcement**: fake transport that blocks until released → probe
+   completes as `TIMEOUT` at ≈ configured timeout (asserted wall-clock bound:
+   ≤ timeout + 500 ms slack); no thread leak (coroutine jobs all completed).
+3. **Cancellation**: start a 1 000-port scan with a slow fake; cancel at 100 ms
+   → scheduler returns within 500 ms; results contain only completed ports;
+   all probe jobs terminated (structured-concurrency test).
+4. **Progress stream**: events are well-formed — `PortStarted(p)` precedes
+   `PortFinished(p)` for every p; exactly one `ScanFinished` or `ScanFailed`.
+5. **Watchdog**: optional `maxDuration` (default **10 min** for UI-issued scans,
+   clamped 1 s–1 h) forces `ScanFailed(SCAN_DEADLINE_EXCEEDED)`.
+6. **Blocking I/O containment**: socket connects run on `Dispatchers.IO`;
+   cancellation unblocks in-flight connects by closing the socket (documented
+   in ARCHITECTURE.md §4; tested via fake-close semantics).
+7. **Defaults**: `concurrency = 32` (clamped 1–256); probe timeout 5 s (clamped
+   0.1–60 s).
+
+#### 5.1.4 Output & formatting (D6)
+
+- JSON schema v1 (defined in ARCHITECTURE.md §5): envelope carries
+  `schemaVersion`, `generator` (`nmap-android-remake/engine/{version}`),
+  `startedAt`, `finishedAt`, `scanPlan`, `hosts`.
+- Round-trip: `HostResult == decode(encode(HostResult))` for every state,
+  including all-failure and empty-result cases.
+- Unresolvable host → `ScanFailed(UNRESOLVABLE_HOST)` envelope, not a fake
+  empty host.
+- Formatter never throws on valid inputs; malformed model states are rejected
+  at construction (factory validation), not at format time.
+
+#### 5.1.5 UI (D7)
+
+- Capability banner rows are **derived from `CapabilityProfile`** (unit-tested
+  mapping profile → banner rows). M1 profile: TCP connect = SUPPORTED; service
+  detection = UNSUPPORTED (Phase 2); raw packet = UNSUPPORTED on stock Android;
+  VPN = UNKNOWN (Phase 6 experiment). No hardcoded banner strings.
+- Emulator (CI): launch → scan `127.0.0.1` against a loopback listener started
+  by the instrumentation test → OPEN row appears with latency; a refused port
+  shows CLOSED. (End-to-end proof on-device.)
+- Invalid input shows the typed `ScanError` message; no crash (espresso-level
+  assertion).
+- Cancel button → UI returns to idle ≤ 1 s after scheduler completes.
+
+#### 5.1.6 Quality gates (enforced in CI, failing = red build)
+
+- JaCoCo **≥ 80 % line coverage** on `core` and `engine`.
+- ktlint + detekt: **0 issues** (detekt failThreshold = 0, curated ruleset).
+- `allWarningsAsErrors = true`; `lintDebug` **0 errors**.
+- CI matrix: (a) JVM build+test+lint; (b) emulator instrumented smoke test on
+  **API 26** and **API 36**.
+
+#### 5.1.7 Evidence required for milestone sign-off
+
+- Green CI (above), plus **one real-device verification**: a LAN scan of the
+  device's own network (e.g., gateway/known host) performed by the stakeholder
+  on real hardware, results recorded in AGENT-EXPERIENCE.md with device model
+  and Android version. The agent cannot fabricate this (rule #21) — the
+  milestone is not "done" without it.
+
+### 5.2 Later milestones — acceptance criteria (outline, to be finalized at each gate)
+
+| Milestone | Concrete acceptance criteria (preliminary) |
+|---|---|
+| **M2 (Phase 2)** service & version detection | Local lab of ≥ 5 known services (e.g., nginx, OpenSSH, mosquitto, vsftpd) on loopback/LAN. Probes: HTTP GET/HEAD, TLS ClientHello banner, SSH banner, SMTP greeting, null-probe banner read. **AC**: correct identification ≥ 90 % on the lab; every identification carries evidence = probe name + response prefix (≤ 256 B) + sha256; unidentified → `UNKNOWN` state with evidence, never guessed; version inference labeled "probable" with a confidence score in [0,1] and a documented threshold; false-positive rate < 5 % measured on the lab. |
+| **M3 (Phase 3)** UDP application probing | Probes: DNS (query against a local resolver), mDNS (PTR `_services._dns-sd._udp.local`), echo. States restricted to `RESPONDED` / `NO_RESPONSE` / `APPLICATION_IDENTIFIED` / `INCONCLUSIVE`. **AC**: `NO_RESPONSE` is never rendered or described as "closed"; each result records the probe payload summary; verified with a local dnsmasq instance (present/absent cases). |
+| **M4 (Phase 4)** fingerprinting | Fingerprint DB is self-authored (format: features → candidate weights); features derived from application-layer observations (banner patterns, TLS parameters, timing deltas, header order). **AC**: every DB entry carries `source: self-authored` + a test vector; matching emits candidates with confidence + evidence; output is explicitly labeled "application-level inference", never "Nmap OS detection"; comparison experiment documented. |
+| **M5 (Phase 5)** capability system | On-device detection: socket connect ✓; raw socket attempt → observe `EPERM` and report `UNSUPPORTED` (measured, not assumed); `VpnService` presence → `UNKNOWN` until the M6 experiment; interface enumeration via `ConnectivityManager` only (no extra permissions). **AC**: unit tests with fakes; on-device report matches expectations on emulator + real device; UI banner reflects the measured profile. |
+| **M6 (Phase 6)** native/VPN experiments | Experiment matrix: raw-socket attempt (expected `EPERM`), VpnService tun packet-injection test against a controlled LAN responder. **AC**: results recorded verbatim (device model, Android build, command/output); conclusion updates `CapabilityProfile` defaults; any capability is gated behind proof — no claimed capability without a passing experiment. |
+| **M7 (Phase 7)** remote executor | Authenticated executor protocol (mTLS + capability negotiation + versioned result schema) with a written threat model (trust, integrity, replay, injection). **AC**: threat model reviewed and accepted by stakeholder; integration tests between two JVM processes; delegated results tagged with executor identity + trust level and visibly distinguished in the UI; no executor capability claims are trusted without verification path. |
+| **M8 (Phase 8)** compatibility measurement | Feature-by-feature table vs. the Nmap feature set, each row: feature, status (`LOCAL` / `DELEGATED` / `UNAVAILABLE` / `UNVERIFIED`), how it was measured. **AC**: published in docs; every `LOCAL` claim links to a passing test or recorded experiment; no "Nmap-compatible" wording without this table. |
 
 ---
 
@@ -258,8 +376,9 @@ Nmap-for-android-REMAKE/
 ├── AGENT-EXPERIENCE.md
 ├── docs/
 │   ├── PLAN.md                          # this document
+│   ├── ARCHITECTURE.md                  # module map, API sketches, sequence diagrams, schema v1
 │   ├── RECOMMENDATIONS.md               # parked ideas (no scope creep in code)
-│   └── adr/                             # ADR-0001 module boundaries, etc.
+│   └── adr/                             # ADR-0001 license, ADR-0002 UI, ADR-0003 SDK levels, …
 ├── settings.gradle.kts
 ├── build.gradle.kts
 ├── gradle/
@@ -396,12 +515,12 @@ Mitigation: JVM unit tests + `assembleDebug` locally, emulator matrix in CI.
 the stakeholder (see open questions below); no implementation until milestone
 approval is given.
 
-### Open questions for plan refinement
-1. Which plan areas should be deepened next (acceptance criteria per phase,
-   architecture detail / API sketches, ethics & safety section, remote-executor
-   protocol design, capability matrix, or other)?
-2. Are the milestone acceptance criteria (D1–D9) acceptable as written, or do they
-   need tightening before Phase 0+1 can be approved?
+### Open questions / next steps
+1. ~~Which plan areas should be deepened next~~ → done: acceptance criteria
+   tightened (PLAN §5.1–5.2) and architecture/API design added
+   (`docs/ARCHITECTURE.md`), per stakeholder direction (2026-09-11).
+2. Approve (or further refine) the Phase 0+1 milestone criteria (D1–D9, §5.1)
+   before any implementation starts.
 3. Copyright holder line for the GPL notices (to be set by the project owner).
 
 ---
@@ -421,3 +540,4 @@ approval is given.
 [11] android-ndk mailing list, "RAW socket using NDK" (EPERM confirmed) — https://groups.google.com/g/android-ndk/c/7FZCKNwun2I
 [12] Stack Overflow, "Capture network traffic programmatically (no root)" (loopback VPN approach) — https://stackoverflow.com/questions/38679188/capture-network-traffic-programmatically-no-root
 [13] VpnService/TUN explanation and protect() forwarding model — https://topic.alibabacloud.com/a/method-for-implementing-the-android-root-font-classtopic-s-color00c1defreefont-font-classtopic-s-color00c1defirewallfont_1_21_32567522.html
+[14] RFC 5737 — IPv4 address blocks reserved for documentation — https://datatracker.ietf.org/doc/html/rfc5737

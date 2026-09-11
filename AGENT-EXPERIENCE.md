@@ -95,3 +95,55 @@ Presented the plan and four approval questions (guideline #9). Stakeholder answe
 - Sandbox networking is filtered for some hosts (gnu.org, raw.githubusercontent.com
   blocked for curl; api.github.com worked). Verbatim licensing text therefore came
   from SPDX via the GitHub API — provenance recorded, no transcription.
+
+---
+
+## 2026-09-11 (final part) — Plan refinement: acceptance criteria + architecture
+
+### Context
+Stakeholder directed: tighten acceptance criteria & test strategy, and deepen
+architecture & API design. Still docs-only (no application code).
+
+### What I did
+1. Rewrote PLAN §5 into measurable criteria: input/output tables for target and
+   port parsing (incl. explicit `ScanError` codes), a TCP observation →
+   state/evidence classification matrix, deterministic scheduler invariants
+   using fake transports (so tests never depend on the sandbox network), JSON
+   schema checks, UI checks, enforced quality gates (≥80 % coverage, 0 lint
+   issues, CI emulator matrix on API 26 + 36), a real-device sign-off evidence
+   requirement, and preliminary per-milestone criteria for M2–M8.
+2. Authored `docs/ARCHITECTURE.md`: module map with one-way dependency rules,
+   Kotlin API sketches for `core`/`engine`/`app`, the coroutine concurrency
+   model, four sequence diagrams (lifecycle, cancellation, failure
+   classification, Phase-7 delegation intent), JSON result schema v1 with
+   forward-compatible wire error codes, error taxonomy, and a test-strategy
+   placement matrix.
+3. Updated CHANGELOG, PLAN §8 (folder tree) and §11 (open questions), added
+   RFC 5737 source. Committed and pushed (no merge).
+
+### Decisions
+- Wire-format `ScanError.code` is a stable string enum while the internal enum
+  may grow — forward-compatible decoding, unknown codes decode to `INTERNAL`
+  with the raw value preserved.
+- Tests never depend on external networks: real sockets only on loopback;
+  TIMEOUT/UNREACHABLE paths are exercised via scripted fakes.
+- `PortSpec` parsing is atomic — one bad token rejects the whole spec (no
+  partial silent behavior).
+- Default limits locked in the plan: probe timeout 5 s (clamped 0.1–60 s),
+  concurrency 32 (clamped 1–256), scan watchdog 10 min for UI-issued scans,
+  progress channel capacity 64.
+
+### Challenges / open questions
+- Whether the 5 s default timeout fits typical LAN scanning is a hypothesis
+  until the first real-device run (§5.1.7) — the value is configurable, and the
+  real-device evidence will confirm or adjust it.
+- Emulator CI matrix (API 26 + 36) requires GitHub-hosted runners with KVM; if
+  the repo's plan lacks them, the matrix is documented as a gap and reduced to
+  API 36 — decided when CI is actually set up (honesty rule #21).
+
+### Learning
+- Turning "acceptance criteria" into input/output tables and invariant lists
+  forced concrete decisions (defaults, error codes, evidence formats) that
+  would otherwise have been made ad hoc during coding — the tables are now the
+  test specification, which is exactly what rule #1 (complete, tested,
+  purposeful) demands.
