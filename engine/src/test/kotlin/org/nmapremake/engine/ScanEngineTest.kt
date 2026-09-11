@@ -21,7 +21,6 @@ import kotlin.test.assertIs
 import kotlin.test.assertTrue
 
 class ScanEngineTest {
-
     private val target = Target("example.com")
 
     private fun tcpPlan() = ScanPlan(targets = listOf(target), tcpPorts = PortSpec.Single(80))
@@ -85,12 +84,13 @@ class ScanEngineTest {
     fun `rejected plan emits a single ScanFailed and never schedules`() = runTest {
         val error = ScanError(ErrorCode.CAPABILITY_UNSUPPORTED, "nope")
         val scheduler = FakeScheduler()
-        val engine = ScanEngine(
-            router = FakeRouter(ExecutorSelection.Rejected(emptyList(), error)),
-            resolver = FakeResolver(),
-            scheduler = scheduler,
-            transport = FakeTransportStub,
-        )
+        val engine =
+            ScanEngine(
+                router = FakeRouter(ExecutorSelection.Rejected(emptyList(), error)),
+                resolver = FakeResolver(),
+                scheduler = scheduler,
+                transport = FakeTransportStub,
+            )
         val events = engine.scan(tcpPlan()).toList()
         assertEquals(1, events.size)
         val failed = assertIs<ProgressEvent.ScanFailed>(events.single())
@@ -100,16 +100,17 @@ class ScanEngineTest {
 
     @Test
     fun `unresolvable target emits ScanFailed UNRESOLVABLE_HOST`() = runTest {
-        val engine = ScanEngine(
-            router = FakeRouter(ExecutorSelection.Selected(Executors.LOCAL_ANDROID)),
-            resolver = FakeResolver(
-                failure = UnresolvedHostException(
-                    ScanError(ErrorCode.UNRESOLVABLE_HOST, "cannot resolve"),
+        val engine =
+            ScanEngine(
+                router = FakeRouter(ExecutorSelection.Selected(Executors.LOCAL_ANDROID)),
+                resolver = FakeResolver(
+                    failure = UnresolvedHostException(
+                        ScanError(ErrorCode.UNRESOLVABLE_HOST, "cannot resolve"),
+                    ),
                 ),
-            ),
-            scheduler = FakeScheduler(),
-            transport = FakeTransportStub,
-        )
+                scheduler = FakeScheduler(),
+                transport = FakeTransportStub,
+            )
         val events = engine.scan(tcpPlan()).toList()
         val failed = assertIs<ProgressEvent.ScanFailed>(events.single())
         assertEquals(ErrorCode.UNRESOLVABLE_HOST, failed.error.errorCode())
@@ -118,12 +119,13 @@ class ScanEngineTest {
     @Test
     fun `happy path resolves targets then streams scheduler events`() = runTest {
         val scheduler = FakeScheduler()
-        val engine = ScanEngine(
-            router = FakeRouter(ExecutorSelection.Selected(Executors.LOCAL_ANDROID)),
-            resolver = FakeResolver(),
-            scheduler = scheduler,
-            transport = FakeTransportStub,
-        )
+        val engine =
+            ScanEngine(
+                router = FakeRouter(ExecutorSelection.Selected(Executors.LOCAL_ANDROID)),
+                resolver = FakeResolver(),
+                scheduler = scheduler,
+                transport = FakeTransportStub,
+            )
         val events = engine.scan(tcpPlan()).toList()
         assertEquals(1, events.size)
         assertIs<ProgressEvent.ScanFinished>(events.single())
@@ -137,13 +139,14 @@ class ScanEngineTest {
     fun `cancel delegates to the scheduler`() = runTest {
         val scheduler = FakeScheduler()
         val dispatcher = StandardTestDispatcher(testScheduler)
-        val engine = ScanEngine(
-            router = FakeRouter(ExecutorSelection.Selected(Executors.LOCAL_ANDROID)),
-            resolver = FakeResolver(),
-            scheduler = scheduler,
-            transport = FakeTransportStub,
-            cancelDispatcher = dispatcher,
-        )
+        val engine =
+            ScanEngine(
+                router = FakeRouter(ExecutorSelection.Selected(Executors.LOCAL_ANDROID)),
+                resolver = FakeResolver(),
+                scheduler = scheduler,
+                transport = FakeTransportStub,
+                cancelDispatcher = dispatcher,
+            )
         engine.cancel()
         advanceUntilIdle()
         assertEquals(1, scheduler.cancelCalls)
@@ -153,12 +156,13 @@ class ScanEngineTest {
     fun `plan is clamped before routing`() = runTest {
         val scheduler = FakeScheduler()
         val router = FakeRouter(ExecutorSelection.Selected(Executors.LOCAL_ANDROID))
-        val engine = ScanEngine(
-            router = router,
-            resolver = FakeResolver(),
-            scheduler = scheduler,
-            transport = FakeTransportStub,
-        )
+        val engine =
+            ScanEngine(
+                router = router,
+                resolver = FakeResolver(),
+                scheduler = scheduler,
+                transport = FakeTransportStub,
+            )
         engine.scan(tcpPlan().copy(concurrency = 1_000_000)).toList()
         assertEquals(256, scheduler.lastPlan?.concurrency)
         assertTrue(scheduler.lastPlan?.probeTimeoutMs == 5_000L)

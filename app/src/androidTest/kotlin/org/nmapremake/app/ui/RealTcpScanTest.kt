@@ -28,20 +28,21 @@ import org.nmapremake.engine.json.JsonFormatter
  * the emulator, with the schema-v1 JSON report logged as evidence.
  */
 class RealTcpScanTest {
-
     private fun scan(ports: List<Int>, timeoutMs: Long): ScanReport = runBlocking {
-        val engine = ScanEngine(
-            LocalExecutionRouter(),
-            InetHostResolver(),
-            DefaultScanScheduler(),
-            SocketTcpTransport(),
-        )
-        val plan = ScanPlan(
-            targets = listOf(Target("10.0.2.2")),
-            tcpPorts = PortSpec.List(ports),
-            probeTimeoutMs = timeoutMs,
-            concurrency = 4,
-        )
+        val engine =
+            ScanEngine(
+                LocalExecutionRouter(),
+                InetHostResolver(),
+                DefaultScanScheduler(),
+                SocketTcpTransport(),
+            )
+        val plan =
+            ScanPlan(
+                targets = listOf(Target("10.0.2.2")),
+                tcpPorts = PortSpec.List(ports),
+                probeTimeoutMs = timeoutMs,
+                concurrency = 4,
+            )
         val events = engine.scan(plan).toList()
         events.filterIsInstance<ProgressEvent.ScanFinished>().single().report
     }

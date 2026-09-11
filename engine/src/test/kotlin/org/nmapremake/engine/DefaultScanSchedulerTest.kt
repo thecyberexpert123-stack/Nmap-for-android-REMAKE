@@ -17,7 +17,6 @@ import kotlin.test.assertIs
 import kotlin.test.assertTrue
 
 class DefaultScanSchedulerTest {
-
     private val scheduler = DefaultScanScheduler()
     private val executor = Executors.LOCAL_ANDROID
     private val target = Target("127.0.0.1")
@@ -87,14 +86,15 @@ class DefaultScanSchedulerTest {
 
     @Test
     fun `outcome classification flows into host results with evidence`() {
-        val transport = FakeTcpTransport.outcomes(
-            mapOf(
-                22 to ConnectOutcome.Refused(1),
-                81 to ConnectOutcome.TimedOut,
-                82 to ConnectOutcome.NoRoute,
-                80 to ConnectOutcome.Established(3),
-            ),
-        )
+        val transport =
+            FakeTcpTransport.outcomes(
+                mapOf(
+                    22 to ConnectOutcome.Refused(1),
+                    81 to ConnectOutcome.TimedOut,
+                    82 to ConnectOutcome.NoRoute,
+                    80 to ConnectOutcome.Established(3),
+                ),
+            )
         val events = runBlocking {
             scheduler.scan(plan(listOf(80, 22, 81, 82), concurrency = 2), executor, transport).toList()
         }
@@ -112,14 +112,15 @@ class DefaultScanSchedulerTest {
 
     @Test
     fun `every non-OPEN result carries a typed error`() {
-        val transport = FakeTcpTransport.outcomes(
-            mapOf(
-                22 to ConnectOutcome.Refused(1),
-                81 to ConnectOutcome.TimedOut,
-                82 to ConnectOutcome.NoRoute,
-                80 to ConnectOutcome.Established(3),
-            ),
-        )
+        val transport =
+            FakeTcpTransport.outcomes(
+                mapOf(
+                    22 to ConnectOutcome.Refused(1),
+                    81 to ConnectOutcome.TimedOut,
+                    82 to ConnectOutcome.NoRoute,
+                    80 to ConnectOutcome.Established(3),
+                ),
+            )
         val events = runBlocking {
             scheduler.scan(plan(listOf(80, 22, 81, 82), concurrency = 2), executor, transport).toList()
         }
@@ -233,11 +234,12 @@ class DefaultScanSchedulerTest {
     fun `one scan at a time per scheduler instance`() {
         val other = DefaultScanScheduler()
         runBlocking {
-            val flow = scheduler.scan(
-                plan(listOf(80), concurrency = 1),
-                executor,
-                FakeTcpTransport.instant(),
-            )
+            val flow =
+                scheduler.scan(
+                    plan(listOf(80), concurrency = 1),
+                    executor,
+                    FakeTcpTransport.instant(),
+                )
             val thrown = runCatching {
                 other.scan(plan(listOf(80), concurrency = 1), executor, FakeTcpTransport.instant())
             }

@@ -7,7 +7,6 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class CapabilityProfileTest {
-
     @Test
     fun `missing entries are UNKNOWN`() {
         val profile = CapabilityProfile()
@@ -16,14 +15,15 @@ class CapabilityProfileTest {
 
     @Test
     fun `supports is true only for executable states`() {
-        val profile = CapabilityProfile(
-            mapOf(
-                Capability.TCP_CONNECT to Availability.SUPPORTED,
-                Capability.UDP_APP_PROBES to Availability.LIMITED,
-                Capability.SERVICE_DETECTION to Availability.NOT_IMPLEMENTED,
-                Capability.RAW_PACKET_TRANSMIT to Availability.UNSUPPORTED,
-            ),
-        )
+        val profile =
+            CapabilityProfile(
+                mapOf(
+                    Capability.TCP_CONNECT to Availability.SUPPORTED,
+                    Capability.UDP_APP_PROBES to Availability.LIMITED,
+                    Capability.SERVICE_DETECTION to Availability.NOT_IMPLEMENTED,
+                    Capability.RAW_PACKET_TRANSMIT to Availability.UNSUPPORTED,
+                ),
+            )
         assertTrue(profile.supports(Capability.TCP_CONNECT))
         assertTrue(profile.supports(Capability.UDP_APP_PROBES))
         assertFalse(profile.supports(Capability.SERVICE_DETECTION))
@@ -69,15 +69,16 @@ class CapabilityProfileTest {
 
     @Test
     fun `remote node fields default to null until M7`() {
-        val node = ExecutorNode(
-            id = "agent-1",
-            label = "LAN agent",
-            type = ExecutorType.REMOTE_AGENT,
-            transport = "https+mTLS",
-            reachability = ExecutorReachability.OFFLINE,
-            trustLevel = TrustLevel.UNVERIFIED,
-            capabilities = CapabilityProfile(),
-        )
+        val node =
+            ExecutorNode(
+                id = "agent-1",
+                label = "LAN agent",
+                type = ExecutorType.REMOTE_AGENT,
+                transport = "https+mTLS",
+                reachability = ExecutorReachability.OFFLINE,
+                trustLevel = TrustLevel.UNVERIFIED,
+                capabilities = CapabilityProfile(),
+            )
         assertNull(node.discoveredVia)
         assertNull(node.capabilityProof)
     }

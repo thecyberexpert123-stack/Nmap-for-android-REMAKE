@@ -12,7 +12,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertIs
 
 class LocalExecutionRouterTest {
-
     private val router = LocalExecutionRouter()
     private val target = Target("example.com")
 
@@ -25,9 +24,10 @@ class LocalExecutionRouterTest {
 
     @Test
     fun `service detection is rejected as unsupported in M1`() {
-        val selection = router.route(
-            ScanPlan(targets = listOf(target), tcpPorts = PortSpec.Single(80), serviceDetection = true),
-        )
+        val selection =
+            router.route(
+                ScanPlan(targets = listOf(target), tcpPorts = PortSpec.Single(80), serviceDetection = true),
+            )
         val rejected = assertIs<ExecutorSelection.Rejected>(selection)
         assertEquals(listOf(Capability.SERVICE_DETECTION), rejected.missing)
         assertEquals(ErrorCode.CAPABILITY_UNSUPPORTED, rejected.error.errorCode())
@@ -35,26 +35,28 @@ class LocalExecutionRouterTest {
 
     @Test
     fun `UDP probes are rejected as unsupported in M1`() {
-        val selection = router.route(
-            ScanPlan(
-                targets = listOf(target),
-                udpProbes = listOf(UdpProbeSpec(payloadHex = "ab")),
-            ),
-        )
+        val selection =
+            router.route(
+                ScanPlan(
+                    targets = listOf(target),
+                    udpProbes = listOf(UdpProbeSpec(payloadHex = "ab")),
+                ),
+            )
         val rejected = assertIs<ExecutorSelection.Rejected>(selection)
         assertEquals(listOf(Capability.UDP_APP_PROBES), rejected.missing)
     }
 
     @Test
     fun `multiple missing capabilities are reported sorted`() {
-        val selection = router.route(
-            ScanPlan(
-                targets = listOf(target),
-                udpProbes = listOf(UdpProbeSpec(payloadHex = "ab")),
-                serviceDetection = true,
-                fingerprinting = true,
-            ),
-        )
+        val selection =
+            router.route(
+                ScanPlan(
+                    targets = listOf(target),
+                    udpProbes = listOf(UdpProbeSpec(payloadHex = "ab")),
+                    serviceDetection = true,
+                    fingerprinting = true,
+                ),
+            )
         val rejected = assertIs<ExecutorSelection.Rejected>(selection)
         assertEquals(
             listOf(

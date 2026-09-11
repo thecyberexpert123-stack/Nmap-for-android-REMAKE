@@ -31,7 +31,6 @@ import org.nmapremake.core.model.PortState
  * 10.0.2.2). Ports 18080/18443 listen (OPEN); 18081/18082 do not (CLOSED).
  */
 class ScanEndToEndTest {
-
     @get:Rule
     val composeRule = createComposeRule()
 

@@ -15,7 +15,6 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class TcpConnectProberTest {
-
     private val target = Target("127.0.0.1")
 
     @Test
@@ -40,9 +39,10 @@ class TcpConnectProberTest {
 
     @Test
     fun `timed out maps to TIMEOUT with timeout in evidence`() {
-        val prober = TcpConnectProber(
-            FakeTcpTransport { _, _, _ -> ConnectOutcome.TimedOut },
-        )
+        val prober =
+            TcpConnectProber(
+                FakeTcpTransport { _, _, _ -> ConnectOutcome.TimedOut },
+            )
         val result = runBlocking { prober.probe(target, 81, 2_500) }
         assertEquals(PortState.TIMEOUT, result.state)
         assertNull(result.latencyMs)
@@ -52,9 +52,10 @@ class TcpConnectProberTest {
 
     @Test
     fun `no route maps to UNREACHABLE with exact evidence`() {
-        val prober = TcpConnectProber(
-            FakeTcpTransport { _, _, _ -> ConnectOutcome.NoRoute },
-        )
+        val prober =
+            TcpConnectProber(
+                FakeTcpTransport { _, _, _ -> ConnectOutcome.NoRoute },
+            )
         val result = runBlocking { prober.probe(target, 81, 5_000) }
         assertEquals(PortState.UNREACHABLE, result.state)
         assertNull(result.latencyMs)
@@ -64,14 +65,15 @@ class TcpConnectProberTest {
 
     @Test
     fun `failed maps to INCONCLUSIVE preserving error and evidence`() {
-        val prober = TcpConnectProber(
-            FakeTcpTransport { _, _, _ ->
-                ConnectOutcome.Failed(
-                    ScanError(ErrorCode.PERMISSION_DENIED, "Permission denied: INTERNET"),
-                    "Permission denied: INTERNET",
-                )
-            },
-        )
+        val prober =
+            TcpConnectProber(
+                FakeTcpTransport { _, _, _ ->
+                    ConnectOutcome.Failed(
+                        ScanError(ErrorCode.PERMISSION_DENIED, "Permission denied: INTERNET"),
+                        "Permission denied: INTERNET",
+                    )
+                },
+            )
         val result = runBlocking { prober.probe(target, 81, 5_000) }
         assertEquals(PortState.INCONCLUSIVE, result.state)
         assertEquals(ErrorCode.PERMISSION_DENIED, result.error?.errorCode())

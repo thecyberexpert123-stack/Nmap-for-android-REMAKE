@@ -18,60 +18,62 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
 class JsonFormatterTest {
-
     private val formatter = JsonFormatter()
 
     private fun sampleReport(ports: PortSpec? = PortSpec.List(listOf(22, 80, 81, 82))): ScanReport {
         val executor = Executors.LOCAL_ANDROID
         val target = Target("127.0.0.1", resolved = "127.0.0.1", family = IpFamily.IPV4)
-        val results = listOf(
-            PortResult(
-                port = 22,
-                protocol = TransportProtocol.TCP,
-                state = PortState.CLOSED,
-                latencyMs = 1,
-                error = ScanError(ErrorCode.CONNECTION_REFUSED, "Connection refused"),
-                evidence = "Connection refused (ECONNREFUSED)",
-            ),
-            PortResult(
-                port = 80,
-                protocol = TransportProtocol.TCP,
-                state = PortState.OPEN,
-                latencyMs = 12,
-                error = null,
-                evidence = "TCP connect completed in 12 ms",
-            ),
-            PortResult(
-                port = 81,
-                protocol = TransportProtocol.TCP,
-                state = PortState.TIMEOUT,
-                latencyMs = null,
-                error = ScanError(ErrorCode.PROBE_TIMEOUT, "No response"),
-                evidence = "No response within 5000 ms",
-            ),
-            PortResult(
-                port = 82,
-                protocol = TransportProtocol.TCP,
-                state = PortState.UNREACHABLE,
-                latencyMs = null,
-                error = ScanError(ErrorCode.NO_ROUTE_TO_HOST, "No route to host"),
-                evidence = "No route to host (EHOSTUNREACH)",
-            ),
-        )
-        val plan = ScanPlan(
-            targets = listOf(target),
-            tcpPorts = ports,
-            probeTimeoutMs = 5_000,
-            concurrency = 32,
-        )
-        val host = HostResult(
-            target = target,
-            portResults = results,
-            executor = executor,
-            capabilities = executor.capabilities,
-            startedAtEpochMs = 1_000,
-            finishedAtEpochMs = 2_000,
-        )
+        val results =
+            listOf(
+                PortResult(
+                    port = 22,
+                    protocol = TransportProtocol.TCP,
+                    state = PortState.CLOSED,
+                    latencyMs = 1,
+                    error = ScanError(ErrorCode.CONNECTION_REFUSED, "Connection refused"),
+                    evidence = "Connection refused (ECONNREFUSED)",
+                ),
+                PortResult(
+                    port = 80,
+                    protocol = TransportProtocol.TCP,
+                    state = PortState.OPEN,
+                    latencyMs = 12,
+                    error = null,
+                    evidence = "TCP connect completed in 12 ms",
+                ),
+                PortResult(
+                    port = 81,
+                    protocol = TransportProtocol.TCP,
+                    state = PortState.TIMEOUT,
+                    latencyMs = null,
+                    error = ScanError(ErrorCode.PROBE_TIMEOUT, "No response"),
+                    evidence = "No response within 5000 ms",
+                ),
+                PortResult(
+                    port = 82,
+                    protocol = TransportProtocol.TCP,
+                    state = PortState.UNREACHABLE,
+                    latencyMs = null,
+                    error = ScanError(ErrorCode.NO_ROUTE_TO_HOST, "No route to host"),
+                    evidence = "No route to host (EHOSTUNREACH)",
+                ),
+            )
+        val plan =
+            ScanPlan(
+                targets = listOf(target),
+                tcpPorts = ports,
+                probeTimeoutMs = 5_000,
+                concurrency = 32,
+            )
+        val host =
+            HostResult(
+                target = target,
+                portResults = results,
+                executor = executor,
+                capabilities = executor.capabilities,
+                startedAtEpochMs = 1_000,
+                finishedAtEpochMs = 2_000,
+            )
         return ScanReport(
             schemaVersion = 1,
             generator = ResultAggregator.GENERATOR,

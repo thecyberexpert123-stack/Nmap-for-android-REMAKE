@@ -6,7 +6,6 @@ import kotlin.test.assertIs
 import kotlin.test.assertNull
 
 class TargetParserTest {
-
     private fun success(raw: String): TargetParser.ParseOutcome.Success =
         assertIs(TargetParser.ParseOutcome.Success::class, TargetParser.parse(raw))
 

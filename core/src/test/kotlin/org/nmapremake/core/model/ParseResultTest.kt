@@ -6,7 +6,6 @@ import kotlin.test.assertNull
 import kotlin.test.assertSame
 
 class ParseResultTest {
-
     @Test
     fun `map transforms Ok values`() {
         val result: ParseResult<Int> = ParseResult.Ok(2)

@@ -8,7 +8,6 @@ import org.nmapremake.core.capability.Capability
 import org.nmapremake.core.capability.CapabilityProfile
 
 class ProfileBannerTest {
-
     @Test
     fun `banner lists only capabilities with a known availability`() {
         val rows = profileToBanner(CapabilityProfile.ANDROID_LOCAL_M1)

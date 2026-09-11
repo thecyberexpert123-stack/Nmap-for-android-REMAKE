@@ -7,7 +7,6 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class ScanPlanTest {
-
     private val target = Target("example.com")
 
     @Test
@@ -23,12 +22,13 @@ class ScanPlanTest {
 
     @Test
     fun `clamped leaves valid values untouched`() {
-        val plan = ScanPlan(
-            targets = listOf(target),
-            probeTimeoutMs = 2_000,
-            concurrency = 16,
-            maxDurationMs = 120_000,
-        )
+        val plan =
+            ScanPlan(
+                targets = listOf(target),
+                probeTimeoutMs = 2_000,
+                concurrency = 16,
+                maxDurationMs = 120_000,
+            )
         val clamped = plan.clamped()
         assertEquals(2_000L, clamped.probeTimeoutMs)
         assertEquals(16, clamped.concurrency)
@@ -37,12 +37,13 @@ class ScanPlanTest {
 
     @Test
     fun `clamped floors and caps numeric fields`() {
-        val plan = ScanPlan(
-            targets = listOf(target),
-            probeTimeoutMs = 50,
-            concurrency = 10_000,
-            maxDurationMs = 500,
-        ).clamped()
+        val plan =
+            ScanPlan(
+                targets = listOf(target),
+                probeTimeoutMs = 50,
+                concurrency = 10_000,
+                maxDurationMs = 500,
+            ).clamped()
         assertEquals(100L, plan.probeTimeoutMs)
         assertEquals(256, plan.concurrency)
         assertEquals(1_000L, plan.maxDurationMs)
@@ -62,13 +63,14 @@ class ScanPlanTest {
 
     @Test
     fun `required capabilities grow with plan features`() {
-        val plan = ScanPlan(
-            targets = listOf(target),
-            tcpPorts = PortSpec.Single(80),
-            udpProbes = listOf(UdpProbeSpec(payloadHex = "ab")),
-            serviceDetection = true,
-            fingerprinting = true,
-        )
+        val plan =
+            ScanPlan(
+                targets = listOf(target),
+                tcpPorts = PortSpec.Single(80),
+                udpProbes = listOf(UdpProbeSpec(payloadHex = "ab")),
+                serviceDetection = true,
+                fingerprinting = true,
+            )
         assertEquals(
             setOf(
                 Capability.TCP_CONNECT,

@@ -2,11 +2,9 @@ package org.nmapremake.core.model
 
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNull
 import kotlin.test.assertSame
 
 class ScanErrorTest {
-
     @Test
     fun `wire codes are unique and round-trip`() {
         val codes = ErrorCode.entries.map { it.wire }

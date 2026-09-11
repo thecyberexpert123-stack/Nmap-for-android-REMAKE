@@ -10,7 +10,6 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
 class InetHostResolverTest {
-
     private val resolver = InetHostResolver()
 
     @Test

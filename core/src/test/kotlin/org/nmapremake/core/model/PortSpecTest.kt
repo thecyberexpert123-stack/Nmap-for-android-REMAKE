@@ -5,7 +5,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class PortSpecTest {
-
     @Test
     fun `single expands to one port`() {
         assertEquals(listOf(80), PortSpec.Single(80).expand())

@@ -9,7 +9,6 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class PlanInputParserTest {
-
     private fun success(input: PlanInputParser.Input): PlanInputParser.ParseOutcome.Success =
         assertIs(PlanInputParser.ParseOutcome.Success::class, PlanInputParser.parse(input))
 
@@ -67,9 +66,10 @@ class PlanInputParserTest {
 
     @Test
     fun `numeric fields clamped`() {
-        val plan = success(
-            PlanInputParser.Input("h", "80", probeTimeoutMs = 50, concurrency = 10_000, maxDurationMs = 500),
-        ).plan
+        val plan =
+            success(
+                PlanInputParser.Input("h", "80", probeTimeoutMs = 50, concurrency = 10_000, maxDurationMs = 500),
+            ).plan
         assertEquals(100L, plan.probeTimeoutMs)
         assertEquals(256, plan.concurrency)
         assertEquals(1_000L, plan.maxDurationMs)

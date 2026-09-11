@@ -15,7 +15,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class SocketTcpTransportTest {
-
     private val target = Target("127.0.0.1")
 
     private class ThrowingSocket(private val throwable: Throwable) : Socket() {
@@ -57,25 +56,28 @@ class SocketTcpTransportTest {
 
     @Test
     fun `socket timeout maps to TimedOut`() {
-        val transport = SocketTcpTransport(
-            socketFactory = { ThrowingSocket(SocketTimeoutException("timeout")) },
-        )
+        val transport =
+            SocketTcpTransport(
+                socketFactory = { ThrowingSocket(SocketTimeoutException("timeout")) },
+            )
         assertEquals(ConnectOutcome.TimedOut, transport.connect(target, 80, 1_000))
     }
 
     @Test
     fun `no route maps to NoRoute`() {
-        val transport = SocketTcpTransport(
-            socketFactory = { ThrowingSocket(NoRouteToHostException("unreachable")) },
-        )
+        val transport =
+            SocketTcpTransport(
+                socketFactory = { ThrowingSocket(NoRouteToHostException("unreachable")) },
+            )
         assertEquals(ConnectOutcome.NoRoute, transport.connect(target, 80, 1_000))
     }
 
     @Test
     fun `security exception maps to permission error with exact evidence`() {
-        val transport = SocketTcpTransport(
-            socketFactory = { ThrowingSocket(SecurityException("no INTERNET permission")) },
-        )
+        val transport =
+            SocketTcpTransport(
+                socketFactory = { ThrowingSocket(SecurityException("no INTERNET permission")) },
+            )
         val outcome = transport.connect(target, 80, 1_000)
         assertTrue(outcome is ConnectOutcome.Failed)
         assertEquals(ErrorCode.PERMISSION_DENIED, (outcome as ConnectOutcome.Failed).error.errorCode())
@@ -84,9 +86,10 @@ class SocketTcpTransportTest {
 
     @Test
     fun `other IO errors map to INCONCLUSIVE with class and message in evidence`() {
-        val transport = SocketTcpTransport(
-            socketFactory = { ThrowingSocket(IOException("something odd")) },
-        )
+        val transport =
+            SocketTcpTransport(
+                socketFactory = { ThrowingSocket(IOException("something odd")) },
+            )
         val outcome = transport.connect(target, 80, 1_000)
         assertTrue(outcome is ConnectOutcome.Failed)
         assertEquals(ErrorCode.INTERNAL, (outcome as ConnectOutcome.Failed).error.errorCode())
@@ -96,21 +99,22 @@ class SocketTcpTransportTest {
 
     @Test
     fun `abort closes tracked sockets unblocking in-flight connects`() {
-        val transport = SocketTcpTransport(
-            socketFactory = {
-                object : Socket() {
-                    override fun connect(endpoint: SocketAddress, timeout: Int) {
-                        // Simulates a connect blocked inside the OS call: only
-                        // close() (from abort) can unblock it, mirroring how the
-                        // JVM aborts a real pending connect.
-                        while (!isClosed) {
-                            Thread.sleep(10)
+        val transport =
+            SocketTcpTransport(
+                socketFactory = {
+                    object : Socket() {
+                        override fun connect(endpoint: SocketAddress, timeout: Int) {
+                            // Simulates a connect blocked inside the OS call: only
+                            // close() (from abort) can unblock it, mirroring how the
+                            // JVM aborts a real pending connect.
+                            while (!isClosed) {
+                                Thread.sleep(10)
+                            }
+                            throw IOException("closed by abort")
                         }
-                        throw IOException("closed by abort")
                     }
-                }
-            },
-        )
+                },
+            )
         val thread = Thread { transport.connect(target, 80, 60_000) }
         thread.isDaemon = true
         thread.start()

@@ -29,7 +29,6 @@ import org.nmapremake.engine.ScanRunner
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ScanViewModelTest {
-
     private val dispatcher = UnconfinedTestDispatcher()
 
     @Before
@@ -132,22 +131,24 @@ class ScanViewModelTest {
     @Test
     fun `confirmScan runs the plan and reaches FINISHED with hosts`() {
         val target = Target("example.com")
-        val report = ScanReport(
-            schemaVersion = 1,
-            generator = "test",
-            startedAtEpochMs = 1,
-            finishedAtEpochMs = 2,
-            scanPlan = ScanPlan(targets = listOf(target)),
-            executor = Executors.LOCAL_ANDROID,
-            hosts = emptyList(),
-        )
-        val runner = FakeRunner(
-            listOf(
-                ProgressEvent.PortStarted(target, 80, TransportProtocol.TCP),
-                ProgressEvent.PortFinished(target, openResult(80)),
-                ProgressEvent.ScanFinished(report),
-            ),
-        )
+        val report =
+            ScanReport(
+                schemaVersion = 1,
+                generator = "test",
+                startedAtEpochMs = 1,
+                finishedAtEpochMs = 2,
+                scanPlan = ScanPlan(targets = listOf(target)),
+                executor = Executors.LOCAL_ANDROID,
+                hosts = emptyList(),
+            )
+        val runner =
+            FakeRunner(
+                listOf(
+                    ProgressEvent.PortStarted(target, 80, TransportProtocol.TCP),
+                    ProgressEvent.PortFinished(target, openResult(80)),
+                    ProgressEvent.ScanFinished(report),
+                ),
+            )
         val viewModel = ScanViewModel(runner)
         viewModel.updateTarget("example.com")
         viewModel.startScan()
@@ -163,14 +164,15 @@ class ScanViewModelTest {
     @Test
     fun `cancellation surfaces SCAN_CANCELLED with partial results labeled incomplete`() {
         val target = Target("example.com")
-        val runner = FakeRunner(
-            listOf(
-                ProgressEvent.PortStarted(target, 80, TransportProtocol.TCP),
-                ProgressEvent.PortFinished(target, openResult(80)),
-                ProgressEvent.PortStarted(target, 443, TransportProtocol.TCP),
-                ProgressEvent.ScanFailed(ScanError(ErrorCode.SCAN_CANCELLED, "scan cancelled by user")),
-            ),
-        )
+        val runner =
+            FakeRunner(
+                listOf(
+                    ProgressEvent.PortStarted(target, 80, TransportProtocol.TCP),
+                    ProgressEvent.PortFinished(target, openResult(80)),
+                    ProgressEvent.PortStarted(target, 443, TransportProtocol.TCP),
+                    ProgressEvent.ScanFailed(ScanError(ErrorCode.SCAN_CANCELLED, "scan cancelled by user")),
+                ),
+            )
         val viewModel = ScanViewModel(runner)
         viewModel.updateTarget("example.com")
         viewModel.startScan()
@@ -197,9 +199,10 @@ class ScanViewModelTest {
     @Test
     fun `resetToInput clears results and errors`() {
         val target = Target("example.com")
-        val runner = FakeRunner(
-            listOf(ProgressEvent.ScanFailed(ScanError(ErrorCode.INTERNAL, "boom"))),
-        )
+        val runner =
+            FakeRunner(
+                listOf(ProgressEvent.ScanFailed(ScanError(ErrorCode.INTERNAL, "boom"))),
+            )
         val viewModel = ScanViewModel(runner)
         viewModel.updateTarget("example.com")
         viewModel.startScan()

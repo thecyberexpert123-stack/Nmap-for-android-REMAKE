@@ -6,7 +6,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertIs
 
 class PortSpecParserTest {
-
     private fun success(raw: String): PortSpecParser.ParseOutcome.Success =
         assertIs(PortSpecParser.ParseOutcome.Success::class, PortSpecParser.parse(raw))
 

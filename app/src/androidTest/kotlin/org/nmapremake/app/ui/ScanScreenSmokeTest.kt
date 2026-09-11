@@ -1,6 +1,5 @@
 package org.nmapremake.app.ui
 
-import androidx.compose.ui.test.assertExists
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
@@ -14,7 +13,6 @@ import org.nmapremake.core.capability.CapabilityProfile
  * disabled until inputs are valid.
  */
 class ScanScreenSmokeTest {
-
     @get:Rule
     val composeRule = createComposeRule()
 
