@@ -7,8 +7,10 @@ delegating them where it does not.
 > Status: **Planning / plan iteration** — no application code yet. Stack decisions
 > approved: Kotlin + Jetpack Compose, `minSdk 26`, licensed **GPL-2.0-or-later**.
 > See [`docs/PLAN.md`](docs/PLAN.md) for scope, architecture, roadmap, and
-> acceptance criteria. See [`AGENT-EXPERIENCE.md`](AGENT-EXPERIENCE.md) for the
-> development journal and [`CHANGELOG.md`](CHANGELOG.md) for changes.
+> acceptance criteria; [`docs/NMAP-DEEP-DIVE.md`](docs/NMAP-DEEP-DIVE.md) for
+> the subsystem-by-subsystem Nmap analysis and Android feasibility mapping.
+> See [`AGENT-EXPERIENCE.md`](AGENT-EXPERIENCE.md) for the development journal
+> and [`CHANGELOG.md`](CHANGELOG.md) for changes.
 
 ## What this project is (and is not)
 

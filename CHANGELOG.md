@@ -31,6 +31,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   gates incl. coverage thresholds and CI emulator matrix (§5.1.6), real-device
   sign-off evidence requirement (§5.1.7), and per-milestone criteria for M2–M8
   (§5.2).
+- `docs/NMAP-DEEP-DIVE.md` — deep Nmap subsystem analysis from authoritative
+  public sources (book chapters, changelog, source-tree structure): scan
+  phases, target engine, host discovery, all port-scan techniques with
+  privilege requirements, timing/congestion control, version-detection
+  algorithm (NULL probe, softmatch, rarity, SSL post-processor, RPC grinder),
+  OS detection (IPv4 tests + IPv6 ML classifier), NSE, output, and the data
+  files inventory. Includes the kernel-capability boundary table and the
+  **Nmap feature → Android feasibility mapping** (classes A/B/D/U) that seeds
+  the Phase 8 compatibility ledger, plus clean-room data strategy (IANA
+  registries, self-authored signatures).
 
 ### Decided (stakeholder approval, 2026-09-11)
 - License: **GPL-2.0-or-later** — `LICENSE` added (verbatim GPLv2 text from SPDX

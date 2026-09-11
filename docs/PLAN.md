@@ -377,6 +377,7 @@ Nmap-for-android-REMAKE/
 ├── docs/
 │   ├── PLAN.md                          # this document
 │   ├── ARCHITECTURE.md                  # module map, API sketches, sequence diagrams, schema v1
+│   ├── NMAP-DEEP-DIVE.md                # Nmap subsystem analysis + Android feasibility mapping
 │   ├── RECOMMENDATIONS.md               # parked ideas (no scope creep in code)
 │   └── adr/                             # ADR-0001 license, ADR-0002 UI, ADR-0003 SDK levels, …
 ├── settings.gradle.kts
@@ -519,9 +520,14 @@ approval is given.
 1. ~~Which plan areas should be deepened next~~ → done: acceptance criteria
    tightened (PLAN §5.1–5.2) and architecture/API design added
    (`docs/ARCHITECTURE.md`), per stakeholder direction (2026-09-11).
-2. Approve (or further refine) the Phase 0+1 milestone criteria (D1–D9, §5.1)
+2. ~~Deep Nmap understanding~~ → done: `docs/NMAP-DEEP-DIVE.md` maps every
+   Nmap subsystem (phases, scan techniques, version/OS detection, NSE,
+   timing, data files) to Android feasibility classes A/B/D/U with
+   clean-room data strategy; §4 of that document is the Phase 8
+   compatibility ledger seed.
+3. Approve (or further refine) the Phase 0+1 milestone criteria (D1–D9, §5.1)
    before any implementation starts.
-3. Copyright holder line for the GPL notices (to be set by the project owner).
+4. Copyright holder line for the GPL notices (to be set by the project owner).
 
 ---
 

@@ -147,3 +147,50 @@ architecture & API design. Still docs-only (no application code).
   would otherwise have been made ad hoc during coding — the tables are now the
   test specification, which is exactly what rule #1 (complete, tested,
   purposeful) demands.
+
+---
+
+## 2026-09-11 (deep-dive) — Understanding Nmap for the REMAKE
+
+### Context
+Stakeholder task (still docs-only): "Understanding and pinpointing the whole
+Nmap deeply, so that we can create our REMAKE Nmap on Android."
+
+### What I did
+1. Researched Nmap from authoritative sources: book chapters (port scanning
+   techniques, host discovery, version detection technique, OS detection,
+   NSE, timing/performance), the changelog/license history, and the
+   `nmap/nmap` source tree structure on GitHub.
+2. Wrote `docs/NMAP-DEEP-DIVE.md`: the 11 scan phases; subsystem-by-subsystem
+   breakdown with the underlying mechanism of each; the kernel-facility
+   boundary table; the **feature → Android feasibility mapping** with classes
+   A (Kotlin now) / B (platform experiment) / D (delegation) / U (unverified);
+   a clean-room data-file strategy; and six architecture adjustments the
+   analysis implies.
+3. Updated PLAN (§8, §11), README, CHANGELOG. Committed and pushed (no merge).
+
+### Decisions
+- Phase 2 will adopt Nmap's NULL-probe + softmatch + rarity *concepts* with a
+  self-authored signature DB — the intellectual structure, not the assets.
+- NSE-equivalent will be a Kotlin typed probe pipeline (rule + action +
+  evidence), not an embedded Lua interpreter: avoids a heavy dependency and
+  removes any temptation to run NPSL-licensed NSE scripts.
+- Port→service names will be generated from the IANA registry (public data).
+- Traceroute-via-TTL (`Os.setsockoptInt`) and VpnService observation limits
+  added to the M6 experiment matrix as class-U items.
+- Nmap data files are NPSL — confirmed again from the repo listing that they
+  are shipped files; nothing is copied.
+
+### Challenges / open questions
+- The exact behavior of the Android tun interface for observing ICMP errors
+  or ARP remains genuinely unknown until a device experiment — the doc keeps
+  it class U instead of guessing.
+- Whether the remote executor (M7) wraps the real nmap binary or our own
+  engine re-opens the NPSL discussion — flagged for a stakeholder decision at
+  that milestone, not decided now.
+
+### Learning
+- Pinpointing *mechanism* (what kernel facility each Nmap feature actually
+  needs) is what makes the feasibility mapping trustworthy: every "can't do
+  this on stock Android" claim in the doc is tied to a specific verified
+  privilege boundary, not to vague platform pessimism.
