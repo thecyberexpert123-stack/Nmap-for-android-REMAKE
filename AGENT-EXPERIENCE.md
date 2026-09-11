@@ -423,3 +423,45 @@ driving both the router and the UI.
   (UNKNOWN can only change via recorded experiments) turns a
   philosophical commitment into an enforceable workflow — which is
   exactly how rule #21 (verification honesty) should be operationalized.
+
+---
+
+## 2026-09-11 (gap fill) — remote-executor protocol design (M7)
+
+### Context
+Stakeholder asked for the remote-executor protocol deep design.
+
+### What I did
+1. Authored `docs/REMOTE-EXECUTOR-PROTOCOL.md`: goals/non-goals; a
+   12-threat model (T1–T12) with controls, residual risks, and
+   explicitly accepted risks; three-level trust model; TOFU enrollment
+   flow with pinning and short-lived tokens; a versioned, signed
+   message set (hello/profile/plan/progress/result/cancel/revoke/proof);
+   capability negotiation + freshness-windowed capability proofs;
+   least-privilege authorization where only structured ScanPlans reach
+   the executor (never raw CLI strings); transport options; and an
+   acceptance-criteria mapping that tightens PLAN M7.
+2. Updated PLAN (M7 criteria reference the design; tree; open
+   questions), CHANGELOG, this journal. Committed and pushed (no merge).
+
+### Decisions
+- Signing proves *authorship*, not truthfulness — a trusted-but-rogue
+  executor can still fabricate results; the UI must say so. This is
+  recorded as an accepted, documented risk (T6).
+- The executor-side nmap-wrapper builds arguments from a fixed template
+  over the structured plan — injection resistance by construction.
+- 2-node trust (no cross-executor PKI) keeps revocation simple at M7
+  scope.
+
+### Challenges / open questions
+- Wrapping genuine nmap on the reference executor re-opens the NPSL
+  distribution question — parked as an explicit M7 design-gate item
+  for the stakeholder.
+- All security claims in the design are requirements to be verified at
+  implementation time; the doc says so explicitly (rule #21).
+
+### Learning
+- A threat model written *before* the protocol forced several decisions
+  early (structured plans instead of CLI strings, signed results,
+  proof freshness) that would have been much harder to retrofit after
+  the first working delegation — prevention by ordering.

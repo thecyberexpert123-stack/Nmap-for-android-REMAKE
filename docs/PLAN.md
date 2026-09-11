@@ -343,7 +343,7 @@ tests are reserved for the classification matrix on loopback only.
 | **M4 (Phase 4)** fingerprinting | Fingerprint DB is self-authored (format: features → candidate weights); features derived from application-layer observations (banner patterns, TLS parameters, timing deltas, header order). Feature-model conventions adopted from the verified IPv6 engine: unavailable features = −1, per-feature scaling into [0,1] ([NMAP-SUBSYSTEMS-DEEP-4.md](NMAP-SUBSYSTEMS-DEEP-4.md) §2). Matching layer reuses the verified Nmap *concepts* on these features: weighted point scoring (per-category weights), logistic score mapping `100/(1+e^x)`, novelty rejection (variance-scaled distance threshold), and the top-two-within-10% ambiguity rule ([NMAP-SUBSYSTEMS-DEEP.md](NMAP-SUBSYSTEMS-DEEP.md) §4). **AC**: every DB entry carries `source: self-authored` + a test vector; matching emits candidates with confidence + evidence; output is explicitly labeled "application-level inference", never "Nmap OS detection"; comparison experiment documented. |
 | **M5 (Phase 5)** capability system | On-device detection: socket connect ✓; raw socket attempt → observe `EPERM` and report `UNSUPPORTED` (measured, not assumed); `VpnService` presence → `UNKNOWN` until the M6 experiment; interface enumeration via `ConnectivityManager` only (no extra permissions). **AC**: unit tests with fakes; on-device report matches expectations on emulator + real device; UI banner reflects the measured profile. |
 | **M6 (Phase 6)** native/VPN experiments | Experiment matrix: raw-socket attempt (expected `EPERM`), VpnService tun packet-injection test against a controlled LAN responder, and a hop-limited TTL-sweep connect traceroute variant (slow/noisy; feasibility of per-hop observation via sockets). **AC**: results recorded verbatim (device model, Android build, command/output); conclusion updates `CapabilityProfile` defaults; any capability is gated behind proof — no claimed capability without a passing experiment. |
-| **M7 (Phase 7)** remote executor | Authenticated executor protocol (mTLS + capability negotiation + versioned result schema) with a written threat model (trust, integrity, replay, injection). **AC**: threat model reviewed and accepted by stakeholder; integration tests between two JVM processes; executor topology discovery (authenticated LAN enrollment + remote enrollment) selects the *closest capable* executor per scan intent; every delegated result carries executor identity, trust level, and a capability proof; delegated results visibly distinguished in the UI; no executor capability claims are trusted without a verification path. Transport is capability-independent (TLS control channel and/or VpnService tunnel) — encryption ≠ privilege ([NMAP-SUBSYSTEMS-DEEP.md](NMAP-SUBSYSTEMS-DEEP.md) §2). |
+| **M7 (Phase 7)** remote executor | Authenticated executor protocol (mTLS + capability negotiation + versioned result schema) per the reference design in [`REMOTE-EXECUTOR-PROTOCOL.md`](REMOTE-EXECUTOR-PROTOCOL.md) (threat model T1–T12, TOFU enrollment, capability proofs, revocation, structured-plan authorization). **AC**: threat model reviewed and accepted by stakeholder; two-JVM integration tests (enrollment happy/failure paths, replay rejection, injection resistance, proof enforcement, signature verification); executor topology discovery (authenticated LAN enrollment + remote enrollment) selects the *closest capable* executor per scan intent; every delegated result carries executor identity, trust level, and a capability proof; delegated results visibly distinguished in the UI; no executor capability claims are trusted without a verification path. Transport is capability-independent (TLS control channel and/or VpnService tunnel) — encryption ≠ privilege ([NMAP-SUBSYSTEMS-DEEP.md](NMAP-SUBSYSTEMS-DEEP.md) §2). |
 | **M8 (Phase 8)** compatibility measurement | Feature-by-feature table vs. the Nmap feature set, each row: feature, status (`LOCAL` / `DELEGATED` / `UNAVAILABLE` / `UNVERIFIED`), how it was measured. **AC**: published in docs; every `LOCAL` claim links to a passing test or recorded experiment; no "Nmap-compatible" wording without this table. |
 
 ---
@@ -396,6 +396,7 @@ Nmap-for-android-REMAKE/
 │   ├── NMAP-SUBSYSTEMS-DEEP-3.md        # idle scan, traceroute, output system & evidence model, target selection + mass-DNS
 │   ├── NMAP-SUBSYSTEMS-DEEP-4.md        # service_scan internals, IPv6 fingerprinting, aux tools, capstone inventory
 │   ├── CAPABILITY-MATRIX.md             # capability × executor matrix — single source of truth for routing + UI
+│   ├── REMOTE-EXECUTOR-PROTOCOL.md     # M7 threat model + protocol design (enrollment, proofs, revocation)
 │   ├── RECOMMENDATIONS.md               # parked ideas (no scope creep in code)
 │   └── adr/                             # ADR-0001 license, ADR-0002 UI, ADR-0003 SDK levels, …
 ├── settings.gradle.kts
@@ -576,9 +577,16 @@ approval is given.
    the full matrix with per-cell verdicts + evidence requirements, the
    router selection rules, UI derivation, and maintenance rules.
    ARCHITECTURE's `Availability` enum gains `NOT_IMPLEMENTED`.
-8. Approve (or further refine) the Phase 0+1 milestone criteria (D1–D9, §5.1)
+8. ~~Remote-executor protocol gap~~ → done:
+   `docs/REMOTE-EXECUTOR-PROTOCOL.md` provides the M7 reference design:
+   threat model (T1–T12 with controls and accepted risks), trust levels,
+   TOFU enrollment flow, versioned signed message set, capability
+   negotiation + proofs, least-privilege authorization, transport
+   options, acceptance-criteria mapping, and M7 design-gate questions.
+   PLAN M7 criteria now reference it.
+9. Approve (or further refine) the Phase 0+1 milestone criteria (D1–D9, §5.1)
    before any implementation starts.
-9. Copyright holder line for the GPL notices (to be set by the project owner).
+10. Copyright holder line for the GPL notices (to be set by the project owner).
 
 ---
 

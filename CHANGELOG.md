@@ -88,6 +88,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   5 executors, per-cell verdicts with evidence requirements, router
   selection rules, UI banner derivation, and maintenance rules.
   ARCHITECTURE's `Availability` enum gains `NOT_IMPLEMENTED`.
+- `docs/REMOTE-EXECUTOR-PROTOCOL.md` — M7 reference design: threat model
+  (T1–T12 with controls, residual risks, accepted risks), trust levels,
+  TOFU enrollment flow, versioned signed message set, capability
+  negotiation + proofs, least-privilege structured-plan authorization
+  (no raw CLI strings), transport options, acceptance-criteria mapping,
+  and M7 design-gate open questions. PLAN M7 criteria reference it.
 - PLAN/ARCHITECTURE deltas folded in (previous round): delegation model in
   PLAN §2.3 and M7 criteria (topology discovery, capability proof);
   Phase 2 adopts adaptive RTT timeouts + self-authored signature DB
