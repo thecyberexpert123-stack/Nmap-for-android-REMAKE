@@ -8,7 +8,10 @@ delegating them where it does not.
 > approved: Kotlin + Jetpack Compose, `minSdk 26`, licensed **GPL-2.0-or-later**.
 > See [`docs/PLAN.md`](docs/PLAN.md) for scope, architecture, roadmap, and
 > acceptance criteria; [`docs/NMAP-DEEP-DIVE.md`](docs/NMAP-DEEP-DIVE.md) for
-> the subsystem-by-subsystem Nmap analysis and Android feasibility mapping.
+> the subsystem-by-subsystem Nmap analysis and Android feasibility mapping;
+> [`docs/NMAP-SUBSYSTEMS-DEEP.md`](docs/NMAP-SUBSYSTEMS-DEEP.md) for the
+> engine algorithms, the capability-delegation architecture, and the
+> detection/matching formats.
 > See [`AGENT-EXPERIENCE.md`](AGENT-EXPERIENCE.md) for the development journal
 > and [`CHANGELOG.md`](CHANGELOG.md) for changes.
 

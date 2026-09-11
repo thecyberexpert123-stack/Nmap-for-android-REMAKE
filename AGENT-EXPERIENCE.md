@@ -194,3 +194,51 @@ Nmap deeply, so that we can create our REMAKE Nmap on Android."
   needs) is what makes the feasibility mapping trustworthy: every "can't do
   this on stock Android" claim in the doc is tied to a specific verified
   privilege boundary, not to vague platform pessimism.
+
+---
+
+## 2026-09-11 (subsystem deep-dive) — ultra_scan, raw send path, probes format, OS matching
+
+### Context
+Stakeholder supplied a design essay for TCP packet sending (capability
+delegation: Android as controller; the packet is constructed wherever a
+legitimate capability exists — LAN agent, appliance, VPN endpoint, cloud
+Linux) and asked to go deeper on specific Nmap subsystems. Still docs-only.
+
+### What I did
+1. Fetched the exact algorithm chapters from the official Nmap book: "Scan
+   Code and Algorithms" (both chunks), "nmap-service-probes File Format"
+   (both chunks), "OS Matching Algorithms" (full).
+2. Wrote `docs/NMAP-SUBSYSTEMS-DEEP.md` with: the ultra_scan stateful design
+   and exact timing formulas; congestion control with the responses-ratio
+   weighting adaptation; timing probes; adaptive retransmission; scan delay;
+   the raw send path (build ≠ send) and the integrated delegation design;
+   the full service-probes directive grammar with helper functions; IPv4
+   MatchPoints scoring and IPv6 logistic regression with novelty/ambiguity
+   thresholds.
+3. Folded six design deltas into PLAN (§2.3, §5.2 M2/M4/M7, §8, §11) and
+   ARCHITECTURE (§1 invariants, ExecutorNode fields, §4.4 sequence).
+4. Updated README, CHANGELOG, this journal. Committed and pushed (no merge).
+
+### Decisions
+- Delegation architecture adopted as stated: router selects the *closest*
+  capable executor; results carry executor identity + capability proof.
+- Phase 2 will implement srtt/rttvar/timeout (timeout = srtt + 4·rttvar) as
+  the engine's adaptive default; M1 keeps the simpler fixed timeout.
+- Connect-scan honesty: our evidence model must not imply retransmission
+  control — the kernel owns SYN retries for connect scans.
+- Phase 4 reuses weighted scoring + logistic mapping + novelty/ambiguity
+  rejection on application-level features only.
+
+### Challenges / open questions
+- `java.util.regex` vs PCRE divergences need an explicit documented list +
+  tests when the self-authored signature DB arrives (M2).
+- Whether tun-injected crafted probes can be sent at all remains class U —
+  only a Phase 6 device experiment can answer it.
+
+### Learning
+- The stakeholder essay's central move — asking "where is the closest
+  legitimate packet-generation capability?" — turned the Android
+  limitation from a dead end into a routing problem. It maps 1:1 onto the
+  executor/router architecture already planned, which validated the
+  intent/execution separation chosen in Phase 0.

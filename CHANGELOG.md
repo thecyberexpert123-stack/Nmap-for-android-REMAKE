@@ -41,6 +41,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   **Nmap feature → Android feasibility mapping** (classes A/B/D/U) that seeds
   the Phase 8 compatibility ledger, plus clean-room data strategy (IANA
   registries, self-authored signatures).
+- `docs/NMAP-SUBSYSTEMS-DEEP.md` — subsystem deep-dive: (1) `ultra_scan`
+  algorithms with exact formulas (srtt/rttvar/timeout per RFC 2988 lineage,
+  congestion window + response-ratio weighting, timing probes at 1.25 s,
+  adaptive retransmission cap 10, scan-delay doubling to 1 s max);
+  (2) the raw TCP packet-send path and the stakeholder's **capability-
+  delegation architecture** (closest legitimate packet-generation
+  capability; encryption ≠ privilege; topology discovery); (3) the
+  `nmap-service-probes` directive format (Exclude/Probe/match/softmatch/
+  ports/sslports/totalwaitms/tcpwrappedms/rarity/fallback + versioninfo
+  helpers); (4) OS-matching algorithms (IPv4 MatchPoints weighting; IPv6
+  logistic regression + novelty threshold 15 + 10% ambiguity rule).
+- PLAN/ARCHITECTURE deltas folded in: delegation model in PLAN §2.3 and M7
+  criteria (topology discovery, capability proof); Phase 2 adopts adaptive
+  RTT timeouts + self-authored signature DB grammar; Phase 4 adopts weighted
+  scoring + logistic + novelty on application-level features; connect-scan
+  honesty (kernel owns SYN retransmission); architectural invariants added
+  to ARCHITECTURE §1 and delegation sequence in §4.4.
 
 ### Decided (stakeholder approval, 2026-09-11)
 - License: **GPL-2.0-or-later** — `LICENSE` added (verbatim GPLv2 text from SPDX

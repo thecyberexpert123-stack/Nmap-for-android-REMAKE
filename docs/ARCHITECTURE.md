@@ -26,6 +26,10 @@ detection / capability / remote     (future modules; created when M2 / M5 / M7 s
 - Dependencies point only downward. Future modules (`detection`, `capability`,
   `remote`) attach to `core`/`engine` per the same rule.
 - No module is scaffolded before its milestone starts (no empty placeholders).
+- **Architectural invariants** (from the stakeholder delegation design): *encryption ≠ privilege,
+  tunneling ≠ packet crafting, forwarding ≠ packet generation, Wi-Fi ≠ application-level
+  raw-packet API.* Transport and capability are modeled independently at every level
+  (see §4.4).
 
 ## 2. Domain Model (`core`) — API Sketch
 
@@ -104,10 +108,12 @@ data class ExecutorNode(
     val id: String,            // e.g. "local-android"
     val label: String,
     val type: ExecutorType,    // ANDROID_LOCAL | NATIVE | REMOTE_LINUX | REMOTE_AGENT
-    val transport: String,     // "direct" | "https+mTLS" (M7)
+    val transport: String,     // "direct" | "https+mTLS" | "vpn-tunnel" (M7)
     val reachability: ExecutorReachability,  // LOCAL | ONLINE | OFFLINE
     val capabilities: CapabilityProfile,
-    val trustLevel: TrustLevel // UNVERIFIED | VERIFIED | SIGNED_REMOTE (M7)
+    val trustLevel: TrustLevel, // UNVERIFIED | VERIFIED | SIGNED_REMOTE (M7)
+    val discoveredVia: DiscoveryMethod?,     // M7: MANUAL | MDNS | SSDP | ENROLLED_TLS
+    val capabilityProof: CapabilityProof?    // M7: evidence a claimed capability was demonstrated
 )
 ```
 
@@ -222,14 +228,20 @@ ScanScheduler            TcpTransport(Socket)               Network
 
 ### 4.4 Capability delegation (Phase 7 — design intent, not implemented)
 
+Based on the stakeholder design: when local execution lacks a capability, the
+router selects the **closest legitimate packet-generation capability** — never
+fakes the operation locally.
+
 ```text
 UI → ScanViewModel → ExecutionRouter
         │  ScanPlan requests RAW_PACKET_TRANSMIT
-        ├─ local profile: UNSUPPORTED ────────────────► route to executor
-        │                                             whose profile == SUPPORTED
+        ├─ 1. TopologyDiscovery: known executors (manual / mDNS-SSDP enrollment / TLS enrollment)
+        ├─ 2. local profile: UNSUPPORTED ──► select nearest executor whose
+        │       CapabilityProfile == SUPPORTED (distance = reachability + latency + trust)
         ▼
-   RemoteExecutorClient (mTLS) ── capability negotiation ──▶ Linux/Nmap executor
-        │◀── structured result (versioned schema, executor identity, trust tag) ──┤
+   RemoteExecutorClient (mTLS, or VpnService tunnel — transport only, no privilege)
+        ── capability negotiation ──► LAN agent / appliance / VPN endpoint / cloud Linux + Nmap
+        │◀── structured result (versioned schema, executor identity, trust tag, capability proof) ──┤
         ▼
    ResultAggregator → ScanReport { executor, capabilities, delegated = true } → UI (labeled)
 ```

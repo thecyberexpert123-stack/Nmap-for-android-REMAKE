@@ -109,6 +109,15 @@ Phase 0/1 ships exactly one real executor — the **Android Local Executor** wit
 honest profile (TCP connect ✓, service detection ✗-until-Phase-2, raw packet ✗) —
 so the router abstraction exists from day one without pretending more.
 
+**Delegation architecture (adopted, stakeholder design 2026-09-11):** where a scan
+intent exceeds local capability, the router does not fake it — it routes to the
+**closest legitimate packet-generation capability**: a LAN agent, a capable
+network appliance, a VPN endpoint, or a remote Linux/Nmap executor. Android is
+the controller/planner/analyzer; executors provide capabilities; every delegated
+result carries executor identity + capability proof. Architectural invariants:
+*encryption ≠ privilege, tunneling ≠ packet crafting, forwarding ≠ packet
+generation*. Full analysis: [`NMAP-SUBSYSTEMS-DEEP.md`](NMAP-SUBSYSTEMS-DEEP.md) §2.
+
 ### 2.4 Data flow (Phase 1)
 
 ```text
@@ -325,12 +334,12 @@ tests are reserved for the classification matrix on loopback only.
 
 | Milestone | Concrete acceptance criteria (preliminary) |
 |---|---|
-| **M2 (Phase 2)** service & version detection | Local lab of ≥ 5 known services (e.g., nginx, OpenSSH, mosquitto, vsftpd) on loopback/LAN. Probes: HTTP GET/HEAD, TLS ClientHello banner, SSH banner, SMTP greeting, null-probe banner read. **AC**: correct identification ≥ 90 % on the lab; every identification carries evidence = probe name + response prefix (≤ 256 B) + sha256; unidentified → `UNKNOWN` state with evidence, never guessed; version inference labeled "probable" with a confidence score in [0,1] and a documented threshold; false-positive rate < 5 % measured on the lab. |
+| **M2 (Phase 2)** service & version detection | Local lab of ≥ 5 known services (e.g., nginx, OpenSSH, mosquitto, vsftpd) on loopback/LAN. Probes: HTTP GET/HEAD, TLS ClientHello banner, SSH banner, SMTP greeting, null-probe banner read. **AC**: correct identification ≥ 90 % on the lab; every identification carries evidence = probe name + response prefix (≤ 256 B) + sha256; unidentified → `UNKNOWN` state with evidence, never guessed; version inference labeled "probable" with a confidence score in [0,1] and a documented threshold; false-positive rate < 5 % measured on the lab. Engine adopts the verified Nmap techniques as *concepts* with self-authored content: NULL-probe-first, `softmatch` family pruning, `rarity` probe budgets, fallback chains, SSL post-processor, `tcpwrapped` detection, and the srtt/rttvar/timeout formulas (`timeout = srtt + 4·rttvar`) replacing M1's fixed per-probe timeout ([NMAP-SUBSYSTEMS-DEEP.md](NMAP-SUBSYSTEMS-DEEP.md) §1, §3). |
 | **M3 (Phase 3)** UDP application probing | Probes: DNS (query against a local resolver), mDNS (PTR `_services._dns-sd._udp.local`), echo. States restricted to `RESPONDED` / `NO_RESPONSE` / `APPLICATION_IDENTIFIED` / `INCONCLUSIVE`. **AC**: `NO_RESPONSE` is never rendered or described as "closed"; each result records the probe payload summary; verified with a local dnsmasq instance (present/absent cases). |
-| **M4 (Phase 4)** fingerprinting | Fingerprint DB is self-authored (format: features → candidate weights); features derived from application-layer observations (banner patterns, TLS parameters, timing deltas, header order). **AC**: every DB entry carries `source: self-authored` + a test vector; matching emits candidates with confidence + evidence; output is explicitly labeled "application-level inference", never "Nmap OS detection"; comparison experiment documented. |
+| **M4 (Phase 4)** fingerprinting | Fingerprint DB is self-authored (format: features → candidate weights); features derived from application-layer observations (banner patterns, TLS parameters, timing deltas, header order). Matching layer reuses the verified Nmap *concepts* on these features: weighted point scoring (per-category weights), logistic score mapping `100/(1+e^x)`, novelty rejection (variance-scaled distance threshold), and the top-two-within-10% ambiguity rule ([NMAP-SUBSYSTEMS-DEEP.md](NMAP-SUBSYSTEMS-DEEP.md) §4). **AC**: every DB entry carries `source: self-authored` + a test vector; matching emits candidates with confidence + evidence; output is explicitly labeled "application-level inference", never "Nmap OS detection"; comparison experiment documented. |
 | **M5 (Phase 5)** capability system | On-device detection: socket connect ✓; raw socket attempt → observe `EPERM` and report `UNSUPPORTED` (measured, not assumed); `VpnService` presence → `UNKNOWN` until the M6 experiment; interface enumeration via `ConnectivityManager` only (no extra permissions). **AC**: unit tests with fakes; on-device report matches expectations on emulator + real device; UI banner reflects the measured profile. |
 | **M6 (Phase 6)** native/VPN experiments | Experiment matrix: raw-socket attempt (expected `EPERM`), VpnService tun packet-injection test against a controlled LAN responder. **AC**: results recorded verbatim (device model, Android build, command/output); conclusion updates `CapabilityProfile` defaults; any capability is gated behind proof — no claimed capability without a passing experiment. |
-| **M7 (Phase 7)** remote executor | Authenticated executor protocol (mTLS + capability negotiation + versioned result schema) with a written threat model (trust, integrity, replay, injection). **AC**: threat model reviewed and accepted by stakeholder; integration tests between two JVM processes; delegated results tagged with executor identity + trust level and visibly distinguished in the UI; no executor capability claims are trusted without verification path. |
+| **M7 (Phase 7)** remote executor | Authenticated executor protocol (mTLS + capability negotiation + versioned result schema) with a written threat model (trust, integrity, replay, injection). **AC**: threat model reviewed and accepted by stakeholder; integration tests between two JVM processes; executor topology discovery (authenticated LAN enrollment + remote enrollment) selects the *closest capable* executor per scan intent; every delegated result carries executor identity, trust level, and a capability proof; delegated results visibly distinguished in the UI; no executor capability claims are trusted without a verification path. Transport is capability-independent (TLS control channel and/or VpnService tunnel) — encryption ≠ privilege ([NMAP-SUBSYSTEMS-DEEP.md](NMAP-SUBSYSTEMS-DEEP.md) §2). |
 | **M8 (Phase 8)** compatibility measurement | Feature-by-feature table vs. the Nmap feature set, each row: feature, status (`LOCAL` / `DELEGATED` / `UNAVAILABLE` / `UNVERIFIED`), how it was measured. **AC**: published in docs; every `LOCAL` claim links to a passing test or recorded experiment; no "Nmap-compatible" wording without this table. |
 
 ---
@@ -378,6 +387,7 @@ Nmap-for-android-REMAKE/
 │   ├── PLAN.md                          # this document
 │   ├── ARCHITECTURE.md                  # module map, API sketches, sequence diagrams, schema v1
 │   ├── NMAP-DEEP-DIVE.md                # Nmap subsystem analysis + Android feasibility mapping
+│   ├── NMAP-SUBSYSTEMS-DEEP.md          # ultra_scan algorithms, raw-send path + delegation architecture, probes format, OS matching
 │   ├── RECOMMENDATIONS.md               # parked ideas (no scope creep in code)
 │   └── adr/                             # ADR-0001 license, ADR-0002 UI, ADR-0003 SDK levels, …
 ├── settings.gradle.kts
@@ -521,13 +531,18 @@ approval is given.
    tightened (PLAN §5.1–5.2) and architecture/API design added
    (`docs/ARCHITECTURE.md`), per stakeholder direction (2026-09-11).
 2. ~~Deep Nmap understanding~~ → done: `docs/NMAP-DEEP-DIVE.md` maps every
-   Nmap subsystem (phases, scan techniques, version/OS detection, NSE,
-   timing, data files) to Android feasibility classes A/B/D/U with
-   clean-room data strategy; §4 of that document is the Phase 8
-   compatibility ledger seed.
-3. Approve (or further refine) the Phase 0+1 milestone criteria (D1–D9, §5.1)
+   Nmap subsystem to Android feasibility classes A/B/D/U; §4 of that
+   document is the Phase 8 compatibility ledger seed.
+3. ~~Subsystem deep-dive~~ → done: `docs/NMAP-SUBSYSTEMS-DEEP.md` covers the
+   `ultra_scan` algorithms (RTT/congestion/retransmission/scan-delay), the
+   raw TCP send path with the stakeholder's capability-delegation design
+   (adopted into PLAN §2.3 and M7), the `nmap-service-probes` directive
+   format, and the OS-matching algorithms (IPv4 MatchPoints + IPv6
+   logistic/novelty); six integrated design deltas recorded in §5 of that
+   document.
+4. Approve (or further refine) the Phase 0+1 milestone criteria (D1–D9, §5.1)
    before any implementation starts.
-4. Copyright holder line for the GPL notices (to be set by the project owner).
+5. Copyright holder line for the GPL notices (to be set by the project owner).
 
 ---
 
