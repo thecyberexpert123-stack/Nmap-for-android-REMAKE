@@ -98,7 +98,11 @@ enum class Capability { TCP_CONNECT, APPLICATION_PROBES, SERVICE_DETECTION,
                         FINGERPRINT_INFERENCE, RAW_PACKET_BUILD, RAW_PACKET_TRANSMIT,
                         PACKET_CAPTURE, PRIVILEGED_SCAN, UDP_APP_PROBES, REMOTE_DELEGATION }
 
-enum class Availability { SUPPORTED, LIMITED, UNSUPPORTED, UNKNOWN }  // default UNKNOWN until proven
+enum class Availability { SUPPORTED, LIMITED, UNSUPPORTED, UNKNOWN, NOT_IMPLEMENTED }
+// SUPPORTED/LIMITED/UNSUPPORTED/UNKNOWN = platform truth; NOT_IMPLEMENTED = platform
+// can, engine hasn't built it yet. Canonical per-executor cell values and their
+// evidence requirements live in docs/CAPABILITY-MATRIX.md (single source of
+// truth for routing + UI; changes require milestone gates or recorded experiments).
 
 data class CapabilityProfile(val entries: Map<Capability, Availability>) {
     fun supports(c: Capability): Boolean   // SUPPORTED or LIMITED

@@ -379,3 +379,47 @@ Stakeholder again chose to continue subsystem research before any code.
   makes the whole series auditable: each verdict can be traced back
   to the specific source that established the mechanism, which is the
   practical form of rule #11 (never fabricate).
+
+---
+
+## 2026-09-11 (gap fill) — the capability matrix
+
+### Context
+Stakeholder asked to fill the capability-matrix gap: one canonical table
+driving both the router and the UI.
+
+### What I did
+1. Authored `docs/CAPABILITY-MATRIX.md`: five availability states with
+   promotion rules; a canonical list of 16 capabilities (each mapped to
+   its analysis source); 5 executors including the VPN-tun and rooted
+   rows; the full matrix where every cell carries verdict + basis +
+   evidence requirement; router selection rules; UI banner derivation;
+   and maintenance rules (matrix changes only via milestone gates or
+   recorded experiments).
+2. Added `NOT_IMPLEMENTED` to the `Availability` enum in ARCHITECTURE —
+   the distinction between "platform can't" and "we haven't built it
+   yet" is now explicit in the model.
+3. Updated PLAN (§2.3 pointer, §8 tree, §11), CHANGELOG, this journal.
+   Committed and pushed (no merge).
+
+### Decisions
+- The VPN-tun executor row is deliberately almost entirely UNKNOWN: the
+  matrix encodes the brief's "VPN ≠ raw access" as a data property, not
+  a slogan. Only M6 experiments may promote any of its cells.
+- Remote executors default to UNKNOWN until enrollment + capability
+  proof — claimed capabilities are never trusted.
+- A rooted-device row exists for completeness but is explicitly not a
+  project target.
+
+### Challenges / open questions
+- Whether `NOT_IMPLEMENTED`-locally + `SUPPORTED`-remotely should
+  auto-delegate or ask the user first is a UX decision — recorded for
+  the M7 design gate.
+- The matrix is a living artifact; its maintenance rules must be
+  enforced by the CI/PR checklist once code exists.
+
+### Learning
+- Expressing the honesty principle as *data with promotion rules*
+  (UNKNOWN can only change via recorded experiments) turns a
+  philosophical commitment into an enforceable workflow — which is
+  exactly how rule #21 (verification honesty) should be operationalized.

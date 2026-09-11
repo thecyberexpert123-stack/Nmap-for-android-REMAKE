@@ -117,6 +117,10 @@ the controller/planner/analyzer; executors provide capabilities; every delegated
 result carries executor identity + capability proof. Architectural invariants:
 *encryption ≠ privilege, tunneling ≠ packet crafting, forwarding ≠ packet
 generation*. Full analysis: [`NMAP-SUBSYSTEMS-DEEP.md`](NMAP-SUBSYSTEMS-DEEP.md) §2.
+The canonical capability × executor matrix with per-cell verdicts, evidence
+requirements, routing rules, and UI derivation is
+[`CAPABILITY-MATRIX.md`](CAPABILITY-MATRIX.md) — the single source of truth for
+routing and UI.
 
 ### 2.4 Data flow (Phase 1)
 
@@ -391,6 +395,7 @@ Nmap-for-android-REMAKE/
 │   ├── NMAP-SUBSYSTEMS-DEEP-2.md        # NSE internals & parallelism, host discovery mechanics, scan-phase state machine + Nsock
 │   ├── NMAP-SUBSYSTEMS-DEEP-3.md        # idle scan, traceroute, output system & evidence model, target selection + mass-DNS
 │   ├── NMAP-SUBSYSTEMS-DEEP-4.md        # service_scan internals, IPv6 fingerprinting, aux tools, capstone inventory
+│   ├── CAPABILITY-MATRIX.md             # capability × executor matrix — single source of truth for routing + UI
 │   ├── RECOMMENDATIONS.md               # parked ideas (no scope creep in code)
 │   └── adr/                             # ADR-0001 license, ADR-0002 UI, ADR-0003 SDK levels, …
 ├── settings.gradle.kts
@@ -566,9 +571,14 @@ approval is given.
    conventions adopted for M4), the auxiliary tools, and the **capstone
    inventory**: all 18 subsystem groups with verified mechanisms and
    A/B/D/U verdicts, which populates the Phase 8 compatibility ledger.
-7. Approve (or further refine) the Phase 0+1 milestone criteria (D1–D9, §5.1)
+7. ~~Capability matrix~~ → done: `docs/CAPABILITY-MATRIX.md` defines the
+   five availability states, the canonical 16 capabilities, 5 executors,
+   the full matrix with per-cell verdicts + evidence requirements, the
+   router selection rules, UI derivation, and maintenance rules.
+   ARCHITECTURE's `Availability` enum gains `NOT_IMPLEMENTED`.
+8. Approve (or further refine) the Phase 0+1 milestone criteria (D1–D9, §5.1)
    before any implementation starts.
-8. Copyright holder line for the GPL notices (to be set by the project owner).
+9. Copyright holder line for the GPL notices (to be set by the project owner).
 
 ---
 

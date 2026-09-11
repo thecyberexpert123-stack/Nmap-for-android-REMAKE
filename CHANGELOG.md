@@ -83,6 +83,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   mechanisms and A/B/D/U verdicts, seeding the Phase 8 compatibility
   ledger. RECOMMENDATIONS gains FTP-bounce deferral and the ndiff-style
   result-diff view.
+- `docs/CAPABILITY-MATRIX.md` — canonical capability × executor matrix:
+  five availability states (incl. `NOT_IMPLEMENTED`), 16 capabilities,
+  5 executors, per-cell verdicts with evidence requirements, router
+  selection rules, UI banner derivation, and maintenance rules.
+  ARCHITECTURE's `Availability` enum gains `NOT_IMPLEMENTED`.
 - PLAN/ARCHITECTURE deltas folded in (previous round): delegation model in
   PLAN §2.3 and M7 criteria (topology discovery, capability proof);
   Phase 2 adopts adaptive RTT timeouts + self-authored signature DB
