@@ -307,16 +307,25 @@ tests are reserved for the classification matrix on loopback only.
 
 #### 5.1.5 UI (D7)
 
-- Capability banner rows are **derived from `CapabilityProfile`** (unit-tested
-  mapping profile → banner rows). M1 profile: TCP connect = SUPPORTED; service
-  detection = UNSUPPORTED (Phase 2); raw packet = UNSUPPORTED on stock Android;
+UI follows the screen specs in [`UI-UX-CONCEPT.md`](UI-UX-CONCEPT.md)
+(screen map, ScanInput/Scanning/Results specs, authorization dialog,
+state-chip vocabulary, banner derivation, M1 scope line).
+
+- Capability banner rows are **derived from `CapabilityProfile`**
+  (unit-tested mapping profile → banner rows, per CAPABILITY-MATRIX §1
+  states). M1 profile: TCP connect = SUPPORTED; service detection =
+  NOT_IMPLEMENTED (Phase 2); raw packet = UNSUPPORTED on stock Android;
   VPN = UNKNOWN (Phase 6 experiment). No hardcoded banner strings.
-- Emulator (CI): launch → scan `127.0.0.1` against a loopback listener started
-  by the instrumentation test → OPEN row appears with latency; a refused port
-  shows CLOSED. (End-to-end proof on-device.)
-- Invalid input shows the typed `ScanError` message; no crash (espresso-level
-  assertion).
-- Cancel button → UI returns to idle ≤ 1 s after scheduler completes.
+- Authorization dialog gates every scan (scope summary + ownership
+  acknowledgment checkbox); start disabled until acknowledged.
+- Emulator (CI): launch → authorize → scan `127.0.0.1` against a
+  loopback listener started by the instrumentation test → OPEN row
+  appears with latency; a refused port shows CLOSED. (End-to-end proof
+  on-device.)
+- Invalid input shows the typed `ScanError` message inline; no crash
+  (espresso-level assertion).
+- Cancel button → UI returns to idle ≤ 1 s after scheduler completes;
+  partial results labeled "incomplete — cancelled by user".
 
 #### 5.1.6 Quality gates (enforced in CI, failing = red build)
 
@@ -397,6 +406,7 @@ Nmap-for-android-REMAKE/
 │   ├── NMAP-SUBSYSTEMS-DEEP-4.md        # service_scan internals, IPv6 fingerprinting, aux tools, capstone inventory
 │   ├── CAPABILITY-MATRIX.md             # capability × executor matrix — single source of truth for routing + UI
 │   ├── REMOTE-EXECUTOR-PROTOCOL.md     # M7 threat model + protocol design (enrollment, proofs, revocation)
+│   ├── UI-UX-CONCEPT.md                # Compose app design: screens, capability banner, authorization UX, M1 scope
 │   ├── RECOMMENDATIONS.md               # parked ideas (no scope creep in code)
 │   └── adr/                             # ADR-0001 license, ADR-0002 UI, ADR-0003 SDK levels, …
 ├── settings.gradle.kts
@@ -584,9 +594,15 @@ approval is given.
    negotiation + proofs, least-privilege authorization, transport
    options, acceptance-criteria mapping, and M7 design-gate questions.
    PLAN M7 criteria now reference it.
-9. Approve (or further refine) the Phase 0+1 milestone criteria (D1–D9, §5.1)
-   before any implementation starts.
-10. Copyright holder line for the GPL notices (to be set by the project owner).
+9. ~~UI/UX concept gap~~ → done: `docs/UI-UX-CONCEPT.md` specifies the
+   Compose app: design principles (honesty, evidence, consent,
+   provenance), screen map, screen-by-screen specs with wireframes,
+   authorization dialog, Material 3 state-chip vocabulary, banner
+   derivation, accessibility requirements, and the M1 scope line.
+   PLAN §5.1.5 now references it.
+10. Approve (or further refine) the Phase 0+1 milestone criteria (D1–D9, §5.1)
+    before any implementation starts.
+11. Copyright holder line for the GPL notices (to be set by the project owner).
 
 ---
 

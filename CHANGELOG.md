@@ -94,6 +94,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   negotiation + proofs, least-privilege structured-plan authorization
   (no raw CLI strings), transport options, acceptance-criteria mapping,
   and M7 design-gate open questions. PLAN M7 criteria reference it.
+- `docs/UI-UX-CONCEPT.md` — Compose app design: honesty/evidence/
+  consent/provenance principles, screen map, screen specs with
+  wireframes (ScanInput, authorization dialog, Scanning, Results,
+  Executors, CapabilityExplainer), Material 3 state-chip vocabulary,
+  capability-banner derivation, accessibility requirements, and the M1
+  scope line. PLAN §5.1.5 references it (authorization dialog gating
+  every scan; partial-result cancellation labeling).
 - PLAN/ARCHITECTURE deltas folded in (previous round): delegation model in
   PLAN §2.3 and M7 criteria (topology discovery, capability proof);
   Phase 2 adopts adaptive RTT timeouts + self-authored signature DB

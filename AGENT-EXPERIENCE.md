@@ -465,3 +465,48 @@ Stakeholder asked for the remote-executor protocol deep design.
   early (structured plans instead of CLI strings, signed results,
   proof freshness) that would have been much harder to retrofit after
   the first working delegation — prevention by ordering.
+
+---
+
+## 2026-09-11 (gap fill) — UI/UX concept
+
+### Context
+Stakeholder asked for the UI/UX concept before Compose implementation.
+
+### What I did
+1. Authored `docs/UI-UX-CONCEPT.md`: five design principles (honesty,
+   evidence-visible, self-describing, consent-before-traffic,
+   provenance-labeled, minimal-M1); the screen map (M1 = two screens +
+   two dialogs); screen-by-screen specs with ASCII wireframes; an
+   authorization dialog that gates every scan behind a scope summary
+   and ownership acknowledgment; the Material 3 state-chip vocabulary
+   incl. M3 UDP states and M7 trust badges; banner derivation from the
+   capability matrix; accessibility requirements; and the M1 scope line.
+2. Tightened PLAN §5.1.5: the consent dialog is now an acceptance
+   criterion, and cancelled scans must label partial results
+   "incomplete — cancelled by user".
+3. Updated PLAN (tree, open questions), CHANGELOG, this journal.
+   Committed and pushed (no merge).
+
+### Decisions
+- Unavailable scan options stay visible but disabled with reasons —
+   they are never hidden (the brief's self-describing UI requirement).
+- The authorization dialog is not a legal shield; it's an informed-
+   consent affordance. The real guardrails are technical (scope limits)
+   — the UI makes them explicit.
+- M1 deliberately excludes the export sheet unless the copy-JSON
+   affordance stays trivial (no scope creep).
+
+### Challenges / open questions
+- Whether the authorization checkbox wording should be reviewed by a
+  legal professional is flagged for the stakeholder (the wording is
+  engineering-appropriate, not legal advice).
+- Live-streaming results while scrolling (LazyColumn + diffs) is a
+  known Compose performance area; the buffered-channel design (§3) is
+  the mitigation, to be validated by the emulator test.
+
+### Learning
+- Designing the UI *before* the ViewModel made the data contract
+  concrete: every screen element traces to a state field or a matrix
+  row, which means the Compose layer will have no invented states —
+  the front-end equivalent of the honesty rule.
