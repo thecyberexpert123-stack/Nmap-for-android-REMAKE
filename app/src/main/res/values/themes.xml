@@ -1,0 +1,3 @@
+<resources>
+    <style name="Theme.NmapRemake" parent="android:Theme.Material.NoActionBar" />
+</resources>
