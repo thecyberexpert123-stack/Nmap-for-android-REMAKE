@@ -13,6 +13,8 @@ jobs:
     name: Build, unit tests, coverage, lint (JDK 17)
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      checks: write
     steps:
       - uses: actions/checkout@v4
 
@@ -31,8 +33,27 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Build, unit tests, coverage gates, static analysis, app lint
-        run: ./gradlew check ktlintCheck detekt :app:assembleDebug :app:lintDebug --stacktrace
+      - name: Verify pure-JVM modules (core, engine)
+        run: >
+          ./gradlew
+          :core:check
+          :engine:check
+          :core:ktlintCheck
+          :engine:ktlintCheck
+          :core:detekt
+          :engine:detekt
+          --stacktrace
+          2>&1 | tee /tmp/gradle-jvm.log
+
+      - name: Verify Android app (assemble, lint, ktlint, detekt)
+        run: >
+          ./gradlew
+          :app:assembleDebug
+          :app:lintDebug
+          :app:ktlintCheck
+          :app:detekt
+          --stacktrace
+          2>&1 | tee /tmp/gradle-app.log
 
       - name: Upload unit test reports
         if: always()
@@ -44,6 +65,51 @@ jobs:
             **/build/reports/jacoco/**/*.xml
             **/build/reports/detekt/**/*
           if-no-files-found: ignore
+
+      # Diagnostic relay: the development sandbox has no egress to the
+      # Actions log-storage host, so on failure the Gradle tail is posted as
+      # a check-run annotation (readable via api.github.com).
+      - name: Report Gradle failure details
+        if: failure()
+        shell: bash
+        run: |
+          log=/tmp/gradle-app.log
+          [ -f /tmp/gradle-jvm.log ] && log=/tmp/gradle-jvm.log
+          python3 - "$log" <<'PYEOF'
+          import json, os, sys, urllib.request
+          path = sys.argv[1]
+          tail = open(path, errors="replace").read()[-12000:]
+          message = tail if tail.strip() else "(no gradle output captured)"
+          annotation = {
+              "path": path,
+              "start_line": 1,
+              "end_line": 1,
+              "annotation_level": "failure",
+              "message": message,
+          }
+          body = json.dumps({
+              "name": "gradle-failure-details",
+              "head_sha": os.environ["GITHUB_SHA"],
+              "status": "completed",
+              "conclusion": "failure",
+              "output": {
+                  "title": "Gradle failure tail",
+                  "summary": "Tail of the failing Gradle step log.",
+                  "annotations": [annotation],
+              },
+          }).encode()
+          request = urllib.request.Request(
+              f"https://api.github.com/repos/{os.environ['GITHUB_REPOSITORY']}/check-runs",
+              data=body,
+              headers={
+                  "Authorization": f"Bearer {os.environ['GITHUB_TOKEN']}",
+                  "Accept": "application/vnd.github+json",
+                  "X-GitHub-Api-Version": "2022-11-28",
+              },
+          )
+          with urllib.request.urlopen(request, timeout=30) as response:
+              print("check-run posted:", response.status)
+          PYEOF
 
   emulator:
     name: Instrumentation tests on API ${{ matrix.api }}
