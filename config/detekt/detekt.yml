@@ -6,6 +6,9 @@ style:
     active: false
   ForbiddenComment:
     active: false
+
+# FunctionNaming lives in the 'naming' ruleset (not 'style') in detekt 1.x.
+naming:
   FunctionNaming:
     ignoreAnnotated:
       - Composable

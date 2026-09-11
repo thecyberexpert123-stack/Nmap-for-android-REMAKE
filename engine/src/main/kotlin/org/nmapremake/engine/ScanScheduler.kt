@@ -119,8 +119,11 @@ class DefaultScanScheduler(
             }
         }
 
-        val ranToCompletion = if (plan.maxDurationMs != null) {
-            withTimeoutOrNull(plan.maxDurationMs) { portLoop() } != null
+        // Local copy: plan.maxDurationMs is a cross-module public property,
+        // so it cannot be smart-cast to Long directly.
+        val maxDurationMs = plan.maxDurationMs
+        val ranToCompletion = if (maxDurationMs != null) {
+            withTimeoutOrNull(maxDurationMs) { portLoop() } != null
         } else {
             portLoop()
             true

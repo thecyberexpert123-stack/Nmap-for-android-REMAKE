@@ -155,9 +155,10 @@ fun ScanScreenContent(
         }
     }
 
-    if (state.phase == ScanPhase.AUTHORIZING && state.pendingPlan != null) {
+    val pendingPlan = state.pendingPlan
+    if (state.phase == ScanPhase.AUTHORIZING && pendingPlan != null) {
         AuthorizationDialog(
-            plan = state.pendingPlan,
+            plan = pendingPlan,
             onConfirm = onConfirmAuthorization,
             onDismiss = onDismissAuthorization,
         )
@@ -296,9 +297,10 @@ private fun PortRow(result: PortResult) {
             )
         }
         Text(result.evidence, style = MaterialTheme.typography.bodySmall)
-        if (result.error != null) {
+        val error = result.error
+        if (error != null) {
             Text(
-                "${result.error.code}: ${result.error.message}",
+                "${error.code}: ${error.message}",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.error,
             )
