@@ -1,6 +1,6 @@
 # PLAN — Nmap for Android REMAKE
 
-> Status: **DRAFT — awaiting stakeholder approval**
+> Status: **PLAN ITERATION (docs-only)** — application code deliberately on hold per stakeholder decision (2026-09-11). Stack decisions approved: Jetpack Compose · GPL-2.0-or-later · minSdk 26.
 > Branch: `arena/01a08f45-nmap-for-android-remake` (never merged — project rule #23)
 > Date: 2026-09-11
 > Author: Agent (Senior Front-End / UI Developer role), per project guidelines 1–23
@@ -126,8 +126,8 @@ User input → TargetParser / PortSpecParser → ScanPlan
 |---|---|---|
 | Language | **Kotlin 2.2.x** (built-in Kotlin via AGP 9) | Brief mandates Kotlin; current stable toolchain line [1] |
 | Build | **AGP 9.0.x + Gradle 9.1+**, version catalog (`libs.versions.toml`) | Current stable; AGP 9 bundles Kotlin (KGP 2.2.10) [2] [3]. Fallback: AGP 8.13 if blockers are found. |
-| SDK levels | `compileSdk = 36`, `targetSdk = 36`, `minSdk = 26` (proposed) | Play requires API 36 for new apps from 2026-08-31 [4]; minSdk 26 covers ≈ all active devices and modern APIs. `minSdk` is a proposed value, see approval questions. |
-| UI | **Jetpack Compose + Material 3** | Modern, capability-aware UI with far less boilerplate; brief requires a self-describing UI. |
+| SDK levels | `compileSdk = 36`, `targetSdk = 36`, `minSdk = 26` — **APPROVED (2026-09-11)** | Play requires API 36 for new apps from 2026-08-31 [4]; minSdk 26 covers ≈ all active devices and modern APIs. ADR-0003. |
+| UI | **Jetpack Compose + Material 3** — **APPROVED (2026-09-11)** | Modern, capability-aware UI with far less boilerplate; brief requires a self-describing UI. ADR-0002. |
 | Concurrency | **kotlinx.coroutines** (structured concurrency, `Semaphore`-bounded parallelism, `Flow` for progress) | Brief explicitly names coroutines; controlled concurrency, not task storms. |
 | Serialization | **kotlinx.serialization** (JSON; XML formatter later) | First-party, no reflection; stable result model with `schemaVersion`. |
 | Async model | ViewModel + `StateFlow`; scans cancelled via `viewModelScope` | Android lifecycle-safe (brief §7). |
@@ -151,9 +151,10 @@ Policy derived for this project:
 1. **Clean-room implementation.** We do not copy Nmap source, or Nmap data files
    (`nmap-service-probes`, OS fingerprint DB, etc.). Our own probe/response DB and
    fingerprint format will be original work, inspired by the *concepts*, not the assets.
-2. Our own code license: **proposed GPL-2.0-or-later** (ecosystem-aligned; simplest
-   future path if we ever redistribute a Nmap executable alongside). Alternatives in
-   the approval questions — this is a human-authority decision (rule #20).
+2. Our own code license: **APPROVED (2026-09-11): GPL-2.0-or-later** — stakeholder
+   decision (rule #20). `LICENSE` file added (verbatim GPLv2 text from SPDX
+   license-list-data). ADR-0001. Copyright holder to be filled in by the project
+   owner before first release.
 3. If Phase 7 ever bundles/invokes a real `nmap` binary (e.g., inside an authorized
    Linux executor image or Termux), its distribution is governed by NPSL/GPLv2 for
    those components and must be handled explicitly then — **flagged, not decided now**.
@@ -382,13 +383,26 @@ Mitigation: JVM unit tests + `assembleDebug` locally, emulator matrix in CI.
 
 ---
 
-## 11. Open Decisions Requiring Your Approval
+## 11. Decisions Recorded (2026-09-11, stakeholder)
 
-1. First milestone scope (Phase 0+1 as proposed, or wider).
-2. UI framework (Compose vs. XML Views).
-3. License for our clean-room code (GPL-2.0-or-later / GPL-3.0-or-later /
-   Apache-2.0 / defer).
-4. `minSdk` (26 proposed).
+| # | Decision | Status | Reference |
+|---|---|---|---|
+| 1 | First milestone scope | **HOLD** — refine plan/docs further before any application code ("docs-only") | This section |
+| 2 | UI framework | **APPROVED: Jetpack Compose + Material 3** | ADR-0002 |
+| 3 | License for clean-room code | **APPROVED: GPL-2.0-or-later** | ADR-0001, `LICENSE` |
+| 4 | `minSdk` | **APPROVED: API 26 (Android 8.0)** | ADR-0003 |
+
+**Current status:** plan is in iteration. Next refinement areas to be selected by
+the stakeholder (see open questions below); no implementation until milestone
+approval is given.
+
+### Open questions for plan refinement
+1. Which plan areas should be deepened next (acceptance criteria per phase,
+   architecture detail / API sketches, ethics & safety section, remote-executor
+   protocol design, capability matrix, or other)?
+2. Are the milestone acceptance criteria (D1–D9) acceptable as written, or do they
+   need tightening before Phase 0+1 can be approved?
+3. Copyright holder line for the GPL notices (to be set by the project owner).
 
 ---
 

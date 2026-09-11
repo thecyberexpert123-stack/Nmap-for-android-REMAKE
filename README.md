@@ -4,7 +4,8 @@ An Android-native network scanning engine, rebuilt in Kotlin — inspired by Nma
 capabilities, reproducing them **where the Android platform permits** and honestly
 delegating them where it does not.
 
-> Status: **Planning** — no application code yet.
+> Status: **Planning / plan iteration** — no application code yet. Stack decisions
+> approved: Kotlin + Jetpack Compose, `minSdk 26`, licensed **GPL-2.0-or-later**.
 > See [`docs/PLAN.md`](docs/PLAN.md) for scope, architecture, roadmap, and
 > acceptance criteria. See [`AGENT-EXPERIENCE.md`](AGENT-EXPERIENCE.md) for the
 > development journal and [`CHANGELOG.md`](CHANGELOG.md) for changes.
@@ -33,3 +34,12 @@ delegating them where it does not.
 
 First milestone (in review): **Phase 0 + Phase 1** — TCP connect scanning with a
 minimal Compose UI, full test and CI setup.
+
+## License
+
+Original code in this repository is licensed under the **GNU General Public
+License, version 2 or (at your option) any later version** (`GPL-2.0-or-later`).
+See [`LICENSE`](LICENSE). Copyright holder: TBD (set by the project owner before
+first release). This project copies no Nmap source code or data files; see
+[`docs/adr/ADR-0001-license.md`](docs/adr/ADR-0001-license.md) for the clean-room
+policy and NPSL context.

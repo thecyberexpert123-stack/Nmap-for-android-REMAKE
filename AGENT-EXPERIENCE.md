@@ -55,3 +55,43 @@ README; branch `arena/01a08f45-nmap-for-android-remake`; rule #23: never merge.
   delegate capability vs. acquire privilege — maps cleanly onto a concrete
   executor/router architecture; the research validated every boundary the brief
   predicted.
+
+---
+
+## 2026-09-11 (later) — Stakeholder decisions recorded
+
+### Context
+Presented the plan and four approval questions (guideline #9). Stakeholder answers:
+1. Milestone: **docs-only** — refine the plan further before any application code.
+2. UI: **Jetpack Compose**.
+3. License: **GPL-2.0-or-later**.
+4. minSdk: **API 26**.
+
+### What I did
+1. Applied the three stack decisions across `docs/PLAN.md` (§3, §3.1, §11).
+2. Added `LICENSE` — verbatim GPLv2 text fetched from the official SPDX
+   license-list-data mirror (gnu.org direct download was blocked in the sandbox;
+   the SPDX copy is the canonical text — sections 0–12 all verified present).
+   Copyright-holder line deliberately left unset for the project owner.
+3. Created three ADRs: `docs/adr/ADR-0001-license.md`,
+   `ADR-0002-ui-framework.md`, `ADR-0003-sdk-levels.md`.
+4. Updated `CHANGELOG.md` and this journal. Committed and pushed to the session
+   branch (no merge).
+
+### Decisions
+- Plan status is now **PLAN ITERATION (docs-only)**; no implementation starts
+  without explicit milestone approval.
+
+### Challenges / open questions
+- Which areas of the plan to deepen next is the stakeholder's call — options
+  offered: acceptance criteria per phase, architecture/API sketches, ethics &
+  safety section, remote-executor protocol design, capability matrix.
+- Copyright holder for the GPL notice remains unset (project owner decision).
+
+### Learning
+- Rule #20 (human authority) applied concretely: a license is an irreversible,
+  materially consequential decision, so it went through structured approval
+  instead of being assumed.
+- Sandbox networking is filtered for some hosts (gnu.org, raw.githubusercontent.com
+  blocked for curl; api.github.com worked). Verbatim licensing text therefore came
+  from SPDX via the GitHub API — provenance recorded, no transcription.

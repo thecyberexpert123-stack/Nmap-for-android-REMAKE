@@ -21,6 +21,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - VpnService = user-consented L3 tun without root; virtual boundary, not raw NIC access.
   - Toolchain: AGP 9.0.x (built-in Kotlin, KGP 2.2.10), Gradle 9.1+, API 36 target.
 
+### Decided (stakeholder approval, 2026-09-11)
+- License: **GPL-2.0-or-later** — `LICENSE` added (verbatim GPLv2 text from SPDX
+  license-list-data). ADR-0001.
+- UI framework: **Jetpack Compose + Material 3**. ADR-0002.
+- SDK levels: `compileSdk/targetSdk = 36`, `minSdk = 26`. ADR-0003.
+- Milestone: application code **on hold** until plan refinement is complete
+  (stakeholder chose docs-only iteration).
+
 ### Fixed
 - (none yet)
 
