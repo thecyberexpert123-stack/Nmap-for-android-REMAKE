@@ -133,7 +133,10 @@ sealed interface ProgressEvent {
     data class ScanFailed(val error: ScanError) : ProgressEvent
 }
 
-// transport — one small seam, replaced by fakes in scheduler tests
+// transport — one small seam, replaced by fakes in scheduler tests.
+// This is the REMAKE's analog of Nsock's pluggable engines (epoll/select/iocp
+// behind one interface): one contract, multiple realizations (socket / NIO /
+// fake), no privilege assumption baked in. See NMAP-SUBSYSTEMS-DEEP-2 §3.
 interface TcpTransport {
     /** Blocking connect attempt; returns classified outcome. Runs on Dispatchers.IO. */
     fun connect(target: Target, port: Int, timeoutMs: Long): ConnectOutcome

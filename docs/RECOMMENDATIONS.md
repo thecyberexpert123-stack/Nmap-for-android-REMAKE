@@ -16,3 +16,6 @@ when it might become relevant.
 | 8 | Kotlin Multiplatform evaluation for `core`/`engine` | A JVM remote-executor host could reuse the engine; not needed for M1 | M7 design gate |
 | 9 | Foreground service with notification for long scans | Required for background scans by Android 8+; M1 runs in-app | M5 |
 | 10 | Export UI (share JSON report, save to storage) | Natural UX for scan reports; not required by M1 criteria | M2 |
+| 11 | Connect-based host-presence pre-pass (Nmap `-PS` unprivileged-fallback analog: `connect()` to 80/443, quick success/ECONNREFUSED = up) | Verified socket-level technique (NMAP-SUBSYSTEMS-DEEP-2 §2); genuinely useful before port scans | M2 |
+| 12 | `java.nio` Selector-based transport realization | Nsock-style pluggable engine; only if profiling shows `Dispatchers.IO` thread cost is a bottleneck | M2+ (profile first) |
+| 13 | Embedding Lua for a script engine | **Rejected** — heavy dependency + would invite NPSL NSE scripts; typed Kotlin probe pipeline chosen instead (NMAP-SUBSYSTEMS-DEEP-2 §1.4) | Reopen only if stakeholder demands script compatibility |

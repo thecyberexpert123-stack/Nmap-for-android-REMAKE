@@ -242,3 +242,51 @@ Linux) and asked to go deeper on specific Nmap subsystems. Still docs-only.
   limitation from a dead end into a routing problem. It maps 1:1 onto the
   executor/router architecture already planned, which validated the
   intent/execution separation chosen in Phase 0.
+
+---
+
+## 2026-09-11 (subsystem deep-dive, part 2) — NSE, host discovery, scan-phase state machine
+
+### Context
+Stakeholder chose to continue deepening Nmap subsystems before any code.
+
+### What I did
+1. Fetched: the official book's "Implementation Details" (NSE) and
+   "Script Parallelism in NSE" chapters, the remainder of "Host
+   Discovery" (all `-P*` probe semantics), plus DeepWiki source-level
+   analyses of Port Scanning (UltraScanInfo phases) and the Nsock library.
+2. Wrote `docs/NMAP-SUBSYSTEMS-DEEP-2.md`: NSE architecture (Lua/C++
+   split, single persistent Lua state, runlevels, queue scheduler),
+   parallelism model (coroutine threads, worker threads, mutexes,
+   condvars, single-threaded loop), host discovery mechanics table with
+   unprivileged fallbacks, and the ultra_scan state machine with the
+   Nsock event library.
+3. Folded deltas: RECOMMENDATIONS gained the connect-based host-presence
+   pre-pass (M2), the NIO-engine option, and the Lua-rejection rationale;
+   ARCHITECTURE documents `TcpTransport` as the Nsock-engine analog.
+4. Updated PLAN (§8 tree, §11), CHANGELOG, this journal. Committed and
+   pushed (no merge). Fixed a CHANGELOG bullet that my edit had
+   overwritten (caught during self-review — rule #22).
+
+### Decisions
+- Kotlin coroutines are confirmed as the NSE-thread analog: structured
+  concurrency for probe jobs; `Mutex`/condvars from kotlinx when needed.
+- Host discovery on Android starts as the verified unprivileged connect
+  fallback (SYN via connect to 80/443); ARP/ICMP/UDP/SCTP pings remain
+  delegation-class.
+- The `TcpTransport` seam (socket / NIO / fake) mirrors Nsock's engine
+  pluggability — one contract, no privilege assumptions baked in.
+
+### Challenges / open questions
+- Whether to expose an optional "host discovery" pre-pass in the UI
+  before port scans is a UX decision for the stakeholder at M2.
+- DeepWiki is a secondary, AI-generated source: it was cross-checked
+  against file names verified directly on GitHub's nmap/nmap tree; any
+  claim sourced only to DeepWiki is labeled as such in the doc.
+
+### Learning
+- Source-level indexes (DeepWiki) and the official book complement each
+  other: the book gives *why* and the exact algorithms; the index gives
+  *where* (file/function mapping). Using one without the other would
+  have produced either mechanism without location or location without
+  mechanism.

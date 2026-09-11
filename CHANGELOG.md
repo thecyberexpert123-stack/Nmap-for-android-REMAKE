@@ -52,12 +52,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ports/sslports/totalwaitms/tcpwrappedms/rarity/fallback + versioninfo
   helpers); (4) OS-matching algorithms (IPv4 MatchPoints weighting; IPv6
   logistic regression + novelty threshold 15 + 10% ambiguity rule).
-- PLAN/ARCHITECTURE deltas folded in: delegation model in PLAN §2.3 and M7
-  criteria (topology discovery, capability proof); Phase 2 adopts adaptive
-  RTT timeouts + self-authored signature DB grammar; Phase 4 adopts weighted
-  scoring + logistic + novelty on application-level features; connect-scan
-  honesty (kernel owns SYN retransmission); architectural invariants added
-  to ARCHITECTURE §1 and delegation sequence in §4.4.
+- `docs/NMAP-SUBSYSTEMS-DEEP-2.md` — subsystem deep-dive part 2: NSE
+  internals & script parallelism (single Lua state, nse_main.lua core,
+  Script/Thread classes, dependency runlevels, running/waiting/pending
+  queues, coroutine threads, worker threads, mutexes/condvars), host
+  discovery mechanics (all `-P*` probes with defaults, response semantics,
+  unprivileged `connect()` fallbacks, firewall rationale), and the
+  scan-phase state machine (`ultra_scan` → `UltraScanInfo` phases,
+  HostScanStats/GroupScanStats/UltraProbe, connect/raw engine split) with
+  the Nsock event library (pools/IODs/events/engine backends). Deltas:
+  Kotlin coroutines ≈ NSE threads (typed probe pipeline reconfirmed, Lua
+  rejected), connect-based host-presence pre-pass recorded for M2,
+  `TcpTransport` seam documented as the Nsock-engine analog.
+- RECOMMENDATIONS extended: host-presence pre-pass, NIO engine option,
+  Lua-embedding rejection rationale.
+- PLAN/ARCHITECTURE deltas folded in (previous round): delegation model in
+  PLAN §2.3 and M7 criteria (topology discovery, capability proof);
+  Phase 2 adopts adaptive RTT timeouts + self-authored signature DB
+  grammar; Phase 4 adopts weighted scoring + logistic + novelty on
+  application-level features; connect-scan honesty (kernel owns SYN
+  retransmission); architectural invariants added to ARCHITECTURE §1 and
+  delegation sequence in §4.4.
 
 ### Decided (stakeholder approval, 2026-09-11)
 - License: **GPL-2.0-or-later** — `LICENSE` added (verbatim GPLv2 text from SPDX

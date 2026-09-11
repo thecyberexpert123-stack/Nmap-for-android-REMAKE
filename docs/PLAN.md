@@ -388,6 +388,7 @@ Nmap-for-android-REMAKE/
 │   ├── ARCHITECTURE.md                  # module map, API sketches, sequence diagrams, schema v1
 │   ├── NMAP-DEEP-DIVE.md                # Nmap subsystem analysis + Android feasibility mapping
 │   ├── NMAP-SUBSYSTEMS-DEEP.md          # ultra_scan algorithms, raw-send path + delegation architecture, probes format, OS matching
+│   ├── NMAP-SUBSYSTEMS-DEEP-2.md        # NSE internals & parallelism, host discovery mechanics, scan-phase state machine + Nsock
 │   ├── RECOMMENDATIONS.md               # parked ideas (no scope creep in code)
 │   └── adr/                             # ADR-0001 license, ADR-0002 UI, ADR-0003 SDK levels, …
 ├── settings.gradle.kts
@@ -540,9 +541,18 @@ approval is given.
    format, and the OS-matching algorithms (IPv4 MatchPoints + IPv6
    logistic/novelty); six integrated design deltas recorded in §5 of that
    document.
-4. Approve (or further refine) the Phase 0+1 milestone criteria (D1–D9, §5.1)
+4. ~~Subsystem deep-dive part 2~~ → done:
+   `docs/NMAP-SUBSYSTEMS-DEEP-2.md` covers NSE internals & script
+   parallelism (Lua/C++ split, runlevels, coroutine threads, mutexes),
+   host discovery mechanics (`-PS/-PA/-PU/-PY/-PE/-PP/-PM` with
+   unprivileged fallbacks), and the scan-phase state machine
+   (`UltraScanInfo` phases + Nsock event library); deltas folded into
+   RECOMMENDATIONS (connect-based host-presence pre-pass, NIO engine
+   option, Lua rejected) and ARCHITECTURE (transport-seam = Nsock-engine
+   analog).
+5. Approve (or further refine) the Phase 0+1 milestone criteria (D1–D9, §5.1)
    before any implementation starts.
-5. Copyright holder line for the GPL notices (to be set by the project owner).
+6. Copyright holder line for the GPL notices (to be set by the project owner).
 
 ---
 
