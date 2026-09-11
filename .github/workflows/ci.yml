@@ -72,10 +72,10 @@ jobs:
         run: |
           log=/tmp/gradle-app.log
           [ -f /tmp/gradle-jvm.log ] && log=/tmp/gradle-jvm.log
-          python3 .github/scripts/post-failure-annotation.py "$log" "Gradle failure tail"
+          python3 .github/scripts/post-annotation.py "$log" "Gradle failure tail" failure failure
 
   emulator:
-    name: Instrumentation tests on API ${{ matrix.api }}
+    name: E2E app scan on API ${{ matrix.api }} emulator
     runs-on: ubuntu-latest
     timeout-minutes: 60
     permissions:
@@ -104,17 +104,66 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      - name: Run instrumentation tests on emulator
+      # Real, authorized scan targets for the app: the emulator reaches the
+      # runner host as 10.0.2.2. 18080/18443 listen (OPEN), 18081/18082 do
+      # not (CLOSED), and 18099 is silently dropped when iptables allows
+      # (TIMEOUT) — nothing outside this job is touched.
+      - name: Start authorized scan targets on the runner host
+        run: |
+          nohup python3 -m http.server 18080 --bind 127.0.0.1 >/tmp/target-18080.log 2>&1 &
+          nohup python3 -m http.server 18443 --bind 127.0.0.1 >/tmp/target-18443.log 2>&1 &
+          sleep 1
+          curl -s -o /dev/null -w "listener 18080: %{http_code}\n" http://127.0.0.1:18080/ || true
+          curl -s -o /dev/null -w "listener 18443: %{http_code}\n" http://127.0.0.1:18443/ || true
+          if sudo iptables -A INPUT -p tcp --dport 18099 -j DROP 2>/dev/null; then
+            echo "TIMEOUT_ENABLED=true" >> "$GITHUB_ENV"
+          else
+            echo "TIMEOUT_ENABLED=false" >> "$GITHUB_ENV"
+          fi
+
+      - name: Run the app on the emulator (E2E scan tests)
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api }}
           arch: x86_64
           disable-animations: true
           emulator-boot-timeout: 1200
-          script: ./gradlew :app:connectedDebugAndroidTest --stacktrace 2>&1 | tee /tmp/gradle-emu.log
+          script: |
+            if [ "$TIMEOUT_ENABLED" = "true" ]; then
+              ./gradlew :app:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.timeoutPortEnabled=true --stacktrace 2>&1 | tee /tmp/gradle-emu.log
+            else
+              ./gradlew :app:connectedDebugAndroidTest --stacktrace 2>&1 | tee /tmp/gradle-emu.log
+            fi
+
+      - name: Capture scan evidence (logcat + screenshot)
+        if: always()
+        run: |
+          SDK="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-/usr/local/lib/android/sdk}}"
+          export PATH="$SDK/platform-tools:$PATH"
+          adb logcat -d > /tmp/scan-logcat.log || true
+          adb exec-out run-as org.nmapremake.app cat files/scan-results.png > /tmp/scan-results.png 2>/dev/null || true
+          grep -E "ScanE2E|ScanReal|ScanTimeout" /tmp/scan-logcat.log > /tmp/scan-evidence.log \
+            || echo "(no scan evidence in logcat)" > /tmp/scan-evidence.log
+
+      - name: Upload scan evidence artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scan-evidence-api-${{ matrix.api }}
+          path: |
+            /tmp/scan-logcat.log
+            /tmp/scan-results.png
+            /tmp/scan-evidence.log
+          if-no-files-found: ignore
+
+      - name: Post scan evidence as check-run annotation
+        if: always()
+        shell: bash
+        run: |
+          python3 .github/scripts/post-annotation.py /tmp/scan-evidence.log "Scan E2E evidence (API ${{ matrix.api }})" success notice 60000
 
       - name: Report emulator failure details
         if: failure()
         shell: bash
         run: |
-          python3 .github/scripts/post-failure-annotation.py /tmp/gradle-emu.log "Emulator step failure tail (API ${{ matrix.api }})"
+          python3 .github/scripts/post-annotation.py /tmp/gradle-emu.log "Emulator step failure tail (API ${{ matrix.api }})" failure failure

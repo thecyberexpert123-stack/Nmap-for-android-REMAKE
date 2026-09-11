@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Posts the tail of a failing step's log as a GitHub check-run annotation.
+"""Posts the tail of a log file as a GitHub check-run annotation.
 
 The development sandbox has no egress to the Actions log-storage host, so
-this relays failure details through api.github.com (reachable from there).
-Usage: post-failure-annotation.py LOG_PATH ANNOTATION_TITLE [MAX_CHARS]
+this relays step output through api.github.com (reachable from there).
+
+Usage: post-annotation.py LOG_PATH TITLE [CONCLUSION=failure] [LEVEL=failure] [MAX_CHARS=12000]
 """
 import json
 import os
@@ -11,8 +12,10 @@ import sys
 import urllib.request
 
 log_path = sys.argv[1]
-title = sys.argv[2] if len(sys.argv) > 2 else "Gradle failure tail"
-max_chars = int(sys.argv[3]) if len(sys.argv) > 3 else 12000
+title = sys.argv[2] if len(sys.argv) > 2 else "Step details"
+conclusion = sys.argv[3] if len(sys.argv) > 3 else "failure"
+level = sys.argv[4] if len(sys.argv) > 4 else "failure"
+max_chars = int(sys.argv[5]) if len(sys.argv) > 5 else 12000
 
 try:
     with open(log_path, errors="replace") as handle:
@@ -20,22 +23,22 @@ try:
 except OSError as error:
     tail = f"(could not read {log_path}: {error})"
 if not tail.strip():
-    tail = "(no log output captured)"
+    tail = "(no output captured)"
 
 body = json.dumps({
-    "name": "step-failure-details",
+    "name": "step-details",
     "head_sha": os.environ["GITHUB_SHA"],
     "status": "completed",
-    "conclusion": "failure",
+    "conclusion": conclusion,
     "output": {
         "title": title,
-        "summary": "Tail of the failing step log.",
+        "summary": "Captured step output.",
         "annotations": [
             {
                 "path": log_path,
                 "start_line": 1,
                 "end_line": 1,
-                "annotation_level": "failure",
+                "annotation_level": level,
                 "message": tail,
             },
         ],
