@@ -8,6 +8,9 @@ import kotlinx.serialization.Serializable
  * (1..65535). Parsed atomically by [org.nmapremake.core.parse.PortSpecParser]:
  * one invalid token rejects the entire spec. Parser-produced [List] specs are
  * deduped with order kept.
+ *
+ * Note: `kotlin.collections.List` is always written fully qualified here —
+ * the nested [List] class shadows the stdlib type inside this interface.
  */
 @Serializable
 sealed interface PortSpec {
@@ -15,7 +18,7 @@ sealed interface PortSpec {
     data class Single(val port: Int) : PortSpec
 
     @Serializable
-    data class List(val ports: List<Int>) : PortSpec
+    data class List(val ports: kotlin.collections.List<Int>) : PortSpec
 
     @Serializable
     data class Range(val first: Int, val last: Int) : PortSpec
@@ -30,14 +33,14 @@ sealed interface PortSpec {
          * NPSL-licensed `nmap-services` open-frequency data. See
          * docs/NMAP-DEEP-DIVE.md.
          */
-        val curated: List<Int> = CURATED_TOP_PORTS
+        val curated: kotlin.collections.List<Int> = CURATED_TOP_PORTS
     }
 
     @Serializable
     data object All : PortSpec
 
     /** Expands the spec into the concrete port list. Port range is 1..65535. */
-    fun expand(): List<Int> = when (this) {
+    fun expand(): kotlin.collections.List<Int> = when (this) {
         is Single -> listOf(port)
         is List -> ports
         is Range -> (first..last).toList()
@@ -51,7 +54,7 @@ sealed interface PortSpec {
     }
 }
 
-private val CURATED_TOP_PORTS: List<Int> = listOf(
+private val CURATED_TOP_PORTS: kotlin.collections.List<Int> = listOf(
     80, 443, 22, 21, 25, 53, 110, 143, 993, 995,
     8080, 8443, 23, 587, 465, 3306, 5432, 6379, 27017, 3389,
     5900, 139, 445, 135, 137, 138, 161, 162, 389, 636,

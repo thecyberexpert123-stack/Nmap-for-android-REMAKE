@@ -53,7 +53,10 @@ jobs:
             echo "(nothing to commit)"
           fi
 
+      # 'shell: bash' runs with -o pipefail so gradlew's exit code survives
+      # the | tee (the default shell would report tee's status: always 0).
       - name: Verify pure-JVM modules (core, engine)
+        shell: bash
         run: >
           ./gradlew
           :core:check
@@ -66,6 +69,7 @@ jobs:
           2>&1 | tee /tmp/gradle-jvm.log
 
       - name: Verify Android app (assemble, lint, ktlint, detekt)
+        shell: bash
         run: >
           ./gradlew
           :app:assembleDebug
@@ -168,8 +172,9 @@ jobs:
           emulator-boot-timeout: 1200
           # NOTE: this script is executed as ONE line with /bin/sh (dash),
           # so keep it single-line, pipe-free and bashism-free. gradlew logs
-          # to a file first (exit code preserved), then the file is printed.
-          script: if [ "$TIMEOUT_ENABLED" = "true" ]; then ./gradlew :app:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.timeoutPortEnabled=true --stacktrace > /tmp/gradle-emu.log 2>&1; else ./gradlew :app:connectedDebugAndroidTest --stacktrace > /tmp/gradle-emu.log 2>&1; fi; cat /tmp/gradle-emu.log
+          # to a file first, then the status is captured BEFORE the cat so
+          # a failed build cannot be masked by a successful cat.
+          script: if [ "$TIMEOUT_ENABLED" = "true" ]; then ./gradlew :app:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.timeoutPortEnabled=true --stacktrace > /tmp/gradle-emu.log 2>&1; else ./gradlew :app:connectedDebugAndroidTest --stacktrace > /tmp/gradle-emu.log 2>&1; fi; status=$?; cat /tmp/gradle-emu.log; exit $status
 
       # The emulator is torn down after the runner step above, so adb can
       # hang against a stale server — bound every call with a timeout.
