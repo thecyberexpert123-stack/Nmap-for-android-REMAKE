@@ -6,11 +6,9 @@ import kotlin.test.assertIs
 import kotlin.test.assertNull
 
 class TargetParserTest {
-    private fun success(raw: String): TargetParser.ParseOutcome.Success =
-        assertIs(TargetParser.parse(raw))
+    private fun success(raw: String): TargetParser.ParseOutcome.Success = assertIs(TargetParser.parse(raw))
 
-    private fun failure(raw: String): TargetParser.ParseOutcome.Failure =
-        assertIs(TargetParser.parse(raw))
+    private fun failure(raw: String): TargetParser.ParseOutcome.Failure = assertIs(TargetParser.parse(raw))
 
     @Test
     fun `ipv4 literal`() {
@@ -85,8 +83,9 @@ class TargetParserTest {
     }
 
     @Test
-    fun `single label rejected`() {
-        assertEquals("INVALID_TARGET", failure("example").error.code)
+    fun `single label accepted`() {
+        assertEquals("localhost", success("localhost").target.label)
+        assertEquals("h", success("h").target.label)
     }
 
     @Test

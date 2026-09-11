@@ -13,6 +13,8 @@ import org.nmapremake.core.model.ScanPlan
 import org.nmapremake.core.model.ScanReport
 import org.nmapremake.core.model.Target
 import org.nmapremake.core.model.TransportProtocol
+import org.nmapremake.core.model.errorOrNull
+import org.nmapremake.core.model.getOrNull
 import org.nmapremake.engine.ResultAggregator
 import kotlin.test.assertEquals
 import kotlin.test.assertNull

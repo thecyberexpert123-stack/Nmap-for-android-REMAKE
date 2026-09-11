@@ -630,3 +630,51 @@ detekt, app lint warnings-as-errors, emulator matrix API 26 + 36).
 ### Open items
 - §5.1.7 real-device LAN scan sign-off still requires stakeholder
   hardware; CI emulators cannot substitute (recorded in PLAN).
+
+## 2026-09-11 (session 4) — Honest CI: un-masking the M1 defect backlog
+
+### Context
+Stakeholder: "some tests are failing, please fix them." The emulator E2E jobs
+(API 26/36) were green, but the verify job was red since the pipeline became
+honest (10effd7). Every historic "green" had been masked by shell exit-code
+bugs; the honest pipeline now exposes each latent M1 defect one layer at a
+time, and each fix reveals the next layer.
+
+### What I did
+Round by round, from CI evidence branches and job-log blob URLs:
+1. detekt MaxLineLength (4 lines) — fixed, then ktlint collapsed them back
+   (the 121..140 trap: ktlint's 140 limit vs detekt's 120). Restructured the
+   lines instead (block bodies / type-inferred single-line bodies).
+2. `:core:compileTestKotlin` — core/engine tests imported `kotlin.test` with
+   no kotlin-test dependency: added `kotlin("test-junit5")` (matches JUnit 5).
+3. Parser tests misused `kotlin.test.assertIs(KClass, value)` as a two-arg
+   matcher (second parameter is the message): switched to the reified form.
+4. First real unit-test execution ever: 76 ran, 11 failed — genuine spec
+   violations: `TopPorts.curated` had 99 unsorted entries (spec: 100 sorted),
+   `PlanInputParser` tests failed because `TargetParser` rejected
+   single-label hosts ("h", "localhost") while PLAN §5.1.1 explicitly lists
+   `localhost` as accepted, and `PortSpecParser` let `80,all` through.
+5. `JsonFormatterTest` never compiled (missing imports of the
+   `getOrNull`/`errorOrNull` extensions).
+6. Added `--continue` to the verify invocations so one run reports every
+   failing task instead of one layer per round.
+
+### Learnings
+- ktlint's formatter collapses any expression body that fits 140 chars back
+  to one line, while detekt's MaxLineLength stays at 120: lines in the
+  121..140 range can never satisfy both tools. Restructure, don't rewrap.
+- kotlin-test is not on the classpath automatically just because JUnit 5 is.
+- The test suite was written against the PLAN but had never executed: the
+  "first honest run" was always going to surface a backlog, and that backlog
+  is exactly what the stakeholder asked to fix.
+- The git evidence relay + job-log blob channel remains the only way to
+  diagnose CI from this sandbox; the check-run annotation relay stays dead
+  (403 for this repo's token).
+
+### Open items
+- Engine tests run for the first time in the next round; their runtime
+  behavior is unverified as of this entry.
+- The app part of verify (assemble/lint/ktlint/detekt) has not executed yet
+  (the JVM step failed first); it runs once the JVM step passes.
+- `:app:testDebugUnitTest` (ScanViewModelTest, ProfileBannerTest) is still
+  not wired into CI; wire it after the current loop is green.

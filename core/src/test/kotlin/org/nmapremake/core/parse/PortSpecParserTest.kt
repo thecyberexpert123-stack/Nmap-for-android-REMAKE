@@ -6,11 +6,9 @@ import kotlin.test.assertEquals
 import kotlin.test.assertIs
 
 class PortSpecParserTest {
-    private fun success(raw: String): PortSpecParser.ParseOutcome.Success =
-        assertIs(PortSpecParser.parse(raw))
+    private fun success(raw: String): PortSpecParser.ParseOutcome.Success = assertIs(PortSpecParser.parse(raw))
 
-    private fun failure(raw: String): PortSpecParser.ParseOutcome.Failure =
-        assertIs(PortSpecParser.parse(raw))
+    private fun failure(raw: String): PortSpecParser.ParseOutcome.Failure = assertIs(PortSpecParser.parse(raw))
 
     @Test
     fun `single port`() {

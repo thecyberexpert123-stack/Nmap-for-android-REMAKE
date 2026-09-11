@@ -10,8 +10,9 @@ import java.util.regex.Pattern
  * M1 target grammar (PLAN section 5.1.1): a non-empty string containing no
  * whitespace or URI-scheme prefixes. Accepted: IPv4 literal, IPv6 literal
  * (bracketed or not), DNS hostname (including IDN unicode, folded with IDN
- * mapping). Everything else — CIDR blocks, ranges, commas — is rejected with
- * the exact code CIDR_NOT_SUPPORTED_YET so the UI can say so honestly.
+ * mapping, and single-label names such as `localhost`). Everything else —
+ * CIDR blocks, ranges, commas — is rejected with the exact code
+ * CIDR_NOT_SUPPORTED_YET so the UI can say so honestly.
  */
 object TargetParser {
     fun parse(raw: String): ParseOutcome {
@@ -83,11 +84,11 @@ object TargetParser {
             labels.any { label ->
                 label.isEmpty() || label.length > LABEL_MAX || !LABEL.matcher(label).matches()
             }
-        if (labels.size < 2 || hasInvalidLabel) {
+        if (hasInvalidLabel) {
             return ParseOutcome.failure(
                 ScanError(
                     ErrorCode.INVALID_TARGET,
-                    "hostname must be fully qualified (e.g. example.com)",
+                    "hostname contains an invalid label",
                 ),
             )
         }

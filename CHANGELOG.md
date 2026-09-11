@@ -164,7 +164,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (stakeholder chose docs-only iteration).
 
 ### Fixed
-- (none yet)
+- CI honesty chain: exit-code masking in the workflow (`| tee` under the
+  default shell, trailing `cat`) had been silently swallowing real build
+  failures — earlier "M1 CI-verified" runs were false positives. The verify
+  job now runs under `shell: bash` (pipefail), the emulator runner script
+  propagates gradlew's status explicitly, and the JVM unit tests compiled and
+  ran for the first time. Latent defects found and fixed by the now-honest
+  pipeline, one CI round at a time:
+  - `PortSpec.kt` used fully qualified `kotlin.collections.List` (the nested
+    `data class List` shadowed the stdlib type since M1).
+  - `TargetParser` rejected single-label hostnames (`localhost`) contrary to
+    PLAN §5.1.1; single labels are now accepted.
+  - `TargetParserTest` codified the wrong rejection; replaced with
+    `single label accepted`.
+  - `PortSpecParser` accepted `80,all`-style mixes; bulk keywords now must
+    stand alone (`top-100`/`all` alone or rejected).
+  - `TopPorts.curated` had 99 unsorted entries; now exactly 100 distinct
+    ports sorted ascending (added 554/RTSP).
+  - core/engine tests used `kotlin.test` without declaring kotlin-test
+    (added `kotlin("test-junit5")`); parser tests misused the two-argument
+    `assertIs`; `JsonFormatterTest` missed the `getOrNull`/`errorOrNull`
+    extension imports.
+  - ktlint-vs-detekt line-length trap (121–140 chars): ktlint collapses
+    expression bodies that fit 140 while detekt enforces 120 — the four
+    affected lines were restructured to satisfy both.
+  - Verify gradle invocations run with `--continue` so one round reports
+    every failing task instead of stopping at the first layer.
 
 ### Changed
 - (none yet)

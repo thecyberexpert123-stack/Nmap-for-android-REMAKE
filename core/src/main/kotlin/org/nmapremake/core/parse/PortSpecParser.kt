@@ -19,14 +19,6 @@ object PortSpecParser {
         var sawBulk = false
         val entries = mutableListOf<PortEntry>()
         for (token in tokens) {
-            if (sawBulk) {
-                return ParseOutcome.error(
-                    ScanError(
-                        ErrorCode.INVALID_PORT,
-                        "bulk keyword must stand alone: got extra token after it",
-                    ),
-                )
-            }
             when (val e = parseToken(token)) {
                 is ParseTokenResult.Ok -> {
                     entries += e.entry
@@ -34,6 +26,11 @@ object PortSpecParser {
                 }
                 is ParseTokenResult.Error -> return ParseOutcome.error(e.error)
             }
+        }
+        if (sawBulk && entries.size > 1) {
+            return ParseOutcome.error(
+                ScanError(ErrorCode.INVALID_PORT, "bulk keyword must stand alone"),
+            )
         }
         return ParseOutcome.Success(entries)
     }
