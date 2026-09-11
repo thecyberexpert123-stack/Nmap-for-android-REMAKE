@@ -129,20 +129,31 @@ jobs:
           disable-animations: true
           emulator-boot-timeout: 1200
           script: |
+            set -eo pipefail
             if [ "$TIMEOUT_ENABLED" = "true" ]; then
               ./gradlew :app:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.timeoutPortEnabled=true --stacktrace 2>&1 | tee /tmp/gradle-emu.log
             else
               ./gradlew :app:connectedDebugAndroidTest --stacktrace 2>&1 | tee /tmp/gradle-emu.log
             fi
 
+      # Failure details go first: the evidence steps below are slow and
+      # must never delay (or block) the diagnosis of a failed scan step.
+      - name: Report emulator failure details
+        if: failure()
+        shell: bash
+        run: |
+          python3 .github/scripts/post-annotation.py /tmp/gradle-emu.log "Emulator step failure tail (API ${{ matrix.api }})" failure failure 12000 step-details
+
+      # The emulator is torn down after the runner step above, so adb can
+      # hang against a stale server — bound every call with a timeout.
       - name: Capture scan evidence (logcat + screenshot)
         if: always()
         run: |
           SDK="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-/usr/local/lib/android/sdk}}"
           export PATH="$SDK/platform-tools:$PATH"
-          adb logcat -d > /tmp/scan-logcat.log || true
-          adb exec-out run-as org.nmapremake.app cat files/scan-results.png > /tmp/scan-results.png 2>/dev/null || true
-          grep -E "ScanE2E|ScanReal|ScanTimeout" /tmp/scan-logcat.log > /tmp/scan-evidence.log \
+          timeout 45 adb logcat -d > /tmp/scan-logcat.log || true
+          timeout 45 adb exec-out run-as org.nmapremake.app cat files/scan-results.png > /tmp/scan-results.png 2>/dev/null || true
+          timeout 15 grep -E "ScanE2E|ScanReal|ScanTimeout" /tmp/scan-logcat.log > /tmp/scan-evidence.log \
             || echo "(no scan evidence in logcat)" > /tmp/scan-evidence.log
 
       - name: Upload scan evidence artifacts
@@ -160,10 +171,4 @@ jobs:
         if: always()
         shell: bash
         run: |
-          python3 .github/scripts/post-annotation.py /tmp/scan-evidence.log "Scan E2E evidence (API ${{ matrix.api }})" success notice 60000
-
-      - name: Report emulator failure details
-        if: failure()
-        shell: bash
-        run: |
-          python3 .github/scripts/post-annotation.py /tmp/gradle-emu.log "Emulator step failure tail (API ${{ matrix.api }})" failure failure
+          python3 .github/scripts/post-annotation.py /tmp/scan-evidence.log "Scan E2E evidence (API ${{ matrix.api }})" success notice 60000 scan-evidence
