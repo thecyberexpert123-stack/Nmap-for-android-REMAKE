@@ -13,8 +13,9 @@ import org.nmapremake.core.model.ScanReport
  * compatible), and unknown `ScanError.code` strings are preserved verbatim
  * while decoding to INTERNAL.
  */
-class JsonFormatter(private val json: Json = Default) {
-
+class JsonFormatter(
+    private val json: Json = Default,
+) {
     fun format(report: ScanReport): String = json.encodeToString(ScanReport.serializer(), report)
 
     fun parse(text: String): ParseResult<ScanReport> =
@@ -39,10 +40,11 @@ class JsonFormatter(private val json: Json = Default) {
     companion object {
         private const val MAX_ERROR_DETAIL = 160
 
-        val Default: Json = Json {
-            prettyPrint = true
-            encodeDefaults = false
-            ignoreUnknownKeys = true
-        }
+        val Default: Json =
+            Json {
+                prettyPrint = true
+                encodeDefaults = false
+                ignoreUnknownKeys = true
+            }
     }
 }

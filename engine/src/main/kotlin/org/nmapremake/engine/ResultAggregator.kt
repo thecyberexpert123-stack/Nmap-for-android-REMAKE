@@ -13,15 +13,16 @@ class ResultAggregator {
         hostResults: List<HostResult>,
         startedAtEpochMs: Long,
         finishedAtEpochMs: Long,
-    ): ScanReport = ScanReport(
-        schemaVersion = 1,
-        generator = GENERATOR,
-        startedAtEpochMs = startedAtEpochMs,
-        finishedAtEpochMs = finishedAtEpochMs,
-        scanPlan = plan,
-        executor = executor,
-        hosts = hostResults,
-    )
+    ): ScanReport =
+        ScanReport(
+            schemaVersion = 1,
+            generator = GENERATOR,
+            startedAtEpochMs = startedAtEpochMs,
+            finishedAtEpochMs = finishedAtEpochMs,
+            scanPlan = plan,
+            executor = executor,
+            hosts = hostResults,
+        )
 
     companion object {
         const val GENERATOR = "nmap-android-remake/engine/0.1.0"

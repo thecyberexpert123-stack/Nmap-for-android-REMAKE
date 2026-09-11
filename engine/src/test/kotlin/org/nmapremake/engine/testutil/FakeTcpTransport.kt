@@ -1,11 +1,11 @@
 package org.nmapremake.engine.testutil
 
-import java.util.concurrent.atomic.AtomicBoolean
-import java.util.concurrent.atomic.AtomicInteger
-import java.util.concurrent.locks.LockSupport
 import org.nmapremake.core.model.Target
 import org.nmapremake.engine.ConnectOutcome
 import org.nmapremake.engine.TcpTransport
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.locks.LockSupport
 
 /**
  * Scriptable fake transport for scheduler/prober tests (PLAN §5.1.3:
@@ -19,7 +19,6 @@ import org.nmapremake.engine.TcpTransport
 class FakeTcpTransport(
     private val behavior: FakeTcpTransport.(Target, Int, Long) -> ConnectOutcome,
 ) : TcpTransport {
-
     private val released = AtomicBoolean(false)
 
     /** Currently in-flight connect calls (instrumented counter). */
@@ -28,7 +27,11 @@ class FakeTcpTransport(
     /** Maximum observed in-flight connects. */
     val maxInFlight = AtomicInteger(0)
 
-    override fun connect(target: Target, port: Int, timeoutMs: Long): ConnectOutcome {
+    override fun connect(
+        target: Target,
+        port: Int,
+        timeoutMs: Long,
+    ): ConnectOutcome {
         val current = inFlight.incrementAndGet()
         maxInFlight.updateAndGet { maxOf(it, current) }
         try {
@@ -43,11 +46,9 @@ class FakeTcpTransport(
     }
 
     companion object {
-        fun instant(latencyMs: Long = 1L): FakeTcpTransport =
-            FakeTcpTransport { _, _, _ -> ConnectOutcome.Established(latencyMs) }
+        fun instant(latencyMs: Long = 1L): FakeTcpTransport = FakeTcpTransport { _, _, _ -> ConnectOutcome.Established(latencyMs) }
 
-        fun refused(latencyMs: Long = 2L): FakeTcpTransport =
-            FakeTcpTransport { _, _, _ -> ConnectOutcome.Refused(latencyMs) }
+        fun refused(latencyMs: Long = 2L): FakeTcpTransport = FakeTcpTransport { _, _, _ -> ConnectOutcome.Refused(latencyMs) }
 
         fun outcomes(map: Map<Int, ConnectOutcome>): FakeTcpTransport =
             FakeTcpTransport { _, port, _ -> map[port] ?: ConnectOutcome.Established(1L) }

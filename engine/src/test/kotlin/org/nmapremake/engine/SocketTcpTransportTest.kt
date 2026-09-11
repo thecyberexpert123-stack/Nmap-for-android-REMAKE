@@ -1,5 +1,9 @@
 package org.nmapremake.engine
 
+import kotlinx.coroutines.runBlocking
+import org.junit.jupiter.api.Test
+import org.nmapremake.core.model.ErrorCode
+import org.nmapremake.core.model.Target
 import java.io.IOException
 import java.net.ConnectException
 import java.net.NoRouteToHostException
@@ -7,46 +11,47 @@ import java.net.ServerSocket
 import java.net.Socket
 import java.net.SocketAddress
 import java.net.SocketTimeoutException
-import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.Test
-import org.nmapremake.core.model.ErrorCode
-import org.nmapremake.core.model.Target
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class SocketTcpTransportTest {
     private val target = Target("127.0.0.1")
 
-    private class ThrowingSocket(private val throwable: Throwable) : Socket() {
-        override fun connect(endpoint: SocketAddress, timeout: Int) {
-            throw throwable
-        }
+    private class ThrowingSocket(
+        private val throwable: Throwable,
+    ) : Socket() {
+        override fun connect(
+            endpoint: SocketAddress,
+            timeout: Int,
+        ): Unit = throw throwable
     }
 
     @Test
-    fun `loopback listener establishes`() = runBlocking {
-        val transport = SocketTcpTransport()
-        val server = ServerSocket(0)
-        try {
-            val outcome = transport.connect(target, server.localPort, 2_000)
-            assertTrue(outcome is ConnectOutcome.Established, "outcome was $outcome")
-            assertTrue((outcome as ConnectOutcome.Established).latencyMs >= 0)
-        } finally {
+    fun `loopback listener establishes`() =
+        runBlocking {
+            val transport = SocketTcpTransport()
+            val server = ServerSocket(0)
+            try {
+                val outcome = transport.connect(target, server.localPort, 2_000)
+                assertTrue(outcome is ConnectOutcome.Established, "outcome was $outcome")
+                assertTrue((outcome as ConnectOutcome.Established).latencyMs >= 0)
+            } finally {
+                server.close()
+            }
+        }
+
+    @Test
+    fun `closed loopback port refuses`() =
+        runBlocking {
+            val transport = SocketTcpTransport()
+            // Reserve a port, close it, then connect: no listener -> ECONNREFUSED.
+            val server = ServerSocket(0)
+            val port = server.localPort
             server.close()
+            val outcome = transport.connect(target, port, 2_000)
+            assertTrue(outcome is ConnectOutcome.Refused, "outcome was $outcome")
+            assertTrue((outcome as ConnectOutcome.Refused).latencyMs >= 0)
         }
-    }
-
-    @Test
-    fun `closed loopback port refuses`() = runBlocking {
-        val transport = SocketTcpTransport()
-        // Reserve a port, close it, then connect: no listener -> ECONNREFUSED.
-        val server = ServerSocket(0)
-        val port = server.localPort
-        server.close()
-        val outcome = transport.connect(target, port, 2_000)
-        assertTrue(outcome is ConnectOutcome.Refused, "outcome was $outcome")
-        assertTrue((outcome as ConnectOutcome.Refused).latencyMs >= 0)
-    }
 
     @Test
     fun `connect exception maps to Refused`() {
@@ -103,7 +108,10 @@ class SocketTcpTransportTest {
             SocketTcpTransport(
                 socketFactory = {
                     object : Socket() {
-                        override fun connect(endpoint: SocketAddress, timeout: Int) {
+                        override fun connect(
+                            endpoint: SocketAddress,
+                            timeout: Int,
+                        ) {
                             // Simulates a connect blocked inside the OS call: only
                             // close() (from abort) can unblock it, mirroring how the
                             // JVM aborts a real pending connect.

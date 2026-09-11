@@ -71,10 +71,11 @@ object PortSpecParser {
             return ParseTokenResult.Ok(PortEntry.Range(a, b))
         }
 
-        val n = token.toIntOrNull()
-            ?: return ParseTokenResult.Error(
-                ScanError(ErrorCode.INVALID_PORT, "not a number or known keyword: '$token'"),
-            )
+        val n =
+            token.toIntOrNull()
+                ?: return ParseTokenResult.Error(
+                    ScanError(ErrorCode.INVALID_PORT, "not a number or known keyword: '$token'"),
+                )
         if (n < MIN || n > MAX) {
             return ParseTokenResult.Error(
                 ScanError(ErrorCode.PORT_OUT_OF_RANGE, "port out of range $MIN..$MAX: '$token'"),
@@ -87,8 +88,13 @@ object PortSpecParser {
     private const val MAX = 65535
 
     sealed interface ParseOutcome {
-        data class Success(val entries: List<PortEntry>) : ParseOutcome
-        data class Failure(val error: ScanError) : ParseOutcome
+        data class Success(
+            val entries: List<PortEntry>,
+        ) : ParseOutcome
+
+        data class Failure(
+            val error: ScanError,
+        ) : ParseOutcome
 
         companion object {
             fun error(error: ScanError): ParseOutcome = Failure(error)
@@ -96,16 +102,29 @@ object PortSpecParser {
     }
 
     sealed interface ParseTokenResult {
-        data class Ok(val entry: PortEntry) : ParseTokenResult
-        data class Error(val error: ScanError) : ParseTokenResult
+        data class Ok(
+            val entry: PortEntry,
+        ) : ParseTokenResult
+
+        data class Error(
+            val error: ScanError,
+        ) : ParseTokenResult
     }
 
     /** Normalized entry. Single ports and ranges may repeat across tokens (kept in order). */
     sealed interface PortEntry {
-        data class Single(val port: Int) : PortEntry
-        data class Range(val first: Int, val last: Int) : PortEntry
+        data class Single(
+            val port: Int,
+        ) : PortEntry
+
+        data class Range(
+            val first: Int,
+            val last: Int,
+        ) : PortEntry
 
         /** Bulk keywords: top = top-100, !top = all. */
-        data class Bulk(val top: Boolean) : PortEntry
+        data class Bulk(
+            val top: Boolean,
+        ) : PortEntry
     }
 }

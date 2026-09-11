@@ -41,26 +41,30 @@ class ScanViewModelTest {
         Dispatchers.resetMain()
     }
 
-    private class FakeRunner(private val events: List<ProgressEvent>) : ScanRunner {
+    private class FakeRunner(
+        private val events: List<ProgressEvent>,
+    ) : ScanRunner {
         var cancelCalls = 0
 
-        override fun scan(plan: ScanPlan): Flow<ProgressEvent> = flow {
-            events.forEach { emit(it) }
-        }
+        override fun scan(plan: ScanPlan): Flow<ProgressEvent> =
+            flow {
+                events.forEach { emit(it) }
+            }
 
         override fun cancel() {
             cancelCalls++
         }
     }
 
-    private fun openResult(port: Int) = PortResult(
-        port = port,
-        protocol = TransportProtocol.TCP,
-        state = PortState.OPEN,
-        latencyMs = 5,
-        error = null,
-        evidence = "TCP connect completed in 5 ms",
-    )
+    private fun openResult(port: Int) =
+        PortResult(
+            port = port,
+            protocol = TransportProtocol.TCP,
+            state = PortState.OPEN,
+            latencyMs = 5,
+            error = null,
+            evidence = "TCP connect completed in 5 ms",
+        )
 
     @Test
     fun `initial state shows the capability banner and blocks starting`() {

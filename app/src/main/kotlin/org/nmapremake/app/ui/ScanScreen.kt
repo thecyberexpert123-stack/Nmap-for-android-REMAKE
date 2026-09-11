@@ -65,10 +65,11 @@ fun ScanScreenContent(
     onReset: () -> Unit,
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp),
     ) {
         Text("Nmap Android REMAKE", style = MaterialTheme.typography.titleLarge)
         Text(
@@ -133,17 +134,19 @@ fun ScanScreenContent(
             ScanPhase.INPUT, ScanPhase.AUTHORIZING -> Unit
         }
 
-        val showLiveResults = state.liveResults.isNotEmpty() &&
-            state.phase in setOf(ScanPhase.RUNNING, ScanPhase.CANCELLING, ScanPhase.FAILED)
+        val showLiveResults =
+            state.liveResults.isNotEmpty() &&
+                state.phase in setOf(ScanPhase.RUNNING, ScanPhase.CANCELLING, ScanPhase.FAILED)
         if (showLiveResults) {
             Spacer(Modifier.height(16.dp))
             PortList(
                 results = state.liveResults,
-                header = if (state.isIncomplete) {
-                    "Partial results — incomplete: cancelled by user"
-                } else {
-                    "Results so far"
-                },
+                header =
+                    if (state.isIncomplete) {
+                        "Partial results — incomplete: cancelled by user"
+                    } else {
+                        "Results so far"
+                    },
             )
         }
         if (state.hosts.isNotEmpty()) {
@@ -171,20 +174,22 @@ private fun CapabilityBanner(rows: List<CapabilityRow>) {
         Text("This device can and cannot do:", style = MaterialTheme.typography.titleSmall)
         Spacer(Modifier.height(4.dp))
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .horizontalScroll(rememberScrollState()),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState()),
             horizontalArrangement = Arrangement.spacedBy(6.dp),
         ) {
             for (row in rows) {
                 StateChip(
                     label = row.title,
-                    color = when (row.availability) {
-                        Availability.SUPPORTED, Availability.LIMITED -> openGreen
-                        Availability.NOT_IMPLEMENTED -> plannedAmber
-                        Availability.UNSUPPORTED -> unavailableRed
-                        Availability.UNKNOWN -> neutralGray
-                    },
+                    color =
+                        when (row.availability) {
+                            Availability.SUPPORTED, Availability.LIMITED -> openGreen
+                            Availability.NOT_IMPLEMENTED -> plannedAmber
+                            Availability.UNSUPPORTED -> unavailableRed
+                            Availability.UNKNOWN -> neutralGray
+                        },
                     status = availabilityLabel(row.availability),
                 )
             }
@@ -193,11 +198,16 @@ private fun CapabilityBanner(rows: List<CapabilityRow>) {
 }
 
 @Composable
-private fun StateChip(label: String, color: Color, status: String) {
+private fun StateChip(
+    label: String,
+    color: Color,
+    status: String,
+) {
     Column(
-        modifier = Modifier
-            .background(color, RoundedCornerShape(12.dp))
-            .padding(horizontal = 10.dp, vertical = 6.dp),
+        modifier =
+            Modifier
+                .background(color, RoundedCornerShape(12.dp))
+                .padding(horizontal = 10.dp, vertical = 6.dp),
     ) {
         Text(label, color = Color.White, style = MaterialTheme.typography.labelMedium)
         Text(status, color = Color.White.copy(alpha = 0.85f), style = MaterialTheme.typography.labelSmall)
@@ -205,7 +215,10 @@ private fun StateChip(label: String, color: Color, status: String) {
 }
 
 @Composable
-private fun ProgressSection(state: ScanUiState, onCancelClick: () -> Unit) {
+private fun ProgressSection(
+    state: ScanUiState,
+    onCancelClick: () -> Unit,
+) {
     Spacer(Modifier.height(16.dp))
     Column {
         Text(
@@ -217,11 +230,12 @@ private fun ProgressSection(state: ScanUiState, onCancelClick: () -> Unit) {
             style = MaterialTheme.typography.bodySmall,
         )
         Spacer(Modifier.height(8.dp))
-        val fraction = if (state.totalPorts > 0) {
-            state.progress.finished.toFloat() / state.totalPorts
-        } else {
-            0f
-        }
+        val fraction =
+            if (state.totalPorts > 0) {
+                state.progress.finished.toFloat() / state.totalPorts
+            } else {
+                0f
+            }
         LinearProgressIndicator(progress = { fraction }, modifier = Modifier.fillMaxWidth())
         Spacer(Modifier.height(8.dp))
         OutlinedButton(onClick = onCancelClick, enabled = state.phase == ScanPhase.RUNNING) {
@@ -231,7 +245,10 @@ private fun ProgressSection(state: ScanUiState, onCancelClick: () -> Unit) {
 }
 
 @Composable
-private fun FinishedSection(state: ScanUiState, onReset: () -> Unit) {
+private fun FinishedSection(
+    state: ScanUiState,
+    onReset: () -> Unit,
+) {
     Spacer(Modifier.height(16.dp))
     Column {
         val total = state.hosts.sumOf { it.portResults.size }
@@ -246,7 +263,10 @@ private fun FinishedSection(state: ScanUiState, onReset: () -> Unit) {
 }
 
 @Composable
-private fun FailedSection(state: ScanUiState, onReset: () -> Unit) {
+private fun FailedSection(
+    state: ScanUiState,
+    onReset: () -> Unit,
+) {
     Spacer(Modifier.height(16.dp))
     Column {
         val error = state.error
@@ -265,7 +285,10 @@ private fun FailedSection(state: ScanUiState, onReset: () -> Unit) {
 }
 
 @Composable
-private fun PortList(results: List<PortResult>, header: String) {
+private fun PortList(
+    results: List<PortResult>,
+    header: String,
+) {
     Column {
         Text(header, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
         HorizontalDivider(Modifier.padding(vertical = 4.dp))
@@ -287,12 +310,13 @@ private fun PortRow(result: PortResult) {
             Spacer(Modifier.width(8.dp))
             StateChip(
                 label = result.state.name,
-                color = when (result.state) {
-                    PortState.OPEN -> openGreen
-                    PortState.CLOSED -> closedRed
-                    PortState.TIMEOUT -> plannedAmber
-                    PortState.UNREACHABLE, PortState.INCONCLUSIVE -> neutralGray
-                },
+                color =
+                    when (result.state) {
+                        PortState.OPEN -> openGreen
+                        PortState.CLOSED -> closedRed
+                        PortState.TIMEOUT -> plannedAmber
+                        PortState.UNREACHABLE, PortState.INCONCLUSIVE -> neutralGray
+                    },
                 status = result.latencyMs?.let { "$it ms" } ?: "no response",
             )
         }
@@ -308,13 +332,14 @@ private fun PortRow(result: PortResult) {
     }
 }
 
-private fun availabilityLabel(availability: Availability): String = when (availability) {
-    Availability.SUPPORTED -> "available"
-    Availability.LIMITED -> "limited"
-    Availability.NOT_IMPLEMENTED -> "planned"
-    Availability.UNSUPPORTED -> "not available"
-    Availability.UNKNOWN -> "unknown"
-}
+private fun availabilityLabel(availability: Availability): String =
+    when (availability) {
+        Availability.SUPPORTED -> "available"
+        Availability.LIMITED -> "limited"
+        Availability.NOT_IMPLEMENTED -> "planned"
+        Availability.UNSUPPORTED -> "not available"
+        Availability.UNKNOWN -> "unknown"
+    }
 
 private val openGreen = Color(0xFF2E7D32)
 private val closedRed = Color(0xFFC62828)

@@ -26,19 +26,21 @@ data class ScanPlan(
     val maxDurationMs: Long? = DEFAULT_MAX_DURATION_MS,
 ) {
     /** The capabilities this plan requires of its executor. */
-    fun requiredCapabilities(): Set<Capability> = buildSet {
-        if (tcpPorts != null) add(Capability.TCP_CONNECT)
-        if (udpProbes.isNotEmpty()) add(Capability.UDP_APP_PROBES)
-        if (serviceDetection) add(Capability.SERVICE_DETECTION)
-        if (fingerprinting) add(Capability.FINGERPRINT_INFERENCE)
-    }
+    fun requiredCapabilities(): Set<Capability> =
+        buildSet {
+            if (tcpPorts != null) add(Capability.TCP_CONNECT)
+            if (udpProbes.isNotEmpty()) add(Capability.UDP_APP_PROBES)
+            if (serviceDetection) add(Capability.SERVICE_DETECTION)
+            if (fingerprinting) add(Capability.FINGERPRINT_INFERENCE)
+        }
 
     /** Normalized copy with clamped limits; preserves the requested intent otherwise. */
-    fun clamped(): ScanPlan = copy(
-        probeTimeoutMs = probeTimeoutMs.coerceIn(MIN_PROBE_TIMEOUT_MS, MAX_PROBE_TIMEOUT_MS),
-        concurrency = concurrency.coerceIn(MIN_CONCURRENCY, MAX_CONCURRENCY),
-        maxDurationMs = maxDurationMs?.coerceIn(MIN_MAX_DURATION_MS, MAX_MAX_DURATION_MS),
-    )
+    fun clamped(): ScanPlan =
+        copy(
+            probeTimeoutMs = probeTimeoutMs.coerceIn(MIN_PROBE_TIMEOUT_MS, MAX_PROBE_TIMEOUT_MS),
+            concurrency = concurrency.coerceIn(MIN_CONCURRENCY, MAX_CONCURRENCY),
+            maxDurationMs = maxDurationMs?.coerceIn(MIN_MAX_DURATION_MS, MAX_MAX_DURATION_MS),
+        )
 
     companion object {
         const val DEFAULT_PROBE_TIMEOUT_MS = 5_000L

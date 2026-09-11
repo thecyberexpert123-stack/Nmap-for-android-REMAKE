@@ -1,10 +1,10 @@
 package org.nmapremake.core.parse
 
-import java.net.IDN
-import java.util.regex.Pattern
 import org.nmapremake.core.model.ErrorCode
 import org.nmapremake.core.model.ScanError
 import org.nmapremake.core.model.Target
+import java.net.IDN
+import java.util.regex.Pattern
 
 /**
  * M1 target grammar (PLAN section 5.1.1): a non-empty string containing no
@@ -42,9 +42,10 @@ object TargetParser {
             return ParseOutcome.failure(ScanError(ErrorCode.INVALID_TARGET, "invalid IPv4 literal"))
         }
         if (looksV6Literal(trimmed)) return ParseOutcome.success(Target(trimmed))
-        val bracketed = trimmed.startsWith('[') &&
-            trimmed.endsWith(']') &&
-            looksV6Literal(trimmed.substring(1, trimmed.length - 1))
+        val bracketed =
+            trimmed.startsWith('[') &&
+                trimmed.endsWith(']') &&
+                looksV6Literal(trimmed.substring(1, trimmed.length - 1))
         if (bracketed) {
             return ParseOutcome.success(Target(trimmed.substring(1, trimmed.length - 1)))
         }
@@ -53,29 +54,29 @@ object TargetParser {
 
     private fun looksCidr(s: String): Boolean = CIDR.matcher(s).matches()
 
-    private fun looksV4(s: String): Boolean =
-        s.count { it == '.' } == 3 && s.split('.').all { it.toIntOrNull() in 0..255 }
+    private fun looksV4(s: String): Boolean = s.count { it == '.' } == 3 && s.split('.').all { it.toIntOrNull() in 0..255 }
 
-    private fun looksLikeQuad(s: String): Boolean =
-        s.count { it == '.' } == 3 && s.split('.').all { it.toIntOrNull() != null }
+    private fun looksLikeQuad(s: String): Boolean = s.count { it == '.' } == 3 && s.split('.').all { it.toIntOrNull() != null }
 
     private fun looksV6Literal(s: String): Boolean = s.contains(':') && s.all { it.isDigit() || it in "abcdefABCDEF:." }
 
     private fun parseHostname(trimmed: String): ParseOutcome {
-        val ascii: String = try {
-            IDN.toASCII(trimmed, IDN.ALLOW_UNASSIGNED).lowercase()
-        } catch (_: IllegalArgumentException) {
-            return ParseOutcome.failure(
-                ScanError(ErrorCode.INVALID_TARGET, "invalid hostname characters"),
-            )
-        }
+        val ascii: String =
+            try {
+                IDN.toASCII(trimmed, IDN.ALLOW_UNASSIGNED).lowercase()
+            } catch (_: IllegalArgumentException) {
+                return ParseOutcome.failure(
+                    ScanError(ErrorCode.INVALID_TARGET, "invalid hostname characters"),
+                )
+            }
         if (ascii.length > MAX_HOST_LENGTH) {
             return ParseOutcome.failure(ScanError(ErrorCode.INVALID_TARGET, "hostname too long"))
         }
         val labels = ascii.split('.')
-        val hasInvalidLabel = labels.any { label ->
-            label.isEmpty() || label.length > LABEL_MAX || !LABEL.matcher(label).matches()
-        }
+        val hasInvalidLabel =
+            labels.any { label ->
+                label.isEmpty() || label.length > LABEL_MAX || !LABEL.matcher(label).matches()
+            }
         if (labels.size < 2 || hasInvalidLabel) {
             return ParseOutcome.failure(
                 ScanError(
@@ -88,11 +89,17 @@ object TargetParser {
     }
 
     sealed interface ParseOutcome {
-        data class Success(val target: Target) : ParseOutcome
-        data class Failure(val error: ScanError) : ParseOutcome
+        data class Success(
+            val target: Target,
+        ) : ParseOutcome
+
+        data class Failure(
+            val error: ScanError,
+        ) : ParseOutcome
 
         companion object {
             fun success(target: Target): ParseOutcome = Success(target)
+
             fun failure(error: ScanError): ParseOutcome = Failure(error)
         }
     }

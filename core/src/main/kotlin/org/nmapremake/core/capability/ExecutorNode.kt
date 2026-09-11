@@ -36,15 +36,16 @@ data class ExecutorNode(
 
 object Executors {
     /** The local, built-in stock-Android executor (capability matrix column E1). */
-    val LOCAL_ANDROID = ExecutorNode(
-        id = "local-android",
-        label = "This device (Android)",
-        type = ExecutorType.ANDROID_LOCAL,
-        transport = "direct",
-        reachability = ExecutorReachability.LOCAL,
-        trustLevel = TrustLevel.LOCAL,
-        capabilities = CapabilityProfile.ANDROID_LOCAL_M1,
-        discoveredVia = "built-in",
-        capabilityProof = "Matrix E1: stock Android, no root. See docs/CAPABILITY-MATRIX.md",
-    )
+    val LOCAL_ANDROID =
+        ExecutorNode(
+            id = "local-android",
+            label = "This device (Android)",
+            type = ExecutorType.ANDROID_LOCAL,
+            transport = "direct",
+            reachability = ExecutorReachability.LOCAL,
+            trustLevel = TrustLevel.LOCAL,
+            capabilities = CapabilityProfile.ANDROID_LOCAL_M1,
+            discoveredVia = "built-in",
+            capabilityProof = "Matrix E1: stock Android, no root. See docs/CAPABILITY-MATRIX.md",
+        )
 }

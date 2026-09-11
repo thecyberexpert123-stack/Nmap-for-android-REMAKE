@@ -1,5 +1,8 @@
 package org.nmapremake.engine
 
+import org.nmapremake.core.model.ErrorCode
+import org.nmapremake.core.model.ScanError
+import org.nmapremake.core.model.Target
 import java.io.IOException
 import java.net.ConnectException
 import java.net.InetSocketAddress
@@ -7,9 +10,6 @@ import java.net.NoRouteToHostException
 import java.net.Socket
 import java.net.SocketTimeoutException
 import java.util.concurrent.ConcurrentHashMap
-import org.nmapremake.core.model.ErrorCode
-import org.nmapremake.core.model.ScanError
-import org.nmapremake.core.model.Target
 
 /**
  * [java.net.Socket]-backed [TcpTransport]. Maps exceptions per the
@@ -22,13 +22,16 @@ class SocketTcpTransport(
     private val clock: EngineClock = SystemClock,
     private val socketFactory: () -> Socket = { Socket() },
 ) : TcpTransport {
-
     private val openSockets = ConcurrentHashMap.newKeySet<Socket>()
 
     // Each catch maps a specific exception TYPE to a ConnectOutcome; the
     // exception object itself carries no extra information the report needs.
     @Suppress("SwallowedException")
-    override fun connect(target: Target, port: Int, timeoutMs: Long): ConnectOutcome {
+    override fun connect(
+        target: Target,
+        port: Int,
+        timeoutMs: Long,
+    ): ConnectOutcome {
         val started = clock.now()
         val socket = socketFactory()
         openSockets += socket
@@ -47,8 +50,9 @@ class SocketTcpTransport(
                 "Permission denied: INTERNET",
             )
         } catch (e: IOException) {
-            val message = "${e.javaClass.simpleName}: ${e.message ?: "no message"}"
-                .take(ScanError.MAX_MESSAGE_LENGTH)
+            val message =
+                "${e.javaClass.simpleName}: ${e.message ?: "no message"}"
+                    .take(ScanError.MAX_MESSAGE_LENGTH)
             ConnectOutcome.Failed(
                 ScanError(ErrorCode.INTERNAL, message),
                 message,

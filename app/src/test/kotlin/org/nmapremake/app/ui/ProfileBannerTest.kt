@@ -34,8 +34,9 @@ class ProfileBannerTest {
 
     @Test
     fun `TCP connect row reflects matrix E1`() {
-        val row = profileToBanner(CapabilityProfile.ANDROID_LOCAL_M1)
-            .first { it.capability == Capability.TCP_CONNECT }
+        val row =
+            profileToBanner(CapabilityProfile.ANDROID_LOCAL_M1)
+                .first { it.capability == Capability.TCP_CONNECT }
         assertEquals(Availability.SUPPORTED, row.availability)
         assertEquals("TCP connect scan", row.title)
     }

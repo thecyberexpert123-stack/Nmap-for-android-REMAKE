@@ -27,7 +27,11 @@ fun AuthorizationDialog(
     onDismiss: () -> Unit,
 ) {
     var acknowledged by remember { mutableStateOf(false) }
-    val target = plan.targets.firstOrNull()?.label.orEmpty()
+    val target =
+        plan.targets
+            .firstOrNull()
+            ?.label
+            .orEmpty()
     val ports = plan.tcpPorts?.expand()?.size
 
     AlertDialog(

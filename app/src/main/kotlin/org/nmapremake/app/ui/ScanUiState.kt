@@ -37,12 +37,13 @@ data class ScanUiState(
     val totalPorts: Int = 0,
 ) {
     val canStart: Boolean
-        get() = phase == ScanPhase.INPUT &&
-            targetError == null &&
-            portsError == null &&
-            timeoutError == null &&
-            concurrencyError == null &&
-            targetInput.isNotBlank()
+        get() =
+            phase == ScanPhase.INPUT &&
+                targetError == null &&
+                portsError == null &&
+                timeoutError == null &&
+                concurrencyError == null &&
+                targetInput.isNotBlank()
 
     /** True when the scan ended in the middle: results must be labeled incomplete. */
     val isIncomplete: Boolean

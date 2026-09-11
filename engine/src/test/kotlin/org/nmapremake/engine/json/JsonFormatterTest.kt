@@ -117,15 +117,22 @@ class JsonFormatterTest {
     fun `unknown error code is preserved verbatim and decodes to INTERNAL`() {
         val text = formatter.format(sampleReport()).replace("CONNECTION_REFUSED", "FUTURE_CODE")
         val parsed = formatter.parse(text).getOrNull()
-        val closed = parsed!!.hosts.single().portResults.first { it.port == 22 }
+        val closed =
+            parsed!!
+                .hosts
+                .single()
+                .portResults
+                .first { it.port == 22 }
         assertEquals("FUTURE_CODE", closed.error?.code)
         assertEquals(ErrorCode.INTERNAL, closed.error?.errorCode())
     }
 
     @Test
     fun `unknown extra fields are ignored on parse`() {
-        val text = formatter.format(sampleReport())
-            .replaceFirst("\"hosts\": [", "\"futureField\": {\"x\": 1},\n  \"hosts\": [")
+        val text =
+            formatter
+                .format(sampleReport())
+                .replaceFirst("\"hosts\": [", "\"futureField\": {\"x\": 1},\n  \"hosts\": [")
         val parsed = formatter.parse(text).getOrNull()
         assertEquals(sampleReport(), parsed)
     }

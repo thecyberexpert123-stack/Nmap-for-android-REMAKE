@@ -15,7 +15,11 @@ import org.nmapremake.core.model.Target
  */
 interface TcpTransport {
     /** Blocking connect attempt with its own timeout; returns a classified outcome. */
-    fun connect(target: Target, port: Int, timeoutMs: Long): ConnectOutcome
+    fun connect(
+        target: Target,
+        port: Int,
+        timeoutMs: Long,
+    ): ConnectOutcome
 
     /**
      * Optional hook: close any sockets of in-flight connects so cooperative
@@ -25,14 +29,21 @@ interface TcpTransport {
 }
 
 sealed interface ConnectOutcome {
-    data class Established(val latencyMs: Long) : ConnectOutcome
+    data class Established(
+        val latencyMs: Long,
+    ) : ConnectOutcome
 
-    data class Refused(val latencyMs: Long) : ConnectOutcome
+    data class Refused(
+        val latencyMs: Long,
+    ) : ConnectOutcome
 
     data object TimedOut : ConnectOutcome
 
     data object NoRoute : ConnectOutcome
 
     /** Unclassified failure: typed error plus the exact evidence string to record. */
-    data class Failed(val error: ScanError, val evidence: String) : ConnectOutcome
+    data class Failed(
+        val error: ScanError,
+        val evidence: String,
+    ) : ConnectOutcome
 }

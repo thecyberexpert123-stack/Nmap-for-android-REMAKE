@@ -31,30 +31,30 @@ class ScanEngine(
     private val transport: TcpTransport,
     private val cancelDispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) : ScanRunner {
-
     private val cancelScope = CoroutineScope(SupervisorJob() + cancelDispatcher)
 
-    override fun scan(plan: ScanPlan): Flow<ProgressEvent> = flow {
-        val clamped = plan.clamped()
-        val selection = router.route(clamped)
-        if (selection is ExecutorSelection.Rejected) {
-            emit(ProgressEvent.ScanFailed(selection.error))
-            return@flow
-        }
-        val executor = (selection as ExecutorSelection.Selected).executor
-
-        val resolvedTargets = mutableListOf<Target>()
-        for (target in clamped.targets) {
-            try {
-                resolvedTargets += resolver.resolve(target)
-            } catch (e: UnresolvedHostException) {
-                emit(ProgressEvent.ScanFailed(e.error))
+    override fun scan(plan: ScanPlan): Flow<ProgressEvent> =
+        flow {
+            val clamped = plan.clamped()
+            val selection = router.route(clamped)
+            if (selection is ExecutorSelection.Rejected) {
+                emit(ProgressEvent.ScanFailed(selection.error))
                 return@flow
             }
-        }
+            val executor = (selection as ExecutorSelection.Selected).executor
 
-        emitAll(scheduler.scan(clamped.copy(targets = resolvedTargets), executor, transport))
-    }
+            val resolvedTargets = mutableListOf<Target>()
+            for (target in clamped.targets) {
+                try {
+                    resolvedTargets += resolver.resolve(target)
+                } catch (e: UnresolvedHostException) {
+                    emit(ProgressEvent.ScanFailed(e.error))
+                    return@flow
+                }
+            }
+
+            emitAll(scheduler.scan(clamped.copy(targets = resolvedTargets), executor, transport))
+        }
 
     override fun cancel() {
         cancelScope.launch { scheduler.cancel() }

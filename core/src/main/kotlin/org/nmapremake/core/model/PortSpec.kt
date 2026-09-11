@@ -15,13 +15,20 @@ import kotlinx.serialization.Serializable
 @Serializable
 sealed interface PortSpec {
     @Serializable
-    data class Single(val port: Int) : PortSpec
+    data class Single(
+        val port: Int,
+    ) : PortSpec
 
     @Serializable
-    data class List(val ports: kotlin.collections.List<Int>) : PortSpec
+    data class List(
+        val ports: kotlin.collections.List<Int>,
+    ) : PortSpec
 
     @Serializable
-    data class Range(val first: Int, val last: Int) : PortSpec
+    data class Range(
+        val first: Int,
+        val last: Int,
+    ) : PortSpec
 
     @Serializable
     data object TopPorts : PortSpec {
@@ -40,13 +47,14 @@ sealed interface PortSpec {
     data object All : PortSpec
 
     /** Expands the spec into the concrete port list. Port range is 1..65535. */
-    fun expand(): kotlin.collections.List<Int> = when (this) {
-        is Single -> listOf(port)
-        is List -> ports
-        is Range -> (first..last).toList()
-        TopPorts -> TopPorts.curated
-        All -> (1..65535).toList()
-    }
+    fun expand(): kotlin.collections.List<Int> =
+        when (this) {
+            is Single -> listOf(port)
+            is List -> ports
+            is Range -> (first..last).toList()
+            TopPorts -> TopPorts.curated
+            All -> (1..65535).toList()
+        }
 
     companion object {
         const val MIN_PORT = 1
@@ -54,15 +62,105 @@ sealed interface PortSpec {
     }
 }
 
-private val CURATED_TOP_PORTS: kotlin.collections.List<Int> = listOf(
-    80, 443, 22, 21, 25, 53, 110, 143, 993, 995,
-    8080, 8443, 23, 587, 465, 3306, 5432, 6379, 27017, 3389,
-    5900, 139, 445, 135, 137, 138, 161, 162, 389, 636,
-    1433, 1434, 1521, 33060, 9000, 9090, 9200, 9300, 11211, 5672,
-    15672, 1883, 8883, 8081, 8000, 8888, 5000, 5001, 7001,
-    7002, 8008, 8009, 8010, 8042, 8069, 8161, 8181, 8222, 8230,
-    8291, 8333, 9001, 9002, 9003, 9080, 9091, 9160, 9306, 9418,
-    9530, 10000, 10001, 10080, 10443, 11210, 11215, 12345, 16000, 16379,
-    18080, 20000, 27015, 28017, 30000, 31415, 32768, 40000, 44818, 47808,
-    50000, 50030, 50060, 50070, 50075, 50090, 54321, 55555, 61616, 65535,
-)
+private val CURATED_TOP_PORTS: kotlin.collections.List<Int> =
+    listOf(
+        80,
+        443,
+        22,
+        21,
+        25,
+        53,
+        110,
+        143,
+        993,
+        995,
+        8080,
+        8443,
+        23,
+        587,
+        465,
+        3306,
+        5432,
+        6379,
+        27017,
+        3389,
+        5900,
+        139,
+        445,
+        135,
+        137,
+        138,
+        161,
+        162,
+        389,
+        636,
+        1433,
+        1434,
+        1521,
+        33060,
+        9000,
+        9090,
+        9200,
+        9300,
+        11211,
+        5672,
+        15672,
+        1883,
+        8883,
+        8081,
+        8000,
+        8888,
+        5000,
+        5001,
+        7001,
+        7002,
+        8008,
+        8009,
+        8010,
+        8042,
+        8069,
+        8161,
+        8181,
+        8222,
+        8230,
+        8291,
+        8333,
+        9001,
+        9002,
+        9003,
+        9080,
+        9091,
+        9160,
+        9306,
+        9418,
+        9530,
+        10000,
+        10001,
+        10080,
+        10443,
+        11210,
+        11215,
+        12345,
+        16000,
+        16379,
+        18080,
+        20000,
+        27015,
+        28017,
+        30000,
+        31415,
+        32768,
+        40000,
+        44818,
+        47808,
+        50000,
+        50030,
+        50060,
+        50070,
+        50075,
+        50090,
+        54321,
+        55555,
+        61616,
+        65535,
+    )

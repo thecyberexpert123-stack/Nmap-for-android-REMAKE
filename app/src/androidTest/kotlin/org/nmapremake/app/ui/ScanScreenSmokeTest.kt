@@ -21,9 +21,10 @@ class ScanScreenSmokeTest {
         composeRule.setContent {
             NmapRemakeTheme {
                 ScanScreenContent(
-                    state = ScanUiState(
-                        capabilityBanner = profileToBanner(CapabilityProfile.ANDROID_LOCAL_M1),
-                    ),
+                    state =
+                        ScanUiState(
+                            capabilityBanner = profileToBanner(CapabilityProfile.ANDROID_LOCAL_M1),
+                        ),
                     onTargetChange = {},
                     onPortsChange = {},
                     onTimeoutChange = {},

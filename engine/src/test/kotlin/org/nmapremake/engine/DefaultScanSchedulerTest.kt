@@ -27,20 +27,22 @@ class DefaultScanSchedulerTest {
         probeTimeoutMs: Long = 5_000,
         maxDurationMs: Long? = null,
         targets: List<Target> = listOf(target),
-    ): ScanPlan = ScanPlan(
-        targets = targets,
-        tcpPorts = PortSpec.List(ports),
-        probeTimeoutMs = probeTimeoutMs,
-        concurrency = concurrency,
-        maxDurationMs = maxDurationMs,
-    )
+    ): ScanPlan =
+        ScanPlan(
+            targets = targets,
+            tcpPorts = PortSpec.List(ports),
+            probeTimeoutMs = probeTimeoutMs,
+            concurrency = concurrency,
+            maxDurationMs = maxDurationMs,
+        )
 
     @Test
     fun `concurrency is capped at the plan value`() {
         val transport = FakeTcpTransport.slow(5)
-        val events = runBlocking {
-            scheduler.scan(plan((1..64).toList(), concurrency = 8), executor, transport).toList()
-        }
+        val events =
+            runBlocking {
+                scheduler.scan(plan((1..64).toList(), concurrency = 8), executor, transport).toList()
+            }
         assertEquals(8, transport.maxInFlight.get())
         val finished = events.filterIsInstance<ProgressEvent.PortFinished>()
         assertEquals(64, finished.size)
@@ -50,9 +52,10 @@ class DefaultScanSchedulerTest {
     @Test
     fun `PortStarted precedes PortFinished for every port`() {
         val transport = FakeTcpTransport.instant()
-        val events = runBlocking {
-            scheduler.scan(plan((1..16).toList(), concurrency = 4), executor, transport).toList()
-        }
+        val events =
+            runBlocking {
+                scheduler.scan(plan((1..16).toList(), concurrency = 4), executor, transport).toList()
+            }
         val seenStart = mutableSetOf<Int>()
         val seenFinish = mutableSetOf<Int>()
         for (event in events) {
@@ -70,9 +73,10 @@ class DefaultScanSchedulerTest {
 
     @Test
     fun `stream terminates with exactly one ScanFinished on success`() {
-        val events = runBlocking {
-            scheduler.scan(plan(listOf(80, 443), concurrency = 2), executor, FakeTcpTransport.instant()).toList()
-        }
+        val events =
+            runBlocking {
+                scheduler.scan(plan(listOf(80, 443), concurrency = 2), executor, FakeTcpTransport.instant()).toList()
+            }
         assertEquals(1, events.filterIsInstance<ProgressEvent.ScanFinished>().size)
         assertEquals(0, events.filterIsInstance<ProgressEvent.ScanFailed>().size)
         val report = assertIs<ProgressEvent.ScanFinished>(events.last()).report
@@ -80,7 +84,13 @@ class DefaultScanSchedulerTest {
         assertEquals(1, report.schemaVersion)
         assertEquals(executor, report.executor)
         assertEquals(1, report.hosts.size)
-        assertEquals(listOf(80, 443), report.hosts.single().portResults.map { it.port })
+        assertEquals(
+            listOf(80, 443),
+            report.hosts
+                .single()
+                .portResults
+                .map { it.port },
+        )
         assertTrue(report.startedAtEpochMs <= report.finishedAtEpochMs)
     }
 
@@ -95,10 +105,15 @@ class DefaultScanSchedulerTest {
                     80 to ConnectOutcome.Established(3),
                 ),
             )
-        val events = runBlocking {
-            scheduler.scan(plan(listOf(80, 22, 81, 82), concurrency = 2), executor, transport).toList()
-        }
-        val results = assertIs<ProgressEvent.ScanFinished>(events.last()).report.hosts.single().portResults
+        val events =
+            runBlocking {
+                scheduler.scan(plan(listOf(80, 22, 81, 82), concurrency = 2), executor, transport).toList()
+            }
+        val results =
+            assertIs<ProgressEvent.ScanFinished>(events.last())
+                .report.hosts
+                .single()
+                .portResults
         val byPort = results.associateBy { it.port }
         assertEquals(PortState.OPEN, byPort.getValue(80).state)
         assertEquals("TCP connect completed in 3 ms", byPort.getValue(80).evidence)
@@ -121,10 +136,15 @@ class DefaultScanSchedulerTest {
                     80 to ConnectOutcome.Established(3),
                 ),
             )
-        val events = runBlocking {
-            scheduler.scan(plan(listOf(80, 22, 81, 82), concurrency = 2), executor, transport).toList()
-        }
-        val results = assertIs<ProgressEvent.ScanFinished>(events.last()).report.hosts.single().portResults
+        val events =
+            runBlocking {
+                scheduler.scan(plan(listOf(80, 22, 81, 82), concurrency = 2), executor, transport).toList()
+            }
+        val results =
+            assertIs<ProgressEvent.ScanFinished>(events.last())
+                .report.hosts
+                .single()
+                .portResults
         for (result in results) {
             if (result.state != PortState.OPEN) {
                 assertTrue(result.error != null, "port ${result.port} in ${result.state} lacks an error")
@@ -136,13 +156,15 @@ class DefaultScanSchedulerTest {
     fun `timeout enforcement produces TIMEOUT results at about the probe timeout`() {
         val transport = FakeTcpTransport.blockingUntilReleased()
         val started = System.currentTimeMillis()
-        val events = runBlocking {
-            scheduler.scan(
-                plan(listOf(1, 2, 3, 4), concurrency = 2, probeTimeoutMs = 300),
-                executor,
-                transport,
-            ).toList()
-        }
+        val events =
+            runBlocking {
+                scheduler
+                    .scan(
+                        plan(listOf(1, 2, 3, 4), concurrency = 2, probeTimeoutMs = 300),
+                        executor,
+                        transport,
+                    ).toList()
+            }
         val elapsed = System.currentTimeMillis() - started
         val finished = events.filterIsInstance<ProgressEvent.PortFinished>()
         assertEquals(4, finished.size)
@@ -155,18 +177,20 @@ class DefaultScanSchedulerTest {
     @Test
     fun `cancellation stops the scan and reports SCAN_CANCELLED with completed ports only`() {
         val transport = FakeTcpTransport.slow(10)
-        val events = runBlocking {
-            val flow = scheduler.scan(plan((1..200).toList(), concurrency = 32), executor, transport)
-            val collector = launch {
-                val list = mutableListOf<ProgressEvent>()
-                flow.toList(list)
-                list
+        val events =
+            runBlocking {
+                val flow = scheduler.scan(plan((1..200).toList(), concurrency = 32), executor, transport)
+                val collector =
+                    launch {
+                        val list = mutableListOf<ProgressEvent>()
+                        flow.toList(list)
+                        list
+                    }
+                delay(30)
+                scheduler.cancel()
+                collector.join()
+                collector.getCompleted()
             }
-            delay(30)
-            scheduler.cancel()
-            collector.join()
-            collector.getCompleted()
-        }
         val failed = events.filterIsInstance<ProgressEvent.ScanFailed>()
         assertEquals(1, failed.size)
         assertEquals(ErrorCode.SCAN_CANCELLED, failed.single().error.errorCode())
@@ -179,13 +203,15 @@ class DefaultScanSchedulerTest {
     fun `watchdog forces SCAN_DEADLINE_EXCEEDED`() {
         val transport = FakeTcpTransport.blockingUntilReleased()
         val started = System.currentTimeMillis()
-        val events = runBlocking {
-            scheduler.scan(
-                plan((1..20).toList(), concurrency = 8, maxDurationMs = 150),
-                executor,
-                transport,
-            ).toList()
-        }
+        val events =
+            runBlocking {
+                scheduler
+                    .scan(
+                        plan((1..20).toList(), concurrency = 8, maxDurationMs = 150),
+                        executor,
+                        transport,
+                    ).toList()
+            }
         val elapsed = System.currentTimeMillis() - started
         val failed = events.filterIsInstance<ProgressEvent.ScanFailed>()
         assertEquals(1, failed.size)
@@ -196,34 +222,48 @@ class DefaultScanSchedulerTest {
 
     @Test
     fun `empty port list completes with an empty host result`() {
-        val events = runBlocking {
-            scheduler.scan(plan(emptyList(), concurrency = 4), executor, FakeTcpTransport.instant()).toList()
-        }
+        val events =
+            runBlocking {
+                scheduler.scan(plan(emptyList(), concurrency = 4), executor, FakeTcpTransport.instant()).toList()
+            }
         val report = assertIs<ProgressEvent.ScanFinished>(events.last()).report
         assertEquals(1, report.hosts.size)
-        assertTrue(report.hosts.single().portResults.isEmpty())
+        assertTrue(
+            report.hosts
+                .single()
+                .portResults
+                .isEmpty(),
+        )
     }
 
     @Test
     fun `skipped TCP pass completes with an empty host result`() {
         val noPortsPlan = ScanPlan(targets = listOf(target), tcpPorts = null)
-        val events = runBlocking {
-            scheduler.scan(noPortsPlan, executor, FakeTcpTransport.instant()).toList()
-        }
+        val events =
+            runBlocking {
+                scheduler.scan(noPortsPlan, executor, FakeTcpTransport.instant()).toList()
+            }
         val report = assertIs<ProgressEvent.ScanFinished>(events.last()).report
-        assertTrue(report.hosts.single().portResults.isEmpty())
+        assertTrue(
+            report.hosts
+                .single()
+                .portResults
+                .isEmpty(),
+        )
     }
 
     @Test
     fun `multi-target plan aggregates one HostResult per target`() {
         val second = Target("10.0.0.1")
-        val events = runBlocking {
-            scheduler.scan(
-                plan(listOf(80, 443), concurrency = 4, targets = listOf(target, second)),
-                executor,
-                FakeTcpTransport.instant(),
-            ).toList()
-        }
+        val events =
+            runBlocking {
+                scheduler
+                    .scan(
+                        plan(listOf(80, 443), concurrency = 4, targets = listOf(target, second)),
+                        executor,
+                        FakeTcpTransport.instant(),
+                    ).toList()
+            }
         val report = assertIs<ProgressEvent.ScanFinished>(events.last()).report
         assertEquals(2, report.hosts.size)
         assertEquals(setOf("127.0.0.1", "10.0.0.1"), report.hosts.map { it.target.label }.toSet())
@@ -240,13 +280,15 @@ class DefaultScanSchedulerTest {
                     executor,
                     FakeTcpTransport.instant(),
                 )
-            val thrown = runCatching {
-                other.scan(plan(listOf(80), concurrency = 1), executor, FakeTcpTransport.instant())
-            }
+            val thrown =
+                runCatching {
+                    other.scan(plan(listOf(80), concurrency = 1), executor, FakeTcpTransport.instant())
+                }
             assertTrue(thrown.isSuccess, "separate instances may scan concurrently")
-            val second = runCatching {
-                scheduler.scan(plan(listOf(80), concurrency = 1), executor, FakeTcpTransport.instant())
-            }
+            val second =
+                runCatching {
+                    scheduler.scan(plan(listOf(80), concurrency = 1), executor, FakeTcpTransport.instant())
+                }
             assertTrue(second.isFailure, "same instance must reject a concurrent scan")
             flow.toList()
         }

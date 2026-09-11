@@ -28,17 +28,18 @@ import org.nmapremake.engine.SocketTcpTransport
  * the UI can only reach through the authorization dialog (PLAN §5.1.5).
  */
 class ScanViewModel(
-    private val runner: ScanRunner = ScanEngine(
-        LocalExecutionRouter(),
-        InetHostResolver(),
-        DefaultScanScheduler(),
-        SocketTcpTransport(),
-    ),
+    private val runner: ScanRunner =
+        ScanEngine(
+            LocalExecutionRouter(),
+            InetHostResolver(),
+            DefaultScanScheduler(),
+            SocketTcpTransport(),
+        ),
 ) : ViewModel() {
-
-    private val _state = MutableStateFlow(
-        ScanUiState(capabilityBanner = profileToBanner(Executors.LOCAL_ANDROID.capabilities)),
-    )
+    private val _state =
+        MutableStateFlow(
+            ScanUiState(capabilityBanner = profileToBanner(Executors.LOCAL_ANDROID.capabilities)),
+        )
     val state: StateFlow<ScanUiState> = _state.asStateFlow()
 
     private var scanJob: Job? = null
@@ -49,11 +50,12 @@ class ScanViewModel(
     }
 
     fun updatePorts(text: String) {
-        val error = if (text.isBlank()) {
-            null
-        } else {
-            (PortSpecParser.parse(text) as? PortSpecParser.ParseOutcome.Failure)?.error?.message
-        }
+        val error =
+            if (text.isBlank()) {
+                null
+            } else {
+                (PortSpecParser.parse(text) as? PortSpecParser.ParseOutcome.Failure)?.error?.message
+            }
         _state.update { it.copy(portsInput = text, portsError = error) }
     }
 
@@ -61,11 +63,12 @@ class ScanViewModel(
         _state.update {
             it.copy(
                 timeoutInput = text,
-                timeoutError = validateNumber(
-                    text,
-                    ScanPlan.MIN_PROBE_TIMEOUT_MS,
-                    ScanPlan.MAX_PROBE_TIMEOUT_MS,
-                ),
+                timeoutError =
+                    validateNumber(
+                        text,
+                        ScanPlan.MIN_PROBE_TIMEOUT_MS,
+                        ScanPlan.MAX_PROBE_TIMEOUT_MS,
+                    ),
             )
         }
     }
@@ -74,11 +77,12 @@ class ScanViewModel(
         _state.update {
             it.copy(
                 concurrencyInput = text,
-                concurrencyError = validateNumber(
-                    text,
-                    ScanPlan.MIN_CONCURRENCY.toLong(),
-                    ScanPlan.MAX_CONCURRENCY.toLong(),
-                ),
+                concurrencyError =
+                    validateNumber(
+                        text,
+                        ScanPlan.MIN_CONCURRENCY.toLong(),
+                        ScanPlan.MAX_CONCURRENCY.toLong(),
+                    ),
             )
         }
     }
@@ -89,15 +93,18 @@ class ScanViewModel(
         if (!current.canStart) return
         val timeout = current.timeoutInput.toLongOrNull() ?: return
         val concurrency = current.concurrencyInput.toIntOrNull() ?: return
-        when (val outcome = PlanInputParser.parse(
-            PlanInputParser.Input(
-                target = current.targetInput,
-                ports = current.portsInput,
-                probeTimeoutMs = timeout,
-                concurrency = concurrency,
-                maxDurationMs = ScanPlan.DEFAULT_MAX_DURATION_MS,
-            ),
-        )) {
+        when (
+            val outcome =
+                PlanInputParser.parse(
+                    PlanInputParser.Input(
+                        target = current.targetInput,
+                        ports = current.portsInput,
+                        probeTimeoutMs = timeout,
+                        concurrency = concurrency,
+                        maxDurationMs = ScanPlan.DEFAULT_MAX_DURATION_MS,
+                    ),
+                )
+        ) {
             is PlanInputParser.ParseOutcome.Failure -> {
                 _state.update { it.copy(error = outcome.error) }
             }
@@ -107,7 +114,10 @@ class ScanViewModel(
                         phase = ScanPhase.AUTHORIZING,
                         pendingPlan = outcome.plan,
                         error = null,
-                        totalPorts = outcome.plan.tcpPorts?.expand()?.size ?: 0,
+                        totalPorts =
+                            outcome.plan.tcpPorts
+                                ?.expand()
+                                ?.size ?: 0,
                     )
                 }
             }
@@ -129,9 +139,10 @@ class ScanViewModel(
                 pendingPlan = null,
             )
         }
-        scanJob = viewModelScope.launch {
-            runner.scan(plan).collect { event -> onEvent(event) }
-        }
+        scanJob =
+            viewModelScope.launch {
+                runner.scan(plan).collect { event -> onEvent(event) }
+            }
     }
 
     /** Dismisses the authorization dialog without scanning. */
@@ -167,35 +178,45 @@ class ScanViewModel(
 
     private fun onEvent(event: ProgressEvent) {
         when (event) {
-            is ProgressEvent.PortStarted -> _state.update {
-                it.copy(progress = it.progress.copy(started = it.progress.started + 1))
-            }
-            is ProgressEvent.PortFinished -> _state.update { current ->
-                current.copy(
-                    progress = current.progress.copy(
-                        finished = current.progress.finished + 1,
-                        open = current.progress.open +
-                            if (event.result.state == PortState.OPEN) 1 else 0,
-                    ),
-                    liveResults = current.liveResults + event.result,
-                )
-            }
-            is ProgressEvent.ScanFinished -> _state.update {
-                it.copy(
-                    phase = ScanPhase.FINISHED,
-                    hosts = event.report.hosts,
-                    liveResults = emptyList(),
-                    progress = it.progress.copy(started = it.progress.finished),
-                )
-            }
+            is ProgressEvent.PortStarted ->
+                _state.update {
+                    it.copy(progress = it.progress.copy(started = it.progress.started + 1))
+                }
+            is ProgressEvent.PortFinished ->
+                _state.update { current ->
+                    current.copy(
+                        progress =
+                            current.progress.copy(
+                                finished = current.progress.finished + 1,
+                                open =
+                                    current.progress.open +
+                                        if (event.result.state == PortState.OPEN) 1 else 0,
+                            ),
+                        liveResults = current.liveResults + event.result,
+                    )
+                }
+            is ProgressEvent.ScanFinished ->
+                _state.update {
+                    it.copy(
+                        phase = ScanPhase.FINISHED,
+                        hosts = event.report.hosts,
+                        liveResults = emptyList(),
+                        progress = it.progress.copy(started = it.progress.finished),
+                    )
+                }
             is ProgressEvent.ScanFailed -> _state.update { it.copy(phase = ScanPhase.FAILED, error = event.error) }
         }
     }
 
-    private fun validateNumber(text: String, min: Long, max: Long): String? = when {
-        text.isBlank() -> "required"
-        text.toLongOrNull() == null -> "must be a number"
-        text.toLongOrNull()!! < min || text.toLongOrNull()!! > max -> "must be $min–$max"
-        else -> null
-    }
+    private fun validateNumber(
+        text: String,
+        min: Long,
+        max: Long,
+    ): String? =
+        when {
+            text.isBlank() -> "required"
+            text.toLongOrNull() == null -> "must be a number"
+            text.toLongOrNull()!! < min || text.toLongOrNull()!! > max -> "must be $min–$max"
+            else -> null
+        }
 }

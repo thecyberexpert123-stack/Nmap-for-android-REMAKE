@@ -1,7 +1,5 @@
 package org.nmapremake.engine
 
-import java.util.concurrent.atomic.AtomicBoolean
-import java.util.concurrent.atomic.AtomicReference
 import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -19,6 +17,8 @@ import org.nmapremake.core.model.PortResult
 import org.nmapremake.core.model.ScanError
 import org.nmapremake.core.model.ScanPlan
 import org.nmapremake.core.model.TransportProtocol
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicReference
 
 /**
  * Schedules probes against a plan (ARCHITECTURE §3, PLAN §5.1.3).
@@ -32,7 +32,11 @@ import org.nmapremake.core.model.TransportProtocol
  * `ScanFailed(SCAN_DEADLINE_EXCEEDED)`.
  */
 interface ScanScheduler {
-    fun scan(plan: ScanPlan, executor: ExecutorNode, transport: TcpTransport): Flow<ProgressEvent>
+    fun scan(
+        plan: ScanPlan,
+        executor: ExecutorNode,
+        transport: TcpTransport,
+    ): Flow<ProgressEvent>
 
     /** Cooperative; guarantees completion within bounded time (PLAN §5.1.3.3). */
     suspend fun cancel()
@@ -42,8 +46,9 @@ class DefaultScanScheduler(
     private val aggregator: ResultAggregator = ResultAggregator(),
     private val clock: EngineClock = SystemClock,
 ) : ScanScheduler {
-
-    private class Session(val transport: TcpTransport) {
+    private class Session(
+        val transport: TcpTransport,
+    ) {
         val cancelled = AtomicBoolean(false)
     }
 
@@ -108,35 +113,39 @@ class DefaultScanScheduler(
                         }
                     }
                 }
-                hostResults += HostResult(
-                    target = target,
-                    portResults = results.toList(),
-                    executor = executor,
-                    capabilities = executor.capabilities,
-                    startedAtEpochMs = startedAt,
-                    finishedAtEpochMs = clock.now(),
-                )
+                hostResults +=
+                    HostResult(
+                        target = target,
+                        portResults = results.toList(),
+                        executor = executor,
+                        capabilities = executor.capabilities,
+                        startedAtEpochMs = startedAt,
+                        finishedAtEpochMs = clock.now(),
+                    )
             }
         }
 
         // Local copy: plan.maxDurationMs is a cross-module public property,
         // so it cannot be smart-cast to Long directly.
         val maxDurationMs = plan.maxDurationMs
-        val ranToCompletion = if (maxDurationMs != null) {
-            withTimeoutOrNull(maxDurationMs) { portLoop() } != null
-        } else {
-            portLoop()
-            true
-        }
+        val ranToCompletion =
+            if (maxDurationMs != null) {
+                withTimeoutOrNull(maxDurationMs) { portLoop() } != null
+            } else {
+                portLoop()
+                true
+            }
         if (!ranToCompletion) deadlineReached = true
 
         when {
-            session.cancelled.get() -> scope.send(
-                ProgressEvent.ScanFailed(ScanError(ErrorCode.SCAN_CANCELLED, "scan cancelled by user")),
-            )
-            deadlineReached -> scope.send(
-                ProgressEvent.ScanFailed(ScanError(ErrorCode.SCAN_DEADLINE_EXCEEDED, "scan watchdog exceeded")),
-            )
+            session.cancelled.get() ->
+                scope.send(
+                    ProgressEvent.ScanFailed(ScanError(ErrorCode.SCAN_CANCELLED, "scan cancelled by user")),
+                )
+            deadlineReached ->
+                scope.send(
+                    ProgressEvent.ScanFailed(ScanError(ErrorCode.SCAN_DEADLINE_EXCEEDED, "scan watchdog exceeded")),
+                )
             else -> {
                 val report = aggregator.aggregate(plan, executor, hostResults, startedAt, clock.now())
                 scope.send(ProgressEvent.ScanFinished(report))

@@ -17,7 +17,9 @@ interface ExecutionRouter {
 }
 
 sealed interface ExecutorSelection {
-    data class Selected(val executor: ExecutorNode) : ExecutorSelection
+    data class Selected(
+        val executor: ExecutorNode,
+    ) : ExecutorSelection
 
     data class Rejected(
         val missing: List<Capability>,
@@ -33,21 +35,23 @@ sealed interface ExecutorSelection {
 class LocalExecutionRouter(
     private val executor: ExecutorNode = Executors.LOCAL_ANDROID,
 ) : ExecutionRouter {
-
     override fun route(plan: ScanPlan): ExecutorSelection {
         val required = plan.requiredCapabilities()
-        val missing = required.filterNot { executor.capabilities.supports(it) }
-            .sortedBy { it.name }
+        val missing =
+            required
+                .filterNot { executor.capabilities.supports(it) }
+                .sortedBy { it.name }
         return if (missing.isEmpty()) {
             ExecutorSelection.Selected(executor)
         } else {
             ExecutorSelection.Rejected(
                 missing = missing,
-                error = ScanError(
-                    ErrorCode.CAPABILITY_UNSUPPORTED,
-                    "local executor cannot run this plan; missing: " +
-                        missing.joinToString(", ") { it.name },
-                ),
+                error =
+                    ScanError(
+                        ErrorCode.CAPABILITY_UNSUPPORTED,
+                        "local executor cannot run this plan; missing: " +
+                            missing.joinToString(", ") { it.name },
+                    ),
             )
         }
     }

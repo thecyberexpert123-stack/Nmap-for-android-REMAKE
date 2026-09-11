@@ -191,19 +191,16 @@ jobs:
           # NOTE: this script is executed as ONE line with /bin/sh (dash),
           # so keep it single-line, pipe-free and bashism-free. gradlew logs
           # to a file first, then the status is captured BEFORE the cat so
-          # a failed build cannot be masked by a successful cat.
-          script: if [ "$TIMEOUT_ENABLED" = "true" ]; then ./gradlew :app:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.timeoutPortEnabled=true --stacktrace > /tmp/gradle-emu.log 2>&1; else ./gradlew :app:connectedDebugAndroidTest --stacktrace > /tmp/gradle-emu.log 2>&1; fi; status=$?; cat /tmp/gradle-emu.log; exit $status
+          # a failed build cannot be masked by a successful cat. Evidence is
+          # captured here because the runner kills the emulator afterwards.
+          script: if [ "$TIMEOUT_ENABLED" = "true" ]; then ./gradlew :app:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.timeoutPortEnabled=true --stacktrace > /tmp/gradle-emu.log 2>&1; else ./gradlew :app:connectedDebugAndroidTest --stacktrace > /tmp/gradle-emu.log 2>&1; fi; status=$?; cat /tmp/gradle-emu.log; adb logcat -d > /tmp/scan-logcat.log 2>&1 || true; adb exec-out run-as org.nmapremake.app cat files/scan-results.png > /tmp/scan-results.png 2>/dev/null || true; find app/build/outputs/androidTest-results -name "*.xml" -exec cat {} \; > /tmp/test-results.log 2>/dev/null || true; exit $status
 
-      # The emulator is torn down after the runner step above, so adb can
-      # hang against a stale server — bound every call with a timeout.
-      - name: Capture scan evidence (logcat + screenshot)
+      # The emulator is dead after the runner step above, but all evidence
+      # was captured inside the script and lives on the runner host.
+      - name: Extract scan evidence
         if: always()
         run: |
-          SDK="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-/usr/local/lib/android/sdk}}"
-          export PATH="$SDK/platform-tools:$PATH"
-          timeout 45 adb logcat -d > /tmp/scan-logcat.log || true
-          timeout 45 adb exec-out run-as org.nmapremake.app cat files/scan-results.png > /tmp/scan-results.png 2>/dev/null || true
-          timeout 15 grep -E "ScanE2E|ScanReal|ScanTimeout" /tmp/scan-logcat.log > /tmp/scan-evidence.log \
+          grep -E "ScanE2E|ScanReal|ScanTimeout" /tmp/scan-logcat.log > /tmp/scan-evidence.log 2>/dev/null \
             || echo "(no scan evidence in logcat)" > /tmp/scan-evidence.log
 
       - name: Upload scan evidence artifacts
@@ -215,6 +212,7 @@ jobs:
             /tmp/scan-logcat.log
             /tmp/scan-results.png
             /tmp/scan-evidence.log
+            /tmp/test-results.log
           if-no-files-found: ignore
 
       # Relay for the sandbox: publish evidence to a dedicated never-merged
@@ -226,6 +224,9 @@ jobs:
           mkdir -p ci-evidence
           {
             echo "=== run $GITHUB_RUN_ID · API ${{ matrix.api }} · sha $GITHUB_SHA ==="
+            echo ""
+            echo "--- test results (androidTest XML) ---"
+            cat /tmp/test-results.log 2>/dev/null || echo "(none)"
             echo ""
             echo "--- scan evidence (logcat) ---"
             cat /tmp/scan-evidence.log 2>/dev/null || echo "(none)"

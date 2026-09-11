@@ -28,29 +28,37 @@ import org.nmapremake.engine.json.JsonFormatter
  * the emulator, with the schema-v1 JSON report logged as evidence.
  */
 class RealTcpScanTest {
-    private fun scan(ports: List<Int>, timeoutMs: Long): ScanReport = runBlocking {
-        val engine =
-            ScanEngine(
-                LocalExecutionRouter(),
-                InetHostResolver(),
-                DefaultScanScheduler(),
-                SocketTcpTransport(),
-            )
-        val plan =
-            ScanPlan(
-                targets = listOf(Target("10.0.2.2")),
-                tcpPorts = PortSpec.List(ports),
-                probeTimeoutMs = timeoutMs,
-                concurrency = 4,
-            )
-        val events = engine.scan(plan).toList()
-        events.filterIsInstance<ProgressEvent.ScanFinished>().single().report
-    }
+    private fun scan(
+        ports: List<Int>,
+        timeoutMs: Long,
+    ): ScanReport =
+        runBlocking {
+            val engine =
+                ScanEngine(
+                    LocalExecutionRouter(),
+                    InetHostResolver(),
+                    DefaultScanScheduler(),
+                    SocketTcpTransport(),
+                )
+            val plan =
+                ScanPlan(
+                    targets = listOf(Target("10.0.2.2")),
+                    tcpPorts = PortSpec.List(ports),
+                    probeTimeoutMs = timeoutMs,
+                    concurrency = 4,
+                )
+            val events = engine.scan(plan).toList()
+            events.filterIsInstance<ProgressEvent.ScanFinished>().single().report
+        }
 
     @Test
     fun `real_connect_scan_classifies_open_and_closed_ports_on_the_CI_host`() {
         val report = scan(listOf(18080, 18081, 18443, 18082), timeoutMs = 5_000)
-        val results = report.hosts.single().portResults.associateBy { it.port }
+        val results =
+            report.hosts
+                .single()
+                .portResults
+                .associateBy { it.port }
         assertEquals(PortState.OPEN, results.getValue(18080).state)
         assertEquals(PortState.CLOSED, results.getValue(18081).state)
         assertEquals(PortState.OPEN, results.getValue(18443).state)
@@ -84,7 +92,11 @@ class RealTcpScanTest {
             args.getString("timeoutPortEnabled") == "true",
         )
         val report = scan(listOf(18099), timeoutMs = 3_000)
-        val result = report.hosts.single().portResults.single()
+        val result =
+            report.hosts
+                .single()
+                .portResults
+                .single()
         assertEquals(PortState.TIMEOUT, result.state)
         assertEquals(null, result.latencyMs)
         assertEquals(ErrorCode.PROBE_TIMEOUT, result.error?.errorCode())

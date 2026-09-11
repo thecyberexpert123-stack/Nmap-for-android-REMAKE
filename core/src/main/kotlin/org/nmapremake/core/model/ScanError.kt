@@ -24,13 +24,17 @@ data class ScanError(
         const val MAX_MESSAGE_LENGTH = 256
 
         /** Builds a ScanError with a message truncated to the documented maximum length. */
-        fun truncated(errorCode: ErrorCode, message: String?): ScanError =
-            ScanError(errorCode, (message ?: "no message").take(MAX_MESSAGE_LENGTH))
+        fun truncated(
+            errorCode: ErrorCode,
+            message: String?,
+        ): ScanError = ScanError(errorCode, (message ?: "no message").take(MAX_MESSAGE_LENGTH))
     }
 }
 
 /** Internal error taxonomy — the single source of truth for scan failure codes. */
-enum class ErrorCode(val wire: String) {
+enum class ErrorCode(
+    val wire: String,
+) {
     INVALID_TARGET("INVALID_TARGET"),
     UNRESOLVABLE_HOST("UNRESOLVABLE_HOST"),
     CIDR_NOT_SUPPORTED_YET("CIDR_NOT_SUPPORTED_YET"),

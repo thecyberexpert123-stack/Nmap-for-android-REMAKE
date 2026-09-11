@@ -1,10 +1,10 @@
 package org.nmapremake.engine
 
+import org.nmapremake.core.model.PortResult
 import org.nmapremake.core.model.ScanError
 import org.nmapremake.core.model.ScanReport
 import org.nmapremake.core.model.Target
 import org.nmapremake.core.model.TransportProtocol
-import org.nmapremake.core.model.PortResult
 
 /**
  * Progress stream of one scan (ARCHITECTURE §3, PLAN §5.1.3 invariants):
@@ -27,7 +27,11 @@ sealed interface ProgressEvent {
         val result: PortResult,
     ) : ProgressEvent
 
-    data class ScanFinished(val report: ScanReport) : ProgressEvent
+    data class ScanFinished(
+        val report: ScanReport,
+    ) : ProgressEvent
 
-    data class ScanFailed(val error: ScanError) : ProgressEvent
+    data class ScanFailed(
+        val error: ScanError,
+    ) : ProgressEvent
 }

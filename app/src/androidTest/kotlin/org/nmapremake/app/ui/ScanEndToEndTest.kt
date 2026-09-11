@@ -16,13 +16,13 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTextReplacement
 import androidx.test.platform.app.InstrumentationRegistry
-import java.io.File
-import java.io.FileOutputStream
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Rule
 import org.junit.Test
 import org.nmapremake.core.model.PortState
+import java.io.File
+import java.io.FileOutputStream
 
 /**
  * Full-app flow on a cloud emulator (CI §5.1.6): the real MainActivity
@@ -42,12 +42,15 @@ class ScanEndToEndTest {
         }
 
         composeRule.onNodeWithText("Target (IP or hostname)").performTextInput("10.0.2.2")
-        composeRule.onNodeWithText("Ports (e.g. 22,80,443 · 1-100 · top-100 · all)")
+        composeRule
+            .onNodeWithText("Ports (e.g. 22,80,443 · 1-100 · top-100 · all)")
             .performTextReplacement("18080,18081,18443,18082")
 
         composeRule.waitUntil(timeoutMillis = 30_000) {
-            composeRule.onAllNodes(hasText("Start scan") and isEnabled())
-                .fetchSemanticsNodes().isNotEmpty()
+            composeRule
+                .onAllNodes(hasText("Start scan") and isEnabled())
+                .fetchSemanticsNodes()
+                .isNotEmpty()
         }
         composeRule.onNodeWithText("Start scan").performClick()
 
@@ -60,18 +63,26 @@ class ScanEndToEndTest {
 
         // Real scan of 4 ports (probe timeout 5 s each, run in parallel).
         composeRule.waitUntil(timeoutMillis = 120_000) {
-            composeRule.onAllNodes(hasText("Scan finished", substring = true))
-                .fetchSemanticsNodes().isNotEmpty()
+            composeRule
+                .onAllNodes(hasText("Scan finished", substring = true))
+                .fetchSemanticsNodes()
+                .isNotEmpty()
         }
 
         composeRule.onAllNodesWithText("OPEN").assertCountEquals(2)
         composeRule.onAllNodesWithText("CLOSED").assertCountEquals(2)
-        composeRule.onAllNodes(hasText("TCP connect completed in", substring = true))
+        composeRule
+            .onAllNodes(hasText("TCP connect completed in", substring = true))
             .assertCountEquals(2)
-        composeRule.onAllNodes(hasText("Connection refused (ECONNREFUSED)", substring = true))
+        composeRule
+            .onAllNodes(hasText("Connection refused (ECONNREFUSED)", substring = true))
             .assertCountEquals(2)
 
-        val results = viewModel.state.value.hosts.single().portResults.associateBy { it.port }
+        val results =
+            viewModel.state.value.hosts
+                .single()
+                .portResults
+                .associateBy { it.port }
         assertEquals(PortState.OPEN, results.getValue(18080).state)
         assertEquals(PortState.CLOSED, results.getValue(18081).state)
         assertEquals(PortState.OPEN, results.getValue(18443).state)
