@@ -108,6 +108,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   application-level features; connect-scan honesty (kernel owns SYN
   retransmission); architectural invariants added to ARCHITECTURE §1 and
   delegation sequence in §4.4.
+- **Phase 0 + Phase 1 implementation** (stakeholder-approved; first code):
+  - Gradle build system: wrapper 9.1.0 (bootstrap scripts + wrapper jar
+    fetched verbatim from the canonical `gradle/gradle` repository — the
+    only build-ecosystem source reachable from the sandbox), version
+    catalog, ktlint + detekt with shared config, JaCoCo coverage gates
+    (≥80 % line) on `core` and `engine`.
+  - `:core` (pure JVM, zero Android deps): domain model (`ScanPlan`,
+    `Target`, `PortSpec` incl. self-authored curated top-100, `PortResult`/
+    `HostResult`, `ScanError` with wire-stable string codes, `ScanReport`
+    schema-v1 envelope, `UdpProbeSpec`), capability model (C1–C16,
+    `Availability`, `CapabilityProfile.ANDROID_LOCAL_M1` = matrix column
+    E1, `ExecutorNode`), parsers (`TargetParser` with IDN folding + CIDR
+    rejection, `PortSpecParser`, `PlanInputParser`). Unit-tested.
+  - `:engine` (pure JVM): `TcpTransport` seam + `ConnectOutcome`,
+    `SocketTcpTransport` (exception mapping per PLAN §5.1.2),
+    `TcpConnectProber` (exact evidence strings), `ScanScheduler`
+    (Semaphore cap, per-probe `withTimeout`, watchdog, cooperative cancel
+    via `abort()`, progress stream `PortStarted`/`PortFinished`/
+    `ScanFinished`/`ScanFailed`), `LocalExecutionRouter`, host resolver,
+    `ScanEngine` facade, `JsonFormatter` (schema v1 round-trip).
+    Unit-tested incl. the PLAN §5.1.3 invariants with a fake transport.
+  - `:app` (Compose, minSdk 26): scan input + capability banner
+    (data-driven from `CapabilityProfile`), authorization dialog gating
+    every scan, live progress + cancel, results with state chips +
+    evidence, partial-result labeling on cancellation. `ScanViewModel`
+    (StateFlow), `profileToBanner` pure function, unit tests +
+    instrumentation smoke test.
+  - CI (`.github/workflows/ci.yml`): JDK 17 verify job (unit tests, JaCoCo
+    gates, ktlint, detekt, app assemble + lint with warnings-as-errors)
+    and emulator matrix API 26 + 36 (`connectedDebugAndroidTest`).
+- Consistency fixes surfaced by implementing the approved sketches:
+  `PortFinished` carries the target (multi-target well-formedness);
+  `ExecutorNode` follows the §2 sketch (type/reachability/trustLevel/
+  transport); `ScanError.code` is a wire-stable string per the §5 schema
+  note (unknown codes → INTERNAL, raw value preserved); ARCHITECTURE §5
+  host-level executor example updated to the nested executor object.
 
 ### Decided (stakeholder approval, 2026-09-11)
 - License: **GPL-2.0-or-later** — `LICENSE` added (verbatim GPLv2 text from SPDX

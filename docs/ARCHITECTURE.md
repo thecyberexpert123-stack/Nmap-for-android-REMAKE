@@ -81,12 +81,16 @@ enum class TransportProtocol { TCP, UDP }
     val maxDurationMs: Long? = 600_000     // watchdog; UI-issued default 10 min
 )
 
-@Serializable data class ScanError(val code: ErrorCode, val message: String, val cause: Throwable? = null) {
-    enum class ErrorCode {
+@Serializable data class ScanError(val code: String, val message: String) {
+    // `code` is the wire-stable string (schema note below); decode via
+    // ErrorCode.fromWire(code) — unknown values map to INTERNAL and keep the
+    // raw string in `code`.
+    enum class ErrorCode(val wire: String) {
         INVALID_TARGET, UNRESOLVABLE_HOST, CIDR_NOT_SUPPORTED_YET,
         INVALID_PORT, PORT_OUT_OF_RANGE, INVALID_RANGE_ORDER, EMPTY_PORT_SPEC,
-        PERMISSION_DENIED, SCAN_DEADLINE_EXCEEDED, EXECUTOR_UNAVAILABLE,
-        CAPABILITY_UNSUPPORTED, INTERNAL
+        CONNECTION_REFUSED, PROBE_TIMEOUT, NO_ROUTE_TO_HOST,
+        PERMISSION_DENIED, SCAN_DEADLINE_EXCEEDED, SCAN_CANCELLED,
+        EXECUTOR_UNAVAILABLE, CAPABILITY_UNSUPPORTED, INTERNAL
     }
 }
 ```
@@ -132,10 +136,12 @@ interface ScanScheduler {
 
 sealed interface ProgressEvent {
     data class PortStarted(val target: Target, val port: Int, val protocol: TransportProtocol) : ProgressEvent
-    data class PortFinished(val result: PortResult) : ProgressEvent
+    data class PortFinished(val target: Target, val result: PortResult) : ProgressEvent
     data class ScanFinished(val report: ScanReport) : ProgressEvent   // aggregator output
     data class ScanFailed(val error: ScanError) : ProgressEvent
 }
+// Note: PortFinished carries the target too (implemented), so the stream
+// stays well-formed for multi-target plans.
 
 // transport — one small seam, replaced by fakes in scheduler tests.
 // This is the REMAKE's analog of Nsock's pluggable engines (epoll/select/iocp
@@ -275,7 +281,10 @@ UI → ScanViewModel → ExecutionRouter
         {"port": 443, "protocol": "TCP", "state": "OPEN", "latencyMs": 12,
          "error": null, "evidence": "TCP connect completed in 12 ms"}
       ],
-      "executor": "local-android",
+      "executor": {"id": "local-android", "label": "This device (Android)",
+                   "type": "ANDROID_LOCAL", "transport": "direct",
+                   "reachability": "LOCAL", "trustLevel": "LOCAL",
+                   "capabilities": {"TCP_CONNECT": "SUPPORTED"}},
       "startedAtEpochMs": 1726080000000, "finishedAtEpochMs": 1726080045000 }
   ]
 }

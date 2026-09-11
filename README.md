@@ -4,8 +4,12 @@ An Android-native network scanning engine, rebuilt in Kotlin — inspired by Nma
 capabilities, reproducing them **where the Android platform permits** and honestly
 delegating them where it does not.
 
-> Status: **Planning / plan iteration** — no application code yet. Stack decisions
-> approved: Kotlin + Jetpack Compose, `minSdk 26`, licensed **GPL-2.0-or-later**.
+> Status: **M1 (Phase 0 + Phase 1) in implementation** — first code on the
+> session branch: `core` + `engine` (pure JVM) and the Compose `app`, verified
+> by GitHub Actions CI (the development sandbox has no Java/Android toolchain
+> and no Maven/Google egress, so CI is the build channel). Stack decisions
+> approved: Kotlin + Jetpack Compose, `minSdk 26`, licensed
+> **GPL-2.0-or-later**.
 > See [`docs/PLAN.md`](docs/PLAN.md) for scope, architecture, roadmap, and
 > acceptance criteria; [`docs/NMAP-DEEP-DIVE.md`](docs/NMAP-DEEP-DIVE.md) for
 > the subsystem-by-subsystem Nmap analysis and Android feasibility mapping;
@@ -14,6 +18,21 @@ delegating them where it does not.
 > detection/matching formats.
 > See [`AGENT-EXPERIENCE.md`](AGENT-EXPERIENCE.md) for the development journal
 > and [`CHANGELOG.md`](CHANGELOG.md) for changes.
+
+## Build & verification
+
+Local builds need JDK 17 (the wrapper downloads Gradle 9.1.0 and the
+Android SDK components it needs; accept the SDK licenses first).
+
+```bash
+./gradlew check ktlintCheck detekt :app:assembleDebug :app:lintDebug
+./gradlew :app:connectedDebugAndroidTest   # requires a device/emulator
+```
+
+`check` includes the JaCoCo ≥80 % line-coverage gates on `:core` and
+`:engine` (PLAN §5.1.6). CI (`.github/workflows/ci.yml`) runs all of the
+above on every push, plus the instrumentation suite on emulators at API 26
+and API 36.
 
 ## What this project is (and is not)
 

@@ -510,3 +510,77 @@ Stakeholder asked for the UI/UX concept before Compose implementation.
   concrete: every screen element traces to a state field or a matrix
   row, which means the Compose layer will have no invented states —
   the front-end equivalent of the honesty rule.
+
+---
+
+## 2026-09-11 (session 2) — M1 implementation: Phase 0 + Phase 1
+
+### Context
+- Stakeholder approved Phase 0 + Phase 1 implementation.
+- Sandbox egress audit: only GitHub hosts reachable (api.github.com /
+  github.com); Maven Central, Google, Debian, Gradle services all fail at
+  TCP level; `sudo` works but `apt-get update` cannot reach mirrors. No
+  JDK/Gradle/Android SDK and no container tooling.
+
+### What I did
+1. Decided the verification channel: **GitHub Actions runs all builds and
+   tests** — the sandbox cannot compile anything locally. Recorded as a
+   hard environment constraint (guideline #21: never claim builds pass
+   without evidence).
+2. Bootstrapped the Gradle wrapper (jar + scripts) verbatim from the
+   canonical `gradle/gradle` repository via api.github.com raw endpoints;
+   `gradle-wrapper.properties` pins Gradle 9.1.0.
+3. Implemented in PLAN §9 order: build system + quality gates → `core`
+   domain model, capability model, parsers → `engine` transport seam,
+   prober, scheduler, router, resolver, aggregator, JSON formatter →
+   tests → `app` Compose UI + ViewModel → CI workflow.
+4. Aligned code line-by-line to the approved ARCHITECTURE sketches and
+   PLAN §5.1 tables/invariants (evidence strings, clamp ranges, event
+   grammar, schema v1).
+
+### Mistakes made and caught in self-review (guideline #22)
+- Two `write_file` calls to the same path in one batch: the second
+  silently overwrote the first (the `Capability` enum was lost).
+  Detected by listing the directory; recovered by splitting into
+  `Capability.kt` / `CapabilityProfile.kt` and verifying contents.
+  Lesson: never write two different contents to one path in one batch;
+  list-and-verify after batch writes.
+- Wrote a stray unused helper (removed), a redundant duplicate test
+  (removed), and one unused import (removed) — all before commit.
+- Almost shipped `TargetParser` accepting `256.256.256.256` as a
+  "hostname" (all-numeric labels are valid DNS labels); PLAN §5.1.1
+  requires `INVALID_TARGET`. Added dotted-quad detection + test.
+- First prober draft used `withTimeoutOrNull` — which would have
+  swallowed scan-level cancellation as a per-probe TIMEOUT (it converts
+  any `TimeoutCancellationException`, but external cancellation raises
+  `JobCancellationException`, which `withTimeout` rethrows untouched).
+  Switched to `withTimeout` + targeted catch; pinned with a test that
+  asserts cancellation propagates.
+
+### Learnings
+- `channelFlow` (not `flow {}`) is the right builder for a concurrent
+  probe scheduler: concurrent child emissions are legal there, and its
+  default 64-item channel buffer matches the locked progress-channel
+  capacity (PLAN §4.5).
+- Blocking transport fakes must honor `Thread.interrupt()` (the analog of
+  real socket close) or `withTimeout` can never return. The fake parks
+  with `LockSupport.parkNanos` and re-checks interruption.
+- `withTimeoutOrNull` + `runTest` virtual time is a hazard when the block
+  does real blocking work (the virtual clock does not advance). Scheduler
+  and prober timing tests therefore use `runBlocking` with real time;
+  pure-logic tests use `runTest`.
+- AGP 9 built-in Kotlin: no `org.jetbrains.kotlin.android` in the app
+  module; only serialization + Compose compiler plugins (matched to the
+  embedded KGP 2.2.10); compiler options live in the top-level
+  `kotlin { compilerOptions {} }` block.
+- detekt defaults flag Compose PascalCase functions and the curated port
+  table; the shared config exempts `@Composable` names and disables
+  `MagicNumber`/`ForbiddenComment` rather than weakening the gate.
+
+### Open questions / risks
+- The first CI run is the first compile anywhere: expect a fix loop (no
+  local toolchain exists to pre-check).
+- The JaCoCo ≥80 % gate on core/engine is configured but only CI proves
+  it.
+- The emulator matrix (macos-14, API 26 + 36) may need tuning (boot
+  time, image availability) — monitored after first push.
