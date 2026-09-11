@@ -64,7 +64,7 @@ fun AuthorizationDialog(
         },
         confirmButton = {
             TextButton(onClick = onConfirm, enabled = acknowledged) {
-                Text("Start scan")
+                Text("Authorize and start")
             }
         },
         dismissButton = {
