@@ -22,3 +22,8 @@ output.json
 
 # OS
 .DS_Store
+
+# CI diagnostic evidence (published by the workflow to never-merged branches;
+# kept out of the working tree's normal git status)
+ci-evidence/
+ci-probe.txt
