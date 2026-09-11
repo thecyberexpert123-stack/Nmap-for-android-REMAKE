@@ -17,6 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
+      contents: write
       checks: write
     steps:
       - uses: actions/checkout@v4
@@ -115,6 +116,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     permissions:
+      contents: write
       checks: write
     strategy:
       fail-fast: false
@@ -164,13 +166,16 @@ jobs:
           arch: x86_64
           disable-animations: true
           emulator-boot-timeout: 1200
+          # The runner executes this with /bin/sh (dash): no pipefail here.
+          # gradlew writes to a file first so its exit code is preserved,
+          # then the file is printed for the live UI.
           script: |
-            set -eo pipefail
             if [ "$TIMEOUT_ENABLED" = "true" ]; then
-              ./gradlew :app:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.timeoutPortEnabled=true --stacktrace 2>&1 | tee /tmp/gradle-emu.log
+              ./gradlew :app:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.timeoutPortEnabled=true --stacktrace > /tmp/gradle-emu.log 2>&1
             else
-              ./gradlew :app:connectedDebugAndroidTest --stacktrace 2>&1 | tee /tmp/gradle-emu.log
+              ./gradlew :app:connectedDebugAndroidTest --stacktrace > /tmp/gradle-emu.log 2>&1
             fi
+            cat /tmp/gradle-emu.log
 
       # The emulator is torn down after the runner step above, so adb can
       # hang against a stale server — bound every call with a timeout.
