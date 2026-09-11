@@ -323,6 +323,15 @@ Determinism rules: tests never depend on external networks. Non-routable
 documentation ranges ([RFC 5737] TEST-NET addresses) are used only as fakes'
 scripted outcomes, not as live probes.
 
+### Implementation note (Phase 2 mapping, from NMAP-SUBSYSTEMS-DEEP-4 §1)
+The Phase 2 detection engine maps to Nmap's verified service-scan objects:
+`AllProbes` → self-authored ProbeDb (parsed file) · `ServiceProbe` →
+`ProbeDefinition` · `ServiceProbeMatch` → `Signature` (compiled
+`java.util.regex.Pattern` + templates) · `ServiceNFO` → per-port
+`DetectionSession` state machine · `ServiceGroup` → scheduler-bounded
+probe concurrency. Regex engine substitution (`java.util.regex` for
+PCRE2) with documented divergences, covered by tests.
+
 ## 8. Error Taxonomy (internal, typed)
 
 `ScanError.ErrorCode` is the single source of truth (core). Transport-level

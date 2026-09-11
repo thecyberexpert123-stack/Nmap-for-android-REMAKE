@@ -23,3 +23,5 @@ when it might become relevant.
 | 15 | Self-hosted parallel DNS stub resolver (mass-DNS analog) | Platform resolver first; justified only if profiling shows resolution as the bottleneck | M5+ (profile first) |
 | 16 | Leetspeak/skid output mode and similar non-purposeful formats | Explicitly **not** reproduced (rule #2 — no junk) | never |
 | 17 | Idle scan / full traceroute local emulation | Confirmed delegation-class D; TTL-sweep connect traceroute is an M6 experiment only | M6 (experiment) |
+| 18 | FTP bounce scan (`-b`) | Technically socket-level (class A-later) but deprecated, low-value, and abusable against third-party FTP servers — not a milestone | Revisit only on stakeholder request |
+| 19 | Result-diff view (ndiff concept over JSON schema v1) | Two JSON v1 reports are diffable by design; a UI diff view adds value after results export exists | M2+ |

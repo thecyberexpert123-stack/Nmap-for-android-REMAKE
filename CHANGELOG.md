@@ -74,6 +74,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   reproduced), and target selection + mass-DNS (`NetBlock` hierarchy,
   lookahead buffering; richer grammar + parallel resolver recorded as
   recommendations).
+- `docs/NMAP-SUBSYSTEMS-DEEP-4.md` — subsystem deep-dive part 4 (final):
+  `service_scan.cc` internals (AllProbes/ServiceProbe/ServiceProbeMatch/
+  ServiceNFO/ServiceGroup → Phase 2 engine mapping in ARCHITECTURE),
+  IPv6 OS fingerprinting (18 probes; feature-model conventions adopted
+  for M4), auxiliary tools inventory (ncat/nping/ndiff/zenmap), and the
+  **capstone subsystem inventory**: all 18 subsystem groups with
+  mechanisms and A/B/D/U verdicts, seeding the Phase 8 compatibility
+  ledger. RECOMMENDATIONS gains FTP-bounce deferral and the ndiff-style
+  result-diff view.
 - PLAN/ARCHITECTURE deltas folded in (previous round): delegation model in
   PLAN §2.3 and M7 criteria (topology discovery, capability proof);
   Phase 2 adopts adaptive RTT timeouts + self-authored signature DB

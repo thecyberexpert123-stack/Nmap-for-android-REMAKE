@@ -335,3 +335,47 @@ Stakeholder again chose to continue subsystem research before any code.
   *why* a state was assigned (with the packet that proved it) is what
   makes output auditable. Our evidence strings were a start; the typed
   reason model is the generalization.
+
+---
+
+## 2026-09-11 (subsystem deep-dive, part 4 — final) — service_scan, IPv6 fingerprinting, aux tools, capstone
+
+### Context
+Stakeholder again chose to continue subsystem research before any code.
+
+### What I did
+1. Fetched the service-detection internals index and the book's IPv6
+   fingerprinting chapter; cross-referenced auxiliary tool roles against
+   the GitHub tree already verified.
+2. Wrote `docs/NMAP-SUBSYSTEMS-DEEP-4.md`: the `ServiceNFO` per-port
+   state machine and object graph; all 18 IPv6 OS probes with their
+   quirks (invalid extension headers, RFC 4620 NI, NS hop-limit 255) and
+   the feature-model conventions (missing = −1, scaling to [0,1]); the
+   auxiliary tools inventory; and the **capstone table** — all 18
+   subsystem groups with mechanisms and final A/B/D/U verdicts.
+3. Folded deltas: Phase 2 object mapping into ARCHITECTURE; M4
+   feature-model conventions into PLAN; FTP-bounce deferral and
+   ndiff-style diff view into RECOMMENDATIONS.
+4. Updated PLAN (§5.2 M4, §8, §11), CHANGELOG, this journal. Committed
+   and pushed (no merge).
+
+### Decisions
+- The Nmap analysis series is now closed: every subsystem has a
+  verified mechanism and a verdict; the Phase 8 ledger can be
+  populated mechanically from the capstone table.
+- FTP bounce is deliberately not a milestone despite being
+  socket-level: deprecated, low-value, and abusable against
+  third-party FTP servers (rule #2/#15).
+
+### Challenges / open questions
+- The Phase 8 ledger will still need per-feature measurement data at
+  that milestone; the capstone table is the *structure*, not the
+  evidence.
+- With analysis closed, the remaining gate is stakeholder approval of
+  the Phase 0+1 milestone criteria.
+
+### Learning
+- Closing the analysis with an explicit inventory table (not prose)
+  makes the whole series auditable: each verdict can be traced back
+  to the specific source that established the mechanism, which is the
+  practical form of rule #11 (never fabricate).

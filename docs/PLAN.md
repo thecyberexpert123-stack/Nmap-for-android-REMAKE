@@ -336,7 +336,7 @@ tests are reserved for the classification matrix on loopback only.
 |---|---|
 | **M2 (Phase 2)** service & version detection | Local lab of ≥ 5 known services (e.g., nginx, OpenSSH, mosquitto, vsftpd) on loopback/LAN. Probes: HTTP GET/HEAD, TLS ClientHello banner, SSH banner, SMTP greeting, null-probe banner read. **AC**: correct identification ≥ 90 % on the lab; every identification carries evidence = probe name + response prefix (≤ 256 B) + sha256; evidence gains **structured provenance**: typed `StateReason(code, sourceIp?, ttl?)` modeled on Nmap's `state_reason_t` (reason + the observation that determined it); unidentified → `UNKNOWN` state with evidence, never guessed; version inference labeled "probable" with a confidence score in [0,1] and a documented threshold; false-positive rate < 5 % measured on the lab. Engine adopts the verified Nmap techniques as *concepts* with self-authored content: NULL-probe-first, `softmatch` family pruning, `rarity` probe budgets, fallback chains, SSL post-processor, `tcpwrapped` detection, and the srtt/rttvar/timeout formulas (`timeout = srtt + 4·rttvar`) replacing M1's fixed per-probe timeout ([NMAP-SUBSYSTEMS-DEEP.md](NMAP-SUBSYSTEMS-DEEP.md) §1, §3). |
 | **M3 (Phase 3)** UDP application probing | Probes: DNS (query against a local resolver), mDNS (PTR `_services._dns-sd._udp.local`), echo. States restricted to `RESPONDED` / `NO_RESPONSE` / `APPLICATION_IDENTIFIED` / `INCONCLUSIVE`. **AC**: `NO_RESPONSE` is never rendered or described as "closed"; each result records the probe payload summary; verified with a local dnsmasq instance (present/absent cases). |
-| **M4 (Phase 4)** fingerprinting | Fingerprint DB is self-authored (format: features → candidate weights); features derived from application-layer observations (banner patterns, TLS parameters, timing deltas, header order). Matching layer reuses the verified Nmap *concepts* on these features: weighted point scoring (per-category weights), logistic score mapping `100/(1+e^x)`, novelty rejection (variance-scaled distance threshold), and the top-two-within-10% ambiguity rule ([NMAP-SUBSYSTEMS-DEEP.md](NMAP-SUBSYSTEMS-DEEP.md) §4). **AC**: every DB entry carries `source: self-authored` + a test vector; matching emits candidates with confidence + evidence; output is explicitly labeled "application-level inference", never "Nmap OS detection"; comparison experiment documented. |
+| **M4 (Phase 4)** fingerprinting | Fingerprint DB is self-authored (format: features → candidate weights); features derived from application-layer observations (banner patterns, TLS parameters, timing deltas, header order). Feature-model conventions adopted from the verified IPv6 engine: unavailable features = −1, per-feature scaling into [0,1] ([NMAP-SUBSYSTEMS-DEEP-4.md](NMAP-SUBSYSTEMS-DEEP-4.md) §2). Matching layer reuses the verified Nmap *concepts* on these features: weighted point scoring (per-category weights), logistic score mapping `100/(1+e^x)`, novelty rejection (variance-scaled distance threshold), and the top-two-within-10% ambiguity rule ([NMAP-SUBSYSTEMS-DEEP.md](NMAP-SUBSYSTEMS-DEEP.md) §4). **AC**: every DB entry carries `source: self-authored` + a test vector; matching emits candidates with confidence + evidence; output is explicitly labeled "application-level inference", never "Nmap OS detection"; comparison experiment documented. |
 | **M5 (Phase 5)** capability system | On-device detection: socket connect ✓; raw socket attempt → observe `EPERM` and report `UNSUPPORTED` (measured, not assumed); `VpnService` presence → `UNKNOWN` until the M6 experiment; interface enumeration via `ConnectivityManager` only (no extra permissions). **AC**: unit tests with fakes; on-device report matches expectations on emulator + real device; UI banner reflects the measured profile. |
 | **M6 (Phase 6)** native/VPN experiments | Experiment matrix: raw-socket attempt (expected `EPERM`), VpnService tun packet-injection test against a controlled LAN responder, and a hop-limited TTL-sweep connect traceroute variant (slow/noisy; feasibility of per-hop observation via sockets). **AC**: results recorded verbatim (device model, Android build, command/output); conclusion updates `CapabilityProfile` defaults; any capability is gated behind proof — no claimed capability without a passing experiment. |
 | **M7 (Phase 7)** remote executor | Authenticated executor protocol (mTLS + capability negotiation + versioned result schema) with a written threat model (trust, integrity, replay, injection). **AC**: threat model reviewed and accepted by stakeholder; integration tests between two JVM processes; executor topology discovery (authenticated LAN enrollment + remote enrollment) selects the *closest capable* executor per scan intent; every delegated result carries executor identity, trust level, and a capability proof; delegated results visibly distinguished in the UI; no executor capability claims are trusted without a verification path. Transport is capability-independent (TLS control channel and/or VpnService tunnel) — encryption ≠ privilege ([NMAP-SUBSYSTEMS-DEEP.md](NMAP-SUBSYSTEMS-DEEP.md) §2). |
@@ -390,6 +390,7 @@ Nmap-for-android-REMAKE/
 │   ├── NMAP-SUBSYSTEMS-DEEP.md          # ultra_scan algorithms, raw-send path + delegation architecture, probes format, OS matching
 │   ├── NMAP-SUBSYSTEMS-DEEP-2.md        # NSE internals & parallelism, host discovery mechanics, scan-phase state machine + Nsock
 │   ├── NMAP-SUBSYSTEMS-DEEP-3.md        # idle scan, traceroute, output system & evidence model, target selection + mass-DNS
+│   ├── NMAP-SUBSYSTEMS-DEEP-4.md        # service_scan internals, IPv6 fingerprinting, aux tools, capstone inventory
 │   ├── RECOMMENDATIONS.md               # parked ideas (no scope creep in code)
 │   └── adr/                             # ADR-0001 license, ADR-0002 UI, ADR-0003 SDK levels, …
 ├── settings.gradle.kts
@@ -558,9 +559,16 @@ approval is given.
    provenance → typed `StateReason` in M2; bitmask logging; LOG_SKID not
    reproduced), and target selection + mass-DNS (richer target grammar
    and parallel resolver recorded as recommendations).
-6. Approve (or further refine) the Phase 0+1 milestone criteria (D1–D9, §5.1)
+6. ~~Subsystem deep-dive part 4 (final)~~ → done:
+   `docs/NMAP-SUBSYSTEMS-DEEP-4.md` covers `service_scan.cc` internals
+   (AllProbes/ServiceProbe/ServiceNFO/ServiceGroup → Phase 2 engine
+   mapping), IPv6 OS fingerprinting (18 probes; feature-model
+   conventions adopted for M4), the auxiliary tools, and the **capstone
+   inventory**: all 18 subsystem groups with verified mechanisms and
+   A/B/D/U verdicts, which populates the Phase 8 compatibility ledger.
+7. Approve (or further refine) the Phase 0+1 milestone criteria (D1–D9, §5.1)
    before any implementation starts.
-7. Copyright holder line for the GPL notices (to be set by the project owner).
+8. Copyright holder line for the GPL notices (to be set by the project owner).
 
 ---
 
