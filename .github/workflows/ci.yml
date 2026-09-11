@@ -76,7 +76,7 @@ jobs:
 
   emulator:
     name: Instrumentation tests on API ${{ matrix.api }}
-    runs-on: macos-14
+    runs-on: ubuntu-latest
     timeout-minutes: 60
     permissions:
       checks: write
@@ -96,6 +96,14 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      # Hardware-accelerated emulators on GitHub's Ubuntu runners (per the
+      # android-emulator-runner README, this is now the recommended host).
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
       - name: Run instrumentation tests on emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -103,7 +111,6 @@ jobs:
           arch: x86_64
           disable-animations: true
           emulator-boot-timeout: 1200
-          emulator-options: -no-snapshot -no-audio -no-boot-anim -gpu swiftshader_indirect
           script: ./gradlew :app:connectedDebugAndroidTest --stacktrace 2>&1 | tee /tmp/gradle-emu.log
 
       - name: Report emulator failure details
