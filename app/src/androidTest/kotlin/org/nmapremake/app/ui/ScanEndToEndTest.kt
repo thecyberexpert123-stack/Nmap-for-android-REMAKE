@@ -35,7 +35,7 @@ class ScanEndToEndTest {
     val composeRule = createComposeRule()
 
     @Test
-    fun `app runs a real connect scan against the CI host and renders honest results`() {
+    fun `app_runs_a_real_connect_scan_against_the_CI_host_and_renders_honest_results`() {
         val viewModel = ScanViewModel()
         composeRule.setContent {
             NmapRemakeTheme { ScanScreen(viewModel) }

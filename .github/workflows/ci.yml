@@ -115,6 +115,24 @@ jobs:
             echo "(nothing to commit)"
           fi
 
+      # Runs ktlint's own formatter and publishes the result to a
+      # never-merged branch so the canonical style can be adopted without
+      # hand-editing (the sandbox has no local toolchain).
+      - name: Publish ktlint-formatted sources for adoption
+        if: failure()
+        shell: bash
+        run: |
+          ./gradlew :core:ktlintFormat :engine:ktlintFormat :app:ktlintFormat \
+            --stacktrace > /tmp/ktlint-format.log 2>&1 || true
+          if git diff --quiet; then
+            echo "(ktlintFormat produced no changes)"
+          else
+            git add -A
+            git -c user.name="CI evidence bot" -c user.email="ci-evidence@arena.local" \
+              commit -m "ci: ktlint-format run $GITHUB_RUN_ID [format]" \
+              && git push --force origin HEAD:ci-evidence-format
+          fi
+
   emulator:
     name: E2E app scan on API ${{ matrix.api }} emulator
     runs-on: ubuntu-latest
@@ -212,8 +230,11 @@ jobs:
             echo "--- scan evidence (logcat) ---"
             cat /tmp/scan-evidence.log 2>/dev/null || echo "(none)"
             echo ""
+            echo "--- gradle errors ---"
+            grep -E "^e: |What went wrong|Task .*FAILED|BUILD (SUCCESSFUL|FAILED)|^FAILURE:" /tmp/gradle-emu.log 2>/dev/null | tail -n 100 || echo "(none)"
+            echo ""
             echo "--- gradle tail ---"
-            tail -c 30000 /tmp/gradle-emu.log 2>/dev/null || echo "(none)"
+            tail -c 20000 /tmp/gradle-emu.log 2>/dev/null || echo "(none)"
           } > ci-evidence/evidence.txt
           cp /tmp/scan-results.png ci-evidence/scan-results.png 2>/dev/null || true
           git add -f ci-evidence

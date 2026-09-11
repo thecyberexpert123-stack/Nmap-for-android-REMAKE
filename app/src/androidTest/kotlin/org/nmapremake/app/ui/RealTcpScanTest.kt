@@ -48,7 +48,7 @@ class RealTcpScanTest {
     }
 
     @Test
-    fun `real connect scan classifies open and closed ports on the CI host`() {
+    fun `real_connect_scan_classifies_open_and_closed_ports_on_the_CI_host`() {
         val report = scan(listOf(18080, 18081, 18443, 18082), timeoutMs = 5_000)
         val results = report.hosts.single().portResults.associateBy { it.port }
         assertEquals(PortState.OPEN, results.getValue(18080).state)
@@ -75,7 +75,7 @@ class RealTcpScanTest {
     }
 
     @Test
-    fun `dropped port yields an honest TIMEOUT after the probe deadline`() {
+    fun `dropped_port_yields_an_honest_TIMEOUT_after_the_probe_deadline`() {
         // Only enabled when CI successfully applied an iptables DROP for
         // port 18099 on the runner host (SYN silently dropped => TIMEOUT).
         val args = InstrumentationRegistry.getArguments()

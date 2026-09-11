@@ -17,7 +17,7 @@ class ScanScreenSmokeTest {
     val composeRule = createComposeRule()
 
     @Test
-    fun `scan screen renders inputs banner and disabled start button`() {
+    fun `scan_screen_renders_inputs_banner_and_disabled_start_button`() {
         composeRule.setContent {
             NmapRemakeTheme {
                 ScanScreenContent(
