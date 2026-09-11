@@ -46,11 +46,9 @@ class FakeTcpTransport(
     }
 
     companion object {
-        fun instant(latencyMs: Long = 1L): FakeTcpTransport =
-            FakeTcpTransport { _, _, _ -> ConnectOutcome.Established(latencyMs) }
+        fun instant(latencyMs: Long = 1L) = FakeTcpTransport { _, _, _ -> ConnectOutcome.Established(latencyMs) }
 
-        fun refused(latencyMs: Long = 2L): FakeTcpTransport =
-            FakeTcpTransport { _, _, _ -> ConnectOutcome.Refused(latencyMs) }
+        fun refused(latencyMs: Long = 2L) = FakeTcpTransport { _, _, _ -> ConnectOutcome.Refused(latencyMs) }
 
         fun outcomes(map: Map<Int, ConnectOutcome>): FakeTcpTransport =
             FakeTcpTransport { _, port, _ -> map[port] ?: ConnectOutcome.Established(1L) }

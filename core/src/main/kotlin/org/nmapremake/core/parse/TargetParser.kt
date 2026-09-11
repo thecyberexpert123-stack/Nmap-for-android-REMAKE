@@ -54,11 +54,15 @@ object TargetParser {
 
     private fun looksCidr(s: String): Boolean = CIDR.matcher(s).matches()
 
-    private fun looksV4(s: String): Boolean =
-        s.count { it == '.' } == 3 && s.split('.').all { it.toIntOrNull() in 0..255 }
+    private fun looksV4(s: String): Boolean {
+        val parts = s.split('.')
+        return parts.size == 4 && parts.all { it.toIntOrNull() in 0..255 }
+    }
 
-    private fun looksLikeQuad(s: String): Boolean =
-        s.count { it == '.' } == 3 && s.split('.').all { it.toIntOrNull() != null }
+    private fun looksLikeQuad(s: String): Boolean {
+        val parts = s.split('.')
+        return parts.size == 4 && parts.all { it.toIntOrNull() != null }
+    }
 
     private fun looksV6Literal(s: String): Boolean = s.contains(':') && s.all { it.isDigit() || it in "abcdefABCDEF:." }
 
