@@ -1,0 +1,22 @@
+build:
+  maxIssues: 0
+
+style:
+  MagicNumber:
+    active: false
+  ForbiddenComment:
+    active: false
+  FunctionNaming:
+    ignoreAnnotated:
+      - Composable
+      - androidx.compose.runtime.Composable
+
+complexity:
+  LongParameterList:
+    functionThreshold: 12
+    constructorThreshold: 10
+    ignoreDefaultParameters: true
+  TooManyFunctions:
+    active: false
+  LongMethod:
+    threshold: 120
