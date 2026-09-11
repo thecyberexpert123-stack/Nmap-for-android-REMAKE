@@ -54,7 +54,8 @@ object PortSpecParser {
                     ScanError(ErrorCode.INVALID_PORT, "range bounds must be numbers: '$token'"),
                 )
             }
-            if (a < MIN || b < MIN || a > MAX || b > MAX) {
+            val boundsValid = a in MIN..MAX && b in MIN..MAX
+            if (!boundsValid) {
                 return ParseTokenResult.Error(
                     ScanError(
                         ErrorCode.PORT_OUT_OF_RANGE,

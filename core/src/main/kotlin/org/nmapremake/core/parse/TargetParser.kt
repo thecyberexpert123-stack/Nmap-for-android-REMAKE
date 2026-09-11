@@ -73,7 +73,10 @@ object TargetParser {
             return ParseOutcome.failure(ScanError(ErrorCode.INVALID_TARGET, "hostname too long"))
         }
         val labels = ascii.split('.')
-        if (labels.size < 2 || labels.any { it.isEmpty() || it.length > LABEL_MAX || !LABEL.matcher(it).matches() }) {
+        val hasInvalidLabel = labels.any { label ->
+            label.isEmpty() || label.length > LABEL_MAX || !LABEL.matcher(label).matches()
+        }
+        if (labels.size < 2 || hasInvalidLabel) {
             return ParseOutcome.failure(
                 ScanError(
                     ErrorCode.INVALID_TARGET,

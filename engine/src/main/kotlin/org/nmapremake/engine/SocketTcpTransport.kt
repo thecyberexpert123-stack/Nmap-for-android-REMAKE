@@ -25,6 +25,9 @@ class SocketTcpTransport(
 
     private val openSockets = ConcurrentHashMap.newKeySet<Socket>()
 
+    // Each catch maps a specific exception TYPE to a ConnectOutcome; the
+    // exception object itself carries no extra information the report needs.
+    @Suppress("SwallowedException")
     override fun connect(target: Target, port: Int, timeoutMs: Long): ConnectOutcome {
         val started = clock.now()
         val socket = socketFactory()

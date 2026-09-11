@@ -18,6 +18,9 @@ import org.nmapremake.core.model.TransportProtocol
  */
 class TcpConnectProber(private val transport: TcpTransport) {
 
+    // Each catch maps a specific exception TYPE to a classification; the
+    // exception object itself carries no extra information the report needs.
+    @Suppress("SwallowedException")
     suspend fun probe(target: Target, port: Int, timeoutMs: Long): PortResult {
         val outcome = try {
             withTimeout(timeoutMs) {

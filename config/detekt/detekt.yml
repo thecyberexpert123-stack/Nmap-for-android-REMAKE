@@ -14,6 +14,15 @@ naming:
       - Composable
       - androidx.compose.runtime.Composable
 
+style:
+  # The parsers (TargetParser/PortSpecParser/PlanInputParser) are written in
+  # deliberate early-return style — one return per rejected input — which is
+  # the clearest structure for a token parser and is unit-tested end to end.
+  # The default limit (2) cannot express that style; the threshold matches
+  # the largest parser function (9 returns).
+  ReturnCount:
+    max: 10
+
 complexity:
   LongParameterList:
     functionThreshold: 12

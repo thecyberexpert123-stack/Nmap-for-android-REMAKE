@@ -18,6 +18,9 @@ interface HostResolver {
 class UnresolvedHostException(val error: ScanError) : Exception(error.message)
 
 class InetHostResolver : HostResolver {
+    // The caught type is the whole signal here: resolution failure is
+    // re-thrown as a typed UnresolvedHostException with an honest error.
+    @Suppress("SwallowedException")
     override suspend fun resolve(target: Target): Target = withContext(Dispatchers.IO) {
         try {
             val address = InetAddress.getAllByName(target.label).firstOrNull()
