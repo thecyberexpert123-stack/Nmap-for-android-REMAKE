@@ -11,7 +11,10 @@ kotlin {
 }
 
 dependencies {
-    implementation(project(":core"))
+    // api, not implementation: the engine's public surface (ScanEngine,
+    // ProgressEvent, ConnectOutcome, ScanReport, ...) exposes core types,
+    // so consumers need :core on their compile classpath.
+    api(project(":core"))
     api(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.serialization.json)
 

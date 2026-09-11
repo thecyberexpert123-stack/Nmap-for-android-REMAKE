@@ -6,15 +6,6 @@ style:
     active: false
   ForbiddenComment:
     active: false
-
-# FunctionNaming lives in the 'naming' ruleset (not 'style') in detekt 1.x.
-naming:
-  FunctionNaming:
-    ignoreAnnotated:
-      - Composable
-      - androidx.compose.runtime.Composable
-
-style:
   # The parsers (TargetParser/PortSpecParser/PlanInputParser) are written in
   # deliberate early-return style — one return per rejected input — which is
   # the clearest structure for a token parser and is unit-tested end to end.
@@ -22,6 +13,13 @@ style:
   # the largest parser function (9 returns).
   ReturnCount:
     max: 10
+
+# FunctionNaming lives in the 'naming' ruleset (not 'style') in detekt 1.x.
+naming:
+  FunctionNaming:
+    ignoreAnnotated:
+      - Composable
+      - androidx.compose.runtime.Composable
 
 complexity:
   LongParameterList:
