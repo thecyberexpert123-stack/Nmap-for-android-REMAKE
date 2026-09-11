@@ -290,3 +290,48 @@ Stakeholder chose to continue deepening Nmap subsystems before any code.
   *where* (file/function mapping). Using one without the other would
   have produced either mechanism without location or location without
   mechanism.
+
+---
+
+## 2026-09-11 (subsystem deep-dive, part 3) — idle scan, traceroute, output system, target selection
+
+### Context
+Stakeholder again chose to continue subsystem research before any code.
+
+### What I did
+1. Fetched the book's idle-scan chapter, DeepWiki's target-selection and
+   output-system pages, and cross-referenced the traceroute file roles
+   already verified on the GitHub tree.
+2. Wrote `docs/NMAP-SUBSYSTEMS-DEEP-3.md`: idle-scan step mechanics with
+   the IP-ID +1/+2 logic and zombie requirements; traceroute TTL
+   mechanics with an honest split between verified file roles and
+   standard protocol knowledge; the output system's evidence model
+   (`state_reason_t` = reason + source IP + TTL) and bitmask logging;
+   the NetBlock target grammar and mass-DNS flow.
+3. Folded deltas: typed `StateReason` provenance into M2 criteria;
+   TTL-sweep traceroute variant into the M6 experiment matrix; richer
+   target grammar, parallel DNS resolver, and non-reproduction of
+   leetspeak output recorded in RECOMMENDATIONS.
+4. Updated PLAN (§5.2 M2/M6, §8, §11), CHANGELOG, this journal.
+   Committed and pushed (no merge).
+
+### Decisions
+- Evidence provenance becomes structured in Phase 2 (reason code +
+  source + TTL), mirroring `state_reason_t` — evidence must be
+  queryable, not just printable.
+- Idle scan is the purest delegation case: mechanism impossible locally,
+  result model fully renderable from a remote executor.
+- `LOG_SKID` and similar modes are deliberately excluded (rule #2).
+
+### Challenges / open questions
+- The M6 traceroute experiment now has two variants (VPN observation and
+  TTL-sweep); both need real hardware, keeping M6 dependent on device
+  access.
+- Whether `Os.setsockoptInt(IPPROTO_IP, IP_TTL, …)` works unprivileged on
+  Android remains class U until measured.
+
+### Learning
+- Nmap's `state_reason_t` is a small but high-value design: recording
+  *why* a state was assigned (with the packet that proved it) is what
+  makes output auditable. Our evidence strings were a start; the typed
+  reason model is the generalization.

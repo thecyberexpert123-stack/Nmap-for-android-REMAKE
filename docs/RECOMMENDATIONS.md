@@ -19,3 +19,7 @@ when it might become relevant.
 | 11 | Connect-based host-presence pre-pass (Nmap `-PS` unprivileged-fallback analog: `connect()` to 80/443, quick success/ECONNREFUSED = up) | Verified socket-level technique (NMAP-SUBSYSTEMS-DEEP-2 §2); genuinely useful before port scans | M2 |
 | 12 | `java.nio` Selector-based transport realization | Nsock-style pluggable engine; only if profiling shows `Dispatchers.IO` thread cost is a bottleneck | M2+ (profile first) |
 | 13 | Embedding Lua for a script engine | **Rejected** — heavy dependency + would invite NPSL NSE scripts; typed Kotlin probe pipeline chosen instead (NMAP-SUBSYSTEMS-DEEP-2 §1.4) | Reopen only if stakeholder demands script compatibility |
+| 14 | Richer target grammar (octet ranges, input files, excludes, random targets) | Nmap's `NetBlock` grammar (NMAP-SUBSYSTEMS-DEEP-3 §4); M1 grammar is a deliberate subset | M3/M5 (multi-target milestones) |
+| 15 | Self-hosted parallel DNS stub resolver (mass-DNS analog) | Platform resolver first; justified only if profiling shows resolution as the bottleneck | M5+ (profile first) |
+| 16 | Leetspeak/skid output mode and similar non-purposeful formats | Explicitly **not** reproduced (rule #2 — no junk) | never |
+| 17 | Idle scan / full traceroute local emulation | Confirmed delegation-class D; TTL-sweep connect traceroute is an M6 experiment only | M6 (experiment) |

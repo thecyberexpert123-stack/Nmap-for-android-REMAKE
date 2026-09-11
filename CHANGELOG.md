@@ -66,6 +66,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `TcpTransport` seam documented as the Nsock-engine analog.
 - RECOMMENDATIONS extended: host-presence pre-pass, NIO engine option,
   Lua-embedding rejection rationale.
+- `docs/NMAP-SUBSYSTEMS-DEEP-3.md` — subsystem deep-dive part 3: TCP idle
+  scan (IP-ID side channel, +1/+2 logic, zombie requirements — class D),
+  traceroute (TTL mechanics; TTL-sweep connect variant added to M6
+  experiments), the output system (bitmask logging; `state_reason_t`
+  provenance model → typed `StateReason` in M2; `LOG_SKID` not
+  reproduced), and target selection + mass-DNS (`NetBlock` hierarchy,
+  lookahead buffering; richer grammar + parallel resolver recorded as
+  recommendations).
 - PLAN/ARCHITECTURE deltas folded in (previous round): delegation model in
   PLAN §2.3 and M7 criteria (topology discovery, capability proof);
   Phase 2 adopts adaptive RTT timeouts + self-authored signature DB
