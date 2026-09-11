@@ -144,6 +144,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   transport); `ScanError.code` is a wire-stable string per the §5 schema
   note (unknown codes → INTERNAL, raw value preserved); ARCHITECTURE §5
   host-level executor example updated to the nested executor object.
+- CI verification loop (all green on the session branch):
+  - Fixed a phantom plugin pin: `detekt 2.0.1` never shipped — pinned
+    portal-stable 1.23.8; ktlint bumped 12.2.0 → 14.2.0.
+  - Added a failure relay: CI posts Gradle log tails as check-run
+    annotations via api.github.com (the sandbox cannot reach the Actions
+    log-storage host, so this keeps failures diagnosable).
+  - Emulator matrix moved from `macos-14` to `ubuntu-latest` + KVM (the
+    android-emulator-runner README's current recommendation): the macOS
+    runners never registered the emulator with adb; Ubuntu boots in
+    minutes. API 26 and API 36 legs both pass.
 
 ### Decided (stakeholder approval, 2026-09-11)
 - License: **GPL-2.0-or-later** — `LICENSE` added (verbatim GPLv2 text from SPDX

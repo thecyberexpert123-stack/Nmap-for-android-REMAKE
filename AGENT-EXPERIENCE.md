@@ -584,3 +584,49 @@ Stakeholder asked for the UI/UX concept before Compose implementation.
   it.
 - The emulator matrix (macos-14, API 26 + 36) may need tuning (boot
   time, image availability) — monitored after first push.
+
+---
+
+## 2026-09-11 (session 3) — CI verification loop
+
+### Context
+First code pushed; CI is the only build channel (sandbox cannot compile).
+Goal: green CI per PLAN §5.1.6 (unit tests, coverage gates, ktlint,
+detekt, app lint warnings-as-errors, emulator matrix API 26 + 36).
+
+### What happened
+1. **Phantom version**: first run failed in ~1 min at plugin resolution.
+   Root cause (verified against the plugin portal + upstream releases):
+   `detekt 2.0.1` does not exist — 2.0.0 is still in alpha; portal-stable
+   latest is 1.23.8. Also bumped ktlint 12.2.0 → 14.2.0 (current stable,
+   Gradle-9-era). After the fix the whole verify job went green on the
+   first retry.
+2. **Log-egress dead end**: job logs live on the Actions log-storage host,
+   which the sandbox cannot reach (EOF), so failures were invisible.
+   Built a relay: on failure, CI posts the Gradle log tail as a check-run
+   annotation via api.github.com (reachable). Kept permanently — this
+   project's dev loop depends on it.
+3. **Emulator on macOS failed twice**: first "Timeout waiting for emulator
+   to boot" (~9 min), then, with a longer timeout, an endless
+   `adb: device 'emulator-5554' not found` loop — the emulator process
+   never registered with adb on macos-14. Switched the matrix to
+   `ubuntu-latest` with the Enable-KVM udev step from the
+   android-emulator-runner README (its current recommendation: Ubuntu
+   runners are 2-3× faster than macOS for this). Both API 26 and API 36
+   legs passed, and the full run dropped to ~5 minutes.
+4. **GitHub token expiry mid-verification**: gh/git auth died between two
+   polls (401 / "could not read Username"). Reported to the stakeholder,
+   who reconnected GitHub in Arena; work resumed with no loss (all
+   commits had already been pushed).
+
+### Learnings
+- Version pins for Gradle plugins must be checked against the portal
+  listing, not memory — even "recent" versions may never have shipped.
+- The emulator-on-CI landscape shifted in 2025: GitHub Ubuntu runners are
+  now the recommended KVM host; macOS is the legacy/slow path.
+- A failure relay through an API the sandbox CAN reach converts a blind
+  fix-loop into a one-round diagnosis.
+
+### Open items
+- §5.1.7 real-device LAN scan sign-off still requires stakeholder
+  hardware; CI emulators cannot substitute (recorded in PLAN).

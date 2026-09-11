@@ -4,11 +4,15 @@ An Android-native network scanning engine, rebuilt in Kotlin — inspired by Nma
 capabilities, reproducing them **where the Android platform permits** and honestly
 delegating them where it does not.
 
-> Status: **M1 (Phase 0 + Phase 1) in implementation** — first code on the
-> session branch: `core` + `engine` (pure JVM) and the Compose `app`, verified
-> by GitHub Actions CI (the development sandbox has no Java/Android toolchain
-> and no Maven/Google egress, so CI is the build channel). Stack decisions
-> approved: Kotlin + Jetpack Compose, `minSdk 26`, licensed
+> Status: **M1 (Phase 0 + Phase 1) implemented and CI-verified** — `core` +
+> `engine` (pure JVM) and the Compose `app` are on the session branch with a
+> green GitHub Actions pipeline: unit tests, JaCoCo ≥80 % coverage gates on
+> core/engine, ktlint + detekt, app lint (warnings-as-errors), and the
+> instrumentation suite on emulators at API 26 and API 36. The real-device
+> LAN-scan sign-off (PLAN §5.1.7) remains pending stakeholder hardware.
+> The development sandbox has no Java/Android toolchain and no
+> Maven/Google egress, so CI is the build channel.
+> Stack decisions approved: Kotlin + Jetpack Compose, `minSdk 26`, licensed
 > **GPL-2.0-or-later**.
 > See [`docs/PLAN.md`](docs/PLAN.md) for scope, architecture, roadmap, and
 > acceptance criteria; [`docs/NMAP-DEEP-DIVE.md`](docs/NMAP-DEEP-DIVE.md) for
