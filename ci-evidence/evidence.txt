@@ -1,0 +1,750 @@
+=== run 34680374104 · job verify · sha 7e54f91cbcad7fd05fa7ffef83fa3dbc85c8ff03 ===
+
+--- gradle-jvm tail ---
+Fetching distribution.
+Downloading https://services.gradle.org/distributions/gradle-9.1.0-bin.zip
+............10%.............20%.............30%.............40%.............50%............60%.............70%.............80%.............90%.............100%
+
+Welcome to Gradle 9.1.0!
+
+Here are the highlights of this release:
+ - Full Java 25 support
+ - Native task graph visualization
+ - Enhanced console output
+
+For more details see https://docs.gradle.org/9.1.0/release-notes.html
+
+Starting a Gradle Daemon (subsequent builds will be faster)
+> Task :core:detekt
+> Task :engine:detekt
+> Task :core:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :engine:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :engine:processResources NO-SOURCE
+> Task :engine:processTestResources NO-SOURCE
+> Task :engine:loadKtlintReporters
+> Task :engine:runKtlintCheckOverKotlinScripts
+> Task :core:processResources NO-SOURCE
+> Task :core:processTestResources NO-SOURCE
+> Task :core:loadKtlintReporters FROM-CACHE
+> Task :core:runKtlintCheckOverKotlinScripts
+> Task :core:ktlintKotlinScriptCheck
+> Task :core:runKtlintCheckOverMainSourceSet
+> Task :core:ktlintMainSourceSetCheck
+> Task :engine:runKtlintCheckOverMainSourceSet
+> Task :engine:ktlintKotlinScriptCheck
+> Task :engine:ktlintMainSourceSetCheck
+> Task :engine:runKtlintCheckOverTestSourceSet
+> Task :engine:ktlintTestSourceSetCheck
+> Task :engine:ktlintCheck
+> Task :core:runKtlintCheckOverTestSourceSet
+> Task :core:ktlintTestSourceSetCheck
+> Task :core:ktlintCheck
+> Task :core:compileKotlin
+> Task :core:compileJava NO-SOURCE
+> Task :core:classes UP-TO-DATE
+> Task :core:jar
+> Task :engine:compileKotlin
+> Task :engine:compileJava NO-SOURCE
+> Task :engine:classes UP-TO-DATE
+> Task :engine:jar
+> Task :core:compileTestKotlin
+> Task :core:compileTestJava NO-SOURCE
+> Task :core:testClasses UP-TO-DATE
+> Task :engine:compileTestKotlin
+> Task :engine:compileTestJava NO-SOURCE
+> Task :engine:testClasses UP-TO-DATE
+
+> Task :core:test
+
+CapabilityProfileTest > remote node fields default to null until M7() STARTED
+
+CapabilityProfileTest > local M1 profile matches capability matrix column E1() STARTED
+
+CapabilityProfileTest > local executor node carries matrix E1 identity() STARTED
+
+CapabilityProfileTest > supports is true only for executable states() STARTED
+
+CapabilityProfileTest > missing entries are UNKNOWN() STARTED
+
+ModelContractTest > PortSpec variants round trip through JSON() STARTED
+
+ModelContractTest > PortResult data class and enums behave as documented() STARTED
+
+ModelContractTest > ScanReport envelope round trips with defaults restored() STARTED
+
+ModelContractTest > every error code round trips through its wire string() STARTED
+
+ModelContractTest > schema version default is restored when omitted on the wire() STARTED
+
+ModelContractTest > local M1 executor advertises exactly the E1 matrix column() STARTED
+
+ModelContractTest > Target effective address prefers the resolved literal() STARTED
+
+ModelContractTest > Target equals and hashCode follow the data class contract() STARTED
+
+ModelContractTest > clamped preserves the requested plan otherwise() STARTED
+
+ModelContractTest > UdpProbeSpec round trips through JSON() STARTED
+
+ModelContractTest > unknown wire fields are ignored and port results keep their evidence() STARTED
+
+ModelContractTest > missing capability entries mean UNKNOWN and never assumed executable() STARTED
+
+ModelContractTest > ScanError constructors agree and truncated applies the message contract() STARTED
+
+ModelContractTest > unknown wire code decodes to INTERNAL() STARTED
+
+ModelContractTest > required capabilities are derived from the plan only() STARTED
+
+ParseResultTest > map passes errors through() STARTED
+
+ParseResultTest > errorOrNull is null for Ok() STARTED
+
+ParseResultTest > map transforms Ok values() STARTED
+
+PortSpecTest > all expands to the full port space() STARTED
+
+PortSpecTest > list expands to itself() STARTED
+
+PortSpecTest > curated top list has exactly 100 distinct in-range ports() STARTED
+
+PortSpecTest > range of one expands to one() STARTED
+
+PortSpecTest > curated top list is sorted and contains core well-known ports() STARTED
+
+PortSpecTest > single expands to one port() STARTED
+
+PortSpecTest > range expands inclusively() STARTED
+
+ScanErrorTest > truncated accepts null message() STARTED
+
+ScanErrorTest > wire codes are unique and round-trip() STARTED
+
+ScanErrorTest > truncated caps message length() STARTED
+
+ScanErrorTest > unknown wire code decodes to INTERNAL() STARTED
+
+ScanErrorTest > constructor from ErrorCode uses the wire string() STARTED
+
+ScanPlanTest > required capabilities grow with plan features() STARTED
+
+ScanPlanTest > defaults match the locked M1 values() STARTED
+
+ScanPlanTest > clamped leaves valid values untouched() STARTED
+
+ScanPlanTest > required capabilities for a TCP-only plan() STARTED
+
+ScanPlanTest > clamped preserves a null max duration() STARTED
+
+ScanPlanTest > plan without passes requires nothing() STARTED
+
+ScanPlanTest > clamped floors and caps numeric fields() STARTED
+
+PlanInputParserTest > invalid target error passed through() STARTED
+
+PlanInputParserTest > range parsed() STARTED
+
+PlanInputParserTest > invalid ports error passed through() STARTED
+
+PlanInputParserTest > happy path with top-100() STARTED
+
+PlanInputParserTest > null max duration preserved() STARTED
+
+PlanInputParserTest > single target per plan in M1() STARTED
+
+PlanInputParserTest > blank ports means TCP pass skipped() STARTED
+
+PlanInputParserTest > numeric fields clamped() STARTED
+
+PlanInputParserTest > all parsed() STARTED
+
+PlanInputParserTest > single port parsed() STARTED
+
+PlanInputParserTest > defaults applied() STARTED
+
+PlanInputParserTest > mixed list expands ranges in place() STARTED
+
+PlanInputParserTest > list parsed with duplicates removed and order kept() STARTED
+
+PortSpecParserTest > dangling dash rejected() STARTED
+
+PortSpecParserTest > single port() STARTED
+
+PortSpecParserTest > all keyword case insensitive() STARTED
+
+PortSpecParserTest > range bounds out of range rejected() STARTED
+
+PortSpecParserTest > port zero rejected() STARTED
+
+PortSpecParserTest > range boundaries 1-65535 accepted() STARTED
+
+PortSpecParserTest > non-numeric range bounds rejected() STARTED
+
+PortSpecParserTest > top-100 keyword case insensitive() STARTED
+
+PortSpecParserTest > non-numeric token rejected() STARTED
+
+PortSpecParserTest > comma list keeps order and duplicates() STARTED
+
+PortSpecParserTest > inclusive range() STARTED
+
+PortSpecParserTest > port above 65535 rejected() STARTED
+
+PortSpecParserTest > whitespace around tokens is ignored() STARTED
+
+PortSpecParserTest > empty spec rejected() STARTED
+
+PortSpecParserTest > bulk keyword must stand alone() STARTED
+
+PortSpecParserTest > one invalid token rejects the whole spec() STARTED
+
+PortSpecParserTest > multiple dashes rejected() STARTED
+
+PortSpecParserTest > descending range rejected() STARTED
+
+TargetParserTest > url scheme rejected() STARTED
+
+TargetParserTest > invalid ipv4 octets rejected as INVALID_TARGET() STARTED
+
+TargetParserTest > resolved address defaults are null before resolution() STARTED
+
+TargetParserTest > unicode hostname is folded with idna() STARTED
+
+TargetParserTest > surrounding whitespace is trimmed() STARTED
+
+TargetParserTest > overlong label rejected() STARTED
+
+TargetParserTest > single label accepted() STARTED
+
+TargetParserTest > bracketed ipv6 literal is unwrapped() STARTED
+
+TargetParserTest > hostname() STARTED
+
+TargetParserTest > path suffix rejected() STARTED
+
+TargetParserTest > internal whitespace rejected() STARTED
+
+TargetParserTest > ipv4 literal() STARTED
+
+TargetParserTest > overlong hostname rejected() STARTED
+
+TargetParserTest > underscore label rejected() STARTED
+
+TargetParserTest > ipv6 literal() STARTED
+
+TargetParserTest > cidr rejected with dedicated code() STARTED
+
+TargetParserTest > whitespace-only target rejected() STARTED
+
+TargetParserTest > empty target rejected() STARTED
+
+> Task :engine:test
+
+DefaultScanSchedulerTest > skipped TCP pass completes with an empty host result() STARTED
+
+> Task :core:jacocoTestCoverageVerification
+> Task :core:check
+> Task :core:jacocoTestReport
+
+> Task :engine:test
+
+DefaultScanSchedulerTest > watchdog forces SCAN_DEADLINE_EXCEEDED() STARTED
+Requesting stop of task ':engine:test' as it has exceeded its configured timeout of 8m.
+
+DefaultScanSchedulerTest > watchdog forces SCAN_DEADLINE_EXCEEDED() SKIPPED
+
+> Task :engine:test FAILED
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_3-1789197525981.json
+
+[Incubating] Problems report is available at: file:///home/runner/work/Nmap-for-android-REMAKE/Nmap-for-android-REMAKE/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':engine:test'.
+> Timeout has been exceeded
+
+* Try:
+> Run with --info or --debug option to get more log output.
+> Run with --scan to generate a Build Scan (Powered by Develocity).
+> Get more help at https://help.gradle.org.
+
+* Exception is:
+org.gradle.api.tasks.TaskExecutionException: Execution failed for task ':engine:test'.
+	at org.gradle.api.internal.tasks.execution.CatchExceptionTaskExecuter.execute(CatchExceptionTaskExecuter.java:38)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.executeTask(EventFiringTaskExecuter.java:77)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:55)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:52)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:209)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter.execute(EventFiringTaskExecuter.java:52)
+	at org.gradle.execution.plan.LocalTaskNodeExecutor.execute(LocalTaskNodeExecutor.java:45)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:355)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:342)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.lambda$execute$0(DefaultTaskExecutionGraph.java:338)
+	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:84)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:338)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:327)
+	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.execute(DefaultPlanExecutor.java:459)
+	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.run(DefaultPlanExecutor.java:376)
+	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
+	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:47)
+Caused by: org.gradle.api.GradleException: Timeout has been exceeded
+	at org.gradle.internal.execution.steps.TimeoutStep.executeWithTimeout(TimeoutStep.java:69)
+	at org.gradle.internal.execution.steps.TimeoutStep.execute(TimeoutStep.java:53)
+	at org.gradle.internal.execution.steps.PreCreateOutputParentsStep.execute(PreCreateOutputParentsStep.java:50)
+	at org.gradle.internal.execution.steps.PreCreateOutputParentsStep.execute(PreCreateOutputParentsStep.java:28)
+	at org.gradle.internal.execution.steps.RemovePreviousOutputsStep.execute(RemovePreviousOutputsStep.java:68)
+	at org.gradle.internal.execution.steps.RemovePreviousOutputsStep.execute(RemovePreviousOutputsStep.java:38)
+	at org.gradle.internal.execution.steps.BroadcastChangingOutputsStep.execute(BroadcastChangingOutputsStep.java:61)
+	at org.gradle.internal.execution.steps.BroadcastChangingOutputsStep.execute(BroadcastChangingOutputsStep.java:26)
+	at org.gradle.internal.execution.steps.CaptureOutputsAfterExecutionStep.execute(CaptureOutputsAfterExecutionStep.java:69)
+	at org.gradle.internal.execution.steps.CaptureOutputsAfterExecutionStep.execute(CaptureOutputsAfterExecutionStep.java:46)
+	at org.gradle.internal.execution.steps.ResolveInputChangesStep.execute(ResolveInputChangesStep.java:39)
+	at org.gradle.internal.execution.steps.ResolveInputChangesStep.execute(ResolveInputChangesStep.java:28)
+	at org.gradle.internal.execution.steps.BuildCacheStep.executeWithoutCache(BuildCacheStep.java:189)
+	at org.gradle.internal.execution.steps.BuildCacheStep.executeAndStoreInCache(BuildCacheStep.java:145)
+	at org.gradle.internal.execution.steps.BuildCacheStep.lambda$executeWithCache$4(BuildCacheStep.java:101)
+	at org.gradle.internal.execution.steps.BuildCacheStep.lambda$executeWithCache$5(BuildCacheStep.java:101)
+	at org.gradle.internal.Try$Success.map(Try.java:170)
+	at org.gradle.internal.execution.steps.BuildCacheStep.executeWithCache(BuildCacheStep.java:85)
+	at org.gradle.internal.execution.steps.BuildCacheStep.lambda$execute$0(BuildCacheStep.java:74)
+	at org.gradle.internal.Either$Left.fold(Either.java:116)
+	at org.gradle.internal.execution.caching.CachingState.fold(CachingState.java:62)
+	at org.gradle.internal.execution.steps.BuildCacheStep.execute(BuildCacheStep.java:73)
+	at org.gradle.internal.execution.steps.BuildCacheStep.execute(BuildCacheStep.java:48)
+	at org.gradle.internal.execution.steps.StoreExecutionStateStep.execute(StoreExecutionStateStep.java:46)
+	at org.gradle.internal.execution.steps.StoreExecutionStateStep.execute(StoreExecutionStateStep.java:35)
+	at org.gradle.internal.execution.steps.SkipUpToDateStep.executeBecause(SkipUpToDateStep.java:75)
+	at org.gradle.internal.execution.steps.SkipUpToDateStep.lambda$execute$2(SkipUpToDateStep.java:53)
+	at org.gradle.internal.execution.steps.SkipUpToDateStep.execute(SkipUpToDateStep.java:53)
+	at org.gradle.internal.execution.steps.SkipUpToDateStep.execute(SkipUpToDateStep.java:35)
+	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsFinishedStep.execute(MarkSnapshottingInputsFinishedStep.java:37)
+	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsFinishedStep.execute(MarkSnapshottingInputsFinishedStep.java:27)
+	at org.gradle.internal.execution.steps.ResolveIncrementalCachingStateStep.executeDelegate(ResolveIncrementalCachingStateStep.java:49)
+	at org.gradle.internal.execution.steps.ResolveIncrementalCachingStateStep.executeDelegate(ResolveIncrementalCachingStateStep.java:27)
+	at org.gradle.internal.execution.steps.AbstractResolveCachingStateStep.execute(AbstractResolveCachingStateStep.java:71)
+	at org.gradle.internal.execution.steps.AbstractResolveCachingStateStep.execute(AbstractResolveCachingStateStep.java:39)
+	at org.gradle.internal.execution.steps.ResolveChangesStep.execute(ResolveChangesStep.java:64)
+	at org.gradle.internal.execution.steps.ResolveChangesStep.execute(ResolveChangesStep.java:35)
+	at org.gradle.internal.execution.steps.ValidateStep.execute(ValidateStep.java:62)
+	at org.gradle.internal.execution.steps.ValidateStep.execute(ValidateStep.java:40)
+	at org.gradle.internal.execution.steps.AbstractCaptureStateBeforeExecutionStep.execute(AbstractCaptureStateBeforeExecutionStep.java:76)
+	at org.gradle.internal.execution.steps.AbstractCaptureStateBeforeExecutionStep.execute(AbstractCaptureStateBeforeExecutionStep.java:45)
+	at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.executeWithNonEmptySources(AbstractSkipEmptyWorkStep.java:136)
+	at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.execute(AbstractSkipEmptyWorkStep.java:66)
+	at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.execute(AbstractSkipEmptyWorkStep.java:38)
+	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsStartedStep.execute(MarkSnapshottingInputsStartedStep.java:38)
+	at org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.execute(LoadPreviousExecutionStateStep.java:36)
+	at org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.execute(LoadPreviousExecutionStateStep.java:23)
+	at org.gradle.internal.execution.steps.HandleStaleOutputsStep.execute(HandleStaleOutputsStep.java:75)
+	at org.gradle.internal.execution.steps.HandleStaleOutputsStep.execute(HandleStaleOutputsStep.java:41)
+	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.lambda$execute$0(AssignMutableWorkspaceStep.java:35)
+	at org.gradle.api.internal.tasks.execution.TaskExecution$4.withWorkspace(TaskExecution.java:297)
+	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.execute(AssignMutableWorkspaceStep.java:31)
+	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.execute(AssignMutableWorkspaceStep.java:22)
+	at org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:40)
+	at org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:23)
+	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.lambda$execute$2(ExecuteWorkBuildOperationFiringStep.java:67)
+	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:67)
+	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:39)
+	at org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:46)
+	at org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:34)
+	at org.gradle.internal.execution.steps.IdentifyStep.execute(IdentifyStep.java:47)
+	at org.gradle.internal.execution.steps.IdentifyStep.execute(IdentifyStep.java:34)
+	at org.gradle.internal.execution.impl.DefaultExecutionEngine$1.execute(DefaultExecutionEngine.java:64)
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.executeIfValid(ExecuteActionsTaskExecuter.java:132)
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.execute(ExecuteActionsTaskExecuter.java:121)
+	at org.gradle.api.internal.tasks.execution.ProblemsTaskPathTrackingTaskExecuter.execute(ProblemsTaskPathTrackingTaskExecuter.java:41)
+	at org.gradle.api.internal.tasks.execution.FinalizePropertiesTaskExecuter.execute(FinalizePropertiesTaskExecuter.java:46)
+	at org.gradle.api.internal.tasks.execution.ResolveTaskExecutionModeExecuter.execute(ResolveTaskExecutionModeExecuter.java:51)
+	at org.gradle.api.internal.tasks.execution.SkipTaskWithNoActionsExecuter.execute(SkipTaskWithNoActionsExecuter.java:57)
+	at org.gradle.api.internal.tasks.execution.SkipOnlyIfTaskExecuter.execute(SkipOnlyIfTaskExecuter.java:74)
+	at org.gradle.api.internal.tasks.execution.CatchExceptionTaskExecuter.execute(CatchExceptionTaskExecuter.java:36)
+	... 22 more
+
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/9.1.0/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 9m 48s
+26 actionable tasks: 25 executed, 1 from cache
+
+--- gradle-app tail ---
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :core:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :engine:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :engine:processResources NO-SOURCE
+> Task :app:generateDebugResources
+> Task :core:compileKotlin UP-TO-DATE
+> Task :core:compileJava NO-SOURCE
+> Task :core:processResources NO-SOURCE
+> Task :core:classes UP-TO-DATE
+> Task :core:jar UP-TO-DATE
+> Task :engine:compileKotlin UP-TO-DATE
+> Task :engine:compileJava NO-SOURCE
+> Task :engine:classes UP-TO-DATE
+> Task :engine:jar UP-TO-DATE
+> Task :app:packageDebugResources
+> Task :app:processDebugNavigationResources
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :app:javaPreCompileDebug
+> Task :app:parseDebugLocalResources
+> Task :app:mergeDebugAssets
+> Task :app:compressDebugAssets
+> Task :app:desugarDebugFileDependencies
+> Task :app:generateDebugRFile
+> Task :app:checkDebugAarMetadata
+> Task :app:compileDebugNavigationResources
+> Task :app:mapDebugSourceSetPaths
+> Task :app:createDebugCompatibleScreenManifests
+> Task :app:extractDeepLinksDebug
+> Task :app:processDebugMainManifest
+> Task :app:mergeDebugResources
+> Task :app:processDebugManifest
+> Task :app:mergeDebugJniLibFolders
+> Task :app:processDebugManifestForPackage
+> Task :app:checkDebugDuplicateClasses
+> Task :app:processDebugResources
+> Task :app:compileDebugKotlin
+> Task :app:mergeExtDexDebug
+> Task :app:compileDebugJavaWithJavac NO-SOURCE
+> Task :app:dexBuilderDebug
+> Task :app:processDebugJavaRes
+> Task :app:mergeDebugGlobalSynthetics
+> Task :app:mergeLibDexDebug
+> Task :app:mergeProjectDexDebug
+> Task :app:mergeDebugNativeLibs
+> Task :app:mergeDebugJavaResource
+> Task :app:validateSigningDebug
+> Task :app:writeDebugAppMetadata
+> Task :app:writeDebugSigningConfigVersions
+> Task :app:preDebugAndroidTestBuild SKIPPED
+> Task :app:extractProguardFiles
+> Task :app:stripDebugDebugSymbols
+> Task :app:bundleDebugClassesToCompileJar
+> Task :app:generateDebugLintReportModel
+> Task :app:generateDebugAndroidTestLintModel
+> Task :app:preDebugUnitTestBuild UP-TO-DATE
+> Task :app:generateDebugUnitTestLintModel
+> Task :app:packageDebug
+> Task :app:createDebugApkListingFileRedirect
+> Task :app:assembleDebug
+> Task :app:loadKtlintReporters FROM-CACHE
+> Task :app:runKtlintCheckOverAndroidTestDebugSourceSet NO-SOURCE
+> Task :app:ktlintAndroidTestDebugSourceSetCheck SKIPPED
+> Task :app:runKtlintCheckOverAndroidTestReleaseSourceSet NO-SOURCE
+> Task :app:ktlintAndroidTestReleaseSourceSetCheck SKIPPED
+> Task :app:runKtlintCheckOverAndroidTestSourceSet
+> Task :app:ktlintAndroidTestSourceSetCheck
+> Task :app:runKtlintCheckOverDebugSourceSet NO-SOURCE
+> Task :app:ktlintDebugSourceSetCheck SKIPPED
+> Task :app:runKtlintCheckOverKotlinScripts
+> Task :app:ktlintKotlinScriptCheck
+> Task :app:runKtlintCheckOverMainSourceSet
+> Task :app:ktlintMainSourceSetCheck
+> Task :app:runKtlintCheckOverReleaseSourceSet NO-SOURCE
+> Task :app:ktlintReleaseSourceSetCheck SKIPPED
+> Task :app:runKtlintCheckOverTestDebugSourceSet NO-SOURCE
+> Task :app:ktlintTestDebugSourceSetCheck SKIPPED
+> Task :app:runKtlintCheckOverTestFixturesDebugSourceSet NO-SOURCE
+> Task :app:ktlintTestFixturesDebugSourceSetCheck SKIPPED
+> Task :app:runKtlintCheckOverTestFixturesReleaseSourceSet NO-SOURCE
+> Task :app:ktlintTestFixturesReleaseSourceSetCheck SKIPPED
+> Task :app:runKtlintCheckOverTestFixturesSourceSet NO-SOURCE
+> Task :app:ktlintTestFixturesSourceSetCheck SKIPPED
+> Task :app:runKtlintCheckOverTestReleaseSourceSet NO-SOURCE
+> Task :app:ktlintTestReleaseSourceSetCheck SKIPPED
+> Task :app:runKtlintCheckOverTestSourceSet
+> Task :app:ktlintTestSourceSetCheck
+> Task :app:ktlintCheck
+> Task :app:detekt
+> Task :app:bundleDebugClassesToRuntimeJar
+> Task :app:compileDebugUnitTestKotlin
+> Task :app:javaPreCompileDebugUnitTest FROM-CACHE
+> Task :app:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :app:processDebugUnitTestJavaRes
+> Task :app:testDebugUnitTest
+> Task :app:lintAnalyzeDebugUnitTest
+> Task :app:lintAnalyzeDebugAndroidTest
+> Task :app:lintAnalyzeDebug
+
+> Task :app:lintReportDebug
+Wrote HTML report to file:///home/runner/work/Nmap-for-android-REMAKE/Nmap-for-android-REMAKE/app/build/reports/lint-results-debug.html
+Lint found 3 errors. First failure:
+/home/runner/work/Nmap-for-android-REMAKE/Nmap-for-android-REMAKE/app/src/main/res/mipmap-anydpi-v26: Error: This folder configuration (v26) is unnecessary; minSdkVersion is 26. Merge all the resources in this folder into mipmap-anydpi. [ObsoleteSdkInt]
+
+
+> Task :app:lintDebug FAILED
+Lint found 3 errors. First failure:
+
+/home/runner/work/Nmap-for-android-REMAKE/Nmap-for-android-REMAKE/app/src/main/res/mipmap-anydpi-v26: Error: This folder configuration (v26) is unnecessary; minSdkVersion is 26. Merge all the resources in this folder into mipmap-anydpi. [ObsoleteSdkInt]
+
+   Explanation for issues of type "ObsoleteSdkInt":
+   This check flags version checks that are not necessary, because the
+   minSdkVersion (or surrounding known API level) is already at least as high
+   as the version checked for.
+
+   Similarly, it also looks for resources in -vNN folders, such as values-v14
+   where the version qualifier is less than or equal to the minSdkVersion,
+   where the contents should be merged into the best folder.
+
+
+The full lint text report is located at:
+  /home/runner/work/Nmap-for-android-REMAKE/Nmap-for-android-REMAKE/app/build/intermediates/lint_intermediate_text_report/debug/lintReportDebug/lint-results-debug.txt
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_4-1789198105915.json
+
+[Incubating] Problems report is available at: file:///home/runner/work/Nmap-for-android-REMAKE/Nmap-for-android-REMAKE/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:lintDebug'.
+> Lint found errors in the project; aborting build.
+  
+  Fix the issues identified by lint, or create a baseline to see only new errors.
+  To create a baseline, run `gradlew updateLintBaseline` after adding the following to the module's build.gradle file:
+  ```
+  android {
+      lint {
+          baseline = file("lint-baseline.xml")
+      }
+  }
+  ```
+  For more details, see https://developer.android.com/studio/write/lint#snapshot
+  
+  Lint found 3 errors. First failure:
+  
+  /home/runner/work/Nmap-for-android-REMAKE/Nmap-for-android-REMAKE/app/src/main/res/mipmap-anydpi-v26: Error: This folder configuration (v26) is unnecessary; minSdkVersion is 26. Merge all the resources in this folder into mipmap-anydpi. [ObsoleteSdkInt]
+  
+     Explanation for issues of type "ObsoleteSdkInt":
+     This check flags version checks that are not necessary, because the
+     minSdkVersion (or surrounding known API level) is already at least as high
+     as the version checked for.
+  
+     Similarly, it also looks for resources in -vNN folders, such as values-v14
+     where the version qualifier is less than or equal to the minSdkVersion,
+     where the contents should be merged into the best folder.
+  
+  
+  The full lint text report is located at:
+    /home/runner/work/Nmap-for-android-REMAKE/Nmap-for-android-REMAKE/app/build/intermediates/lint_intermediate_text_report/debug/lintReportDebug/lint-results-debug.txt
+
+* Try:
+> Run with --info or --debug option to get more log output.
+> Run with --scan to generate a Build Scan (Powered by Develocity).
+> Get more help at https://help.gradle.org.
+
+* Exception is:
+org.gradle.api.tasks.TaskExecutionException: Execution failed for task ':app:lintDebug'.
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.lambda$executeIfValid$1(ExecuteActionsTaskExecuter.java:135)
+	at org.gradle.internal.Try$Failure.ifSuccessfulOrElse(Try.java:288)
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.executeIfValid(ExecuteActionsTaskExecuter.java:133)
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.execute(ExecuteActionsTaskExecuter.java:121)
+	at org.gradle.api.internal.tasks.execution.ProblemsTaskPathTrackingTaskExecuter.execute(ProblemsTaskPathTrackingTaskExecuter.java:41)
+	at org.gradle.api.internal.tasks.execution.FinalizePropertiesTaskExecuter.execute(FinalizePropertiesTaskExecuter.java:46)
+	at org.gradle.api.internal.tasks.execution.ResolveTaskExecutionModeExecuter.execute(ResolveTaskExecutionModeExecuter.java:51)
+	at org.gradle.api.internal.tasks.execution.SkipTaskWithNoActionsExecuter.execute(SkipTaskWithNoActionsExecuter.java:57)
+	at org.gradle.api.internal.tasks.execution.SkipOnlyIfTaskExecuter.execute(SkipOnlyIfTaskExecuter.java:74)
+	at org.gradle.api.internal.tasks.execution.CatchExceptionTaskExecuter.execute(CatchExceptionTaskExecuter.java:36)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.executeTask(EventFiringTaskExecuter.java:77)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:55)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:52)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:209)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter.execute(EventFiringTaskExecuter.java:52)
+	at org.gradle.execution.plan.LocalTaskNodeExecutor.execute(LocalTaskNodeExecutor.java:45)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:355)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:342)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.lambda$execute$0(DefaultTaskExecutionGraph.java:338)
+	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:84)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:338)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:327)
+	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.execute(DefaultPlanExecutor.java:459)
+	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.run(DefaultPlanExecutor.java:376)
+	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
+	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:47)
+Caused by: java.lang.RuntimeException: Lint found errors in the project; aborting build.
+
+Fix the issues identified by lint, or create a baseline to see only new errors.
+To create a baseline, run `gradlew updateLintBaseline` after adding the following to the module's build.gradle file:
+```
+android {
+    lint {
+        baseline = file("lint-baseline.xml")
+    }
+}
+```
+For more details, see https://developer.android.com/studio/write/lint#snapshot
+
+Lint found 3 errors. First failure:
+
+/home/runner/work/Nmap-for-android-REMAKE/Nmap-for-android-REMAKE/app/src/main/res/mipmap-anydpi-v26: Error: This folder configuration (v26) is unnecessary; minSdkVersion is 26. Merge all the resources in this folder into mipmap-anydpi. [ObsoleteSdkInt]
+
+   Explanation for issues of type "ObsoleteSdkInt":
+   This check flags version checks that are not necessary, because the
+   minSdkVersion (or surrounding known API level) is already at least as high
+   as the version checked for.
+
+   Similarly, it also looks for resources in -vNN folders, such as values-v14
+   where the version qualifier is less than or equal to the minSdkVersion,
+   where the contents should be merged into the best folder.
+
+
+The full lint text report is located at:
+  /home/runner/work/Nmap-for-android-REMAKE/Nmap-for-android-REMAKE/app/build/intermediates/lint_intermediate_text_report/debug/lintReportDebug/lint-results-debug.txt
+	at com.android.build.gradle.internal.lint.AndroidLintWorkAction$Companion.maybeThrowException(AndroidLintWorkAction.kt:235)
+	at com.android.build.gradle.internal.lint.AndroidLintTextOutputTask.doTaskAction(AndroidLintTextOutputTask.kt:121)
+	at com.android.build.gradle.internal.tasks.NonIncrementalTask$taskAction$$inlined$recordTaskAction$1.invoke(BaseTask.kt:79)
+	at com.android.build.gradle.internal.tasks.Blocks.recordSpan(Blocks.java:51)
+	at com.android.build.gradle.internal.tasks.NonIncrementalTask.taskAction(NonIncrementalTask.kt:78)
+	at org.gradle.internal.reflect.JavaMethod.invoke(JavaMethod.java:125)
+	at org.gradle.api.internal.project.taskfactory.StandardTaskAction.doExecute(StandardTaskAction.java:58)
+	at org.gradle.api.internal.project.taskfactory.StandardTaskAction.execute(StandardTaskAction.java:51)
+	at org.gradle.api.internal.project.taskfactory.StandardTaskAction.execute(StandardTaskAction.java:29)
+	at org.gradle.api.internal.tasks.execution.TaskExecution$3.run(TaskExecution.java:252)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$1.execute(DefaultBuildOperationRunner.java:29)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$1.execute(DefaultBuildOperationRunner.java:26)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.run(DefaultBuildOperationRunner.java:47)
+	at org.gradle.api.internal.tasks.execution.TaskExecution.executeAction(TaskExecution.java:237)
+	at org.gradle.api.internal.tasks.execution.TaskExecution.executeActions(TaskExecution.java:220)
+	at org.gradle.api.internal.tasks.execution.TaskExecution.executeWithPreviousOutputFiles(TaskExecution.java:203)
+	at org.gradle.api.internal.tasks.execution.TaskExecution.execute(TaskExecution.java:170)
+	at org.gradle.internal.execution.steps.ExecuteStep.executeInternal(ExecuteStep.java:105)
+	at org.gradle.internal.execution.steps.ExecuteStep.access$000(ExecuteStep.java:44)
+	at org.gradle.internal.execution.steps.ExecuteStep$1.call(ExecuteStep.java:59)
+	at org.gradle.internal.execution.steps.ExecuteStep$1.call(ExecuteStep.java:56)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:209)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
+	at org.gradle.internal.execution.steps.ExecuteStep.execute(ExecuteStep.java:56)
+	at org.gradle.internal.execution.steps.ExecuteStep.execute(ExecuteStep.java:44)
+	at org.gradle.internal.execution.steps.CancelExecutionStep.execute(CancelExecutionStep.java:42)
+	at org.gradle.internal.execution.steps.TimeoutStep.executeWithoutTimeout(TimeoutStep.java:75)
+	at org.gradle.internal.execution.steps.TimeoutStep.execute(TimeoutStep.java:55)
+	at org.gradle.internal.execution.steps.PreCreateOutputParentsStep.execute(PreCreateOutputParentsStep.java:50)
+	at org.gradle.internal.execution.steps.PreCreateOutputParentsStep.execute(PreCreateOutputParentsStep.java:28)
+	at org.gradle.internal.execution.steps.RemovePreviousOutputsStep.execute(RemovePreviousOutputsStep.java:68)
+	at org.gradle.internal.execution.steps.RemovePreviousOutputsStep.execute(RemovePreviousOutputsStep.java:38)
+	at org.gradle.internal.execution.steps.BroadcastChangingOutputsStep.execute(BroadcastChangingOutputsStep.java:61)
+	at org.gradle.internal.execution.steps.BroadcastChangingOutputsStep.execute(BroadcastChangingOutputsStep.java:26)
+	at org.gradle.internal.execution.steps.CaptureOutputsAfterExecutionStep.execute(CaptureOutputsAfterExecutionStep.java:69)
+	at org.gradle.internal.execution.steps.CaptureOutputsAfterExecutionStep.execute(CaptureOutputsAfterExecutionStep.java:46)
+	at org.gradle.internal.execution.steps.ResolveInputChangesStep.execute(ResolveInputChangesStep.java:39)
+	at org.gradle.internal.execution.steps.ResolveInputChangesStep.execute(ResolveInputChangesStep.java:28)
+	at org.gradle.internal.execution.steps.BuildCacheStep.executeWithoutCache(BuildCacheStep.java:189)
+	at org.gradle.internal.execution.steps.BuildCacheStep.lambda$execute$1(BuildCacheStep.java:75)
+	at org.gradle.internal.Either$Right.fold(Either.java:176)
+	at org.gradle.internal.execution.caching.CachingState.fold(CachingState.java:62)
+	at org.gradle.internal.execution.steps.BuildCacheStep.execute(BuildCacheStep.java:73)
+	at org.gradle.internal.execution.steps.BuildCacheStep.execute(BuildCacheStep.java:48)
+	at org.gradle.internal.execution.steps.StoreExecutionStateStep.execute(StoreExecutionStateStep.java:46)
+	at org.gradle.internal.execution.steps.StoreExecutionStateStep.execute(StoreExecutionStateStep.java:35)
+	at org.gradle.internal.execution.steps.SkipUpToDateStep.executeBecause(SkipUpToDateStep.java:75)
+	at org.gradle.internal.execution.steps.SkipUpToDateStep.lambda$execute$2(SkipUpToDateStep.java:53)
+	at org.gradle.internal.execution.steps.SkipUpToDateStep.execute(SkipUpToDateStep.java:53)
+	at org.gradle.internal.execution.steps.SkipUpToDateStep.execute(SkipUpToDateStep.java:35)
+	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsFinishedStep.execute(MarkSnapshottingInputsFinishedStep.java:37)
+	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsFinishedStep.execute(MarkSnapshottingInputsFinishedStep.java:27)
+	at org.gradle.internal.execution.steps.ResolveIncrementalCachingStateStep.executeDelegate(ResolveIncrementalCachingStateStep.java:49)
+	at org.gradle.internal.execution.steps.ResolveIncrementalCachingStateStep.executeDelegate(ResolveIncrementalCachingStateStep.java:27)
+	at org.gradle.internal.execution.steps.AbstractResolveCachingStateStep.execute(AbstractResolveCachingStateStep.java:71)
+	at org.gradle.internal.execution.steps.AbstractResolveCachingStateStep.execute(AbstractResolveCachingStateStep.java:39)
+	at org.gradle.internal.execution.steps.ResolveChangesStep.execute(ResolveChangesStep.java:64)
+	at org.gradle.internal.execution.steps.ResolveChangesStep.execute(ResolveChangesStep.java:35)
+	at org.gradle.internal.execution.steps.ValidateStep.execute(ValidateStep.java:62)
+	at org.gradle.internal.execution.steps.ValidateStep.execute(ValidateStep.java:40)
+	at org.gradle.internal.execution.steps.AbstractCaptureStateBeforeExecutionStep.execute(AbstractCaptureStateBeforeExecutionStep.java:76)
+	at org.gradle.internal.execution.steps.AbstractCaptureStateBeforeExecutionStep.execute(AbstractCaptureStateBeforeExecutionStep.java:45)
+	at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.executeWithNonEmptySources(AbstractSkipEmptyWorkStep.java:136)
+	at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.execute(AbstractSkipEmptyWorkStep.java:61)
+	at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.execute(AbstractSkipEmptyWorkStep.java:38)
+	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsStartedStep.execute(MarkSnapshottingInputsStartedStep.java:38)
+	at org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.execute(LoadPreviousExecutionStateStep.java:36)
+	at org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.execute(LoadPreviousExecutionStateStep.java:23)
+	at org.gradle.internal.execution.steps.HandleStaleOutputsStep.execute(HandleStaleOutputsStep.java:75)
+	at org.gradle.internal.execution.steps.HandleStaleOutputsStep.execute(HandleStaleOutputsStep.java:41)
+	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.lambda$execute$0(AssignMutableWorkspaceStep.java:35)
+	at org.gradle.api.internal.tasks.execution.TaskExecution$4.withWorkspace(TaskExecution.java:297)
+	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.execute(AssignMutableWorkspaceStep.java:31)
+	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.execute(AssignMutableWorkspaceStep.java:22)
+	at org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:40)
+	at org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:23)
+	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.lambda$execute$2(ExecuteWorkBuildOperationFiringStep.java:67)
+	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:67)
+	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:39)
+	at org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:46)
+	at org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:34)
+	at org.gradle.internal.execution.steps.IdentifyStep.execute(IdentifyStep.java:47)
+	at org.gradle.internal.execution.steps.IdentifyStep.execute(IdentifyStep.java:34)
+	at org.gradle.internal.execution.impl.DefaultExecutionEngine$1.execute(DefaultExecutionEngine.java:64)
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.executeIfValid(ExecuteActionsTaskExecuter.java:132)
+	... 29 more
+
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/9.1.0/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 1m 44s
+65 actionable tasks: 59 executed, 2 from cache, 4 up-to-date
+
+--- core jacoco report ---
+covered="2"/><counter type="COMPLEXITY" missed="0" covered="1"/><counter type="METHOD" missed="0" covered="1"/></method><counter type="INSTRUCTION" missed="0" covered="51"/><counter type="LINE" missed="0" covered="2"/><counter type="COMPLEXITY" missed="0" covered="2"/><counter type="METHOD" missed="0" covered="2"/><counter type="CLASS" missed="0" covered="1"/></class><class name="org/nmapremake/core/capability/ExecutorNode$Companion" sourcefilename="ExecutorNode.kt"><method name="serializer" desc="()Lkotlinx/serialization/KSerializer;" line="24"><counter type="INSTRUCTION" missed="3" covered="0"/><counter type="LINE" missed="1" covered="0"/><counter type="COMPLEXITY" missed="1" covered="0"/><counter type="METHOD" missed="1" covered="0"/></method><counter type="INSTRUCTION" missed="3" covered="0"/><counter type="LINE" missed="1" covered="0"/><counter type="COMPLEXITY" missed="1" covered="0"/><counter type="METHOD" missed="1" covered="0"/><counter type="CLASS" missed="1" covered="0"/></class><class name="org/nmapremake/core/capability/ExecutorType$Companion" sourcefilename="ExecutorNode.kt"><method name="serializer" desc="()Lkotlinx/serialization/KSerializer;" line="5"><counter type="INSTRUCTION" missed="0" covered="3"/><counter type="LINE" missed="0" covered="1"/><counter type="COMPLEXITY" missed="0" covered="1"/><counter type="METHOD" missed="0" covered="1"/></method><method name="get$cachedSerializer" desc="()Lkotlinx/serialization/KSerializer;" line="5"><counter type="INSTRUCTION" missed="0" covered="4"/><counter type="LINE" missed="0" covered="1"/><counter type="COMPLEXITY" missed="0" covered="1"/><counter type="METHOD" missed="0" covered="1"/></method><counter type="INSTRUCTION" missed="0" covered="7"/><counter type="LINE" missed="0" covered="1"/><counter type="COMPLEXITY" missed="0" covered="2"/><counter type="METHOD" missed="0" covered="2"/><counter type="CLASS" missed="0" covered="1"/></class><class name="org/nmapremake/core/capability/ExecutorNode" sourcefilename="ExecutorNode.kt"><method name="&lt;init&gt;" desc="(Ljava/lang/String;Ljava/lang/String;Lorg/nmapremake/core/capability/ExecutorType;Ljava/lang/String;Lorg/nmapremake/core/capability/ExecutorReachability;Lorg/nmapremake/core/capability/TrustLevel;Lorg/nmapremake/core/capability/CapabilityProfile;Ljava/lang/String;Ljava/lang/String;)V" line="25"><counter type="INSTRUCTION" missed="0" covered="30"/><counter type="LINE" missed="0" covered="10"/><counter type="COMPLEXITY" missed="0" covered="1"/><counter type="METHOD" missed="0" covered="1"/></method><method name="&lt;init&gt;" desc="(Ljava/lang/String;Ljava/lang/String;Lorg/nmapremake/core/capability/ExecutorType;Ljava/lang/String;Lorg/nmapremake/core/capability/ExecutorReachability;Lorg/nmapremake/core/capability/TrustLevel;Lorg/nmapremake/core/capability/CapabilityProfile;Ljava/lang/String;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V" line="25"><counter type="INSTRUCTION" missed="0" covered="22"/><counter type="LINE" missed="0" covered="4"/><counter type="COMPLEXITY" missed="0" covered="1"/><counter type="METHOD" missed="0" covered="1"/></method><method name="getId" desc="()Ljava/lang/String;" line="26"><counter type="INSTRUCTION" missed="0" covered="3"/><counter type="LINE" missed="0" covered="1"/><counter type="COMPLEXITY" missed="0" covered="1"/><counter type="METHOD" missed="0" covered="1"/></method><method name="getLabel" desc="()Ljava/lang/String;" line="27"><counter type="INSTRUCTION" missed="3" covered="0"/><counter type="LINE" missed="1" covered="0"/><counter type="COMPLEXITY" missed="1" covered="0"/><counter type="METHOD" missed="1" covered="0"/></method><method name="getType" desc="()Lorg/nmapremake/core/capability/ExecutorType;" line="28"><counter type="INSTRUCTION" missed="0" covered="3"/><counter type="LINE" missed="0" covered="1"/><counter type="COMPLEXITY" missed="0" covered="1"/><counter type="METHOD" missed="0" covered="1"/></method><method name="getTransport" desc="()Ljava/lang/String;" line="29"><counter type="INSTRUCTION" missed="0" covered="3"/><counter type="LINE" missed="0" covered="1"/><counter type="COMPLEXITY" missed="0" covered="1"/><counter type="METHOD" missed="0" covered="1"/></method><method name="getReachability" desc="()Lorg/nmapremake/core/capability/ExecutorReachability;" line="30"><counter type="INSTRUCTION" missed="0" covered="3"/><counter type="LINE" missed="0" covered="1"/><counter type="COMPLEXITY" missed="0" covered="1"/><counter type="METHOD" missed="0" covered="1"/></method><method name="getTrustLevel" desc="()Lorg/nmapremake/core/capability/TrustLevel;" line="31"><counter type="INSTRUCTION" missed="0" covered="3"/><counter type="LINE" missed="0" covered="1"/><counter type="COMPLEXITY" missed="0" covered="1"/><counter type="METHOD" missed="0" covered="1"/></method><method name="getCapabilities" desc="()Lorg/nmapremake/core/capability/CapabilityProfile;" line="32"><counter type="INSTRUCTION" missed="0" covered="3"/><counter type="LINE" missed="0" covered="1"/><counter type="COMPLEXITY" missed="0" covered="1"/><counter type="METHOD" missed="0" covered="1"/></method><method name="getDiscoveredVia" desc="()Ljava/lang/String;" line="33"><counter type="INSTRUCTION" missed="0" covered="3"/><counter type="LINE" missed="0" covered="1"/><counter type="COMPLEXITY" missed="0" covered="1"/><counter type="METHOD" missed="0" covered="1"/></method><method name="getCapabilityProof" desc="()Ljava/lang/String;" line="34"><counter type="INSTRUCTION" missed="0" covered="3"/><counter type="LINE" missed="0" covered="1"/><counter type="COMPLEXITY" missed="0" covered="1"/><counter type="METHOD" missed="0" covered="1"/></method><method name="write$Self$core" desc="(Lorg/nmapremake/core/capability/ExecutorNode;Lkotlinx/serialization/encoding/CompositeEncoder;Lkotlinx/serialization/descriptors/SerialDescriptor;)V" line="24"><counter type="INSTRUCTION" missed="6" covered="100"/><counter type="BRANCH" missed="6" covered="6"/><counter type="LINE" missed="0" covered="1"/><counter type="COMPLEXITY" missed="6" covered="1"/><counter type="METHOD" missed="0" covered="1"/></method><method name="&lt;init&gt;" desc="(ILjava/lang/String;Ljava/lang/String;Lorg/nmapremake/core/capability/ExecutorType;Ljava/lang/String;Lorg/nmapremake/core/capability/ExecutorReachability;Lorg/nmapremake/core/capability/TrustLevel;Lorg/nmapremake/core/capability/CapabilityProfile;Ljava/lang/String;Ljava/lang/String;Lkotlinx/serialization/internal/SerializationConstructorMarker;)V" line="24"><counter type="INSTRUCTION" missed="13" covered="43"/><counter type="BRANCH" missed="3" covered="3"/><counter type="LINE" missed="2" covered="1"/><counter type="COMPLEXITY" missed="3" covered="1"/><counter type="METHOD" missed="0" covered="1"/></method><method name="_childSerializers$_anonymous_" desc="()Lkotlinx/serialization/KSerializer;" line="24"><counter type="INSTRUCTION" missed="0" covered="1"/><counter type="LINE" missed="0" covered="1"/><counter type="COMPLEXITY" missed="0" covered="1"/><counter type="METHOD" missed="0" covered="1"/></method><method name="_childSerializers$_anonymous_$0" desc="()Lkotlinx/serialization/KSerializer;" line="24"><counter type="INSTRUCTION" missed="0" covered="1"/><counter type="LINE" missed="0" covered="1"/><counter type="COMPLEXITY" missed="0" covered="1"/><counter type="METHOD" missed="0" covered="1"/></method><method name="_childSerializers$_anonymous_$1" desc="()Lkotlinx/serialization/KSerializer;" line="24"><counter type="INSTRUCTION" missed="0" covered="1"/><counter type="LINE" missed="0" covered="1"/><counter type="COMPLEXITY" missed="0" covered="1"/><counter type="METHOD" missed="0" covered="1"/></method><method name="&lt;clinit&gt;" desc="()V" line="24"><counter type="INSTRUCTION" missed="0" covered="48"/><counter type="LINE" missed="0" covered="1"/><counter type="COMPLEXITY" missed="0" covered="1"/><counter type="METHOD" missed="0" covered="1"/></method><counter type="INSTRUCTION" missed="22" covered="270"/><counter type="BRANCH" missed="9" covered="9"/><counter type="LINE" missed="0" covered="12"/><counter type="COMPLEXITY" missed="10" covered="16"/><counter type="METHOD" missed="1" covered="16"/><counter type="CLASS" missed="0" covered="1"/></class><class name="org/nmapremake/core/capability/ExecutorReachability" sourcefilename="ExecutorNode.kt"><method name="_init_$_anonymous_" desc="()Lkotlinx/serialization/KSerializer;" line="8"><counter type="INSTRUCTION" missed="0" covered="5"/><counter type="LINE" missed="0" covered="1"/><counter type="COMPLEXITY" missed="0" covered="1"/><counter type="METHOD" missed="0" covered="1"/></method><method name="&lt;clinit&gt;" desc="()V" line="8"><counter type="INSTRUCTION" missed="0" covered="34"/><counter type="LINE" missed="0" covered="2"/><counter type="COMPLEXITY" missed="0" covered="1"/><counter type="METHOD" missed="0" covered="1"/></method><counter type="INSTRUCTION" missed="0" covered="39"/><counter type="LINE" missed="0" covered="2"/><counter type="COMPLEXITY" missed="0" covered="2"/><counter type="METHOD" missed="0" covered="2"/><counter type="CLASS" missed="0" covered="1"/></class><class name="org/nmapremake/core/capability/CapabilityProfile$Companion" sourcefilename="CapabilityProfile.kt"><method name="getANDROID_LOCAL_M1" desc="()Lorg/nmapremake/core/capability/CapabilityProfile;" line="22"><counter type="INSTRUCTION" missed="0" covered="2"/><counter type="LINE" missed="0" covered="1"/><counter type="COMPLEXITY" missed="0" covered="1"/><counter type="METHOD" missed="0" covered="1"/></method><method name="serializer" desc="()Lkotlinx/serialization/KSerializer;" line="19"><counter type="INSTRUCTION" missed="3" covered="0"/><counter type="LINE" missed="1" covered="0"/><counter type="COMPLEXITY" missed="1" covered="0"/><counter type="METHOD" missed="1" covered="0"/></method><counter type="INSTRUCTION" missed="3" covered="2"/><counter type="LINE" missed="1" covered="1"/><counter type="COMPLEXITY" missed="1" covered="1"/><counter type="METHOD" missed="1" covered="1"/><counter type="CLASS" missed="0" covered="1"/></class><sourcefile name="Capability.kt"><line nr="10" mi="0" ci="16" mb="0" cb="0"/><line nr="12" mi="0" ci="6" mb="0" cb="0"/><line nr="13" mi="0" ci="6" mb="0" cb="0"/><line nr="14" mi="0" ci="6" mb="0" cb="0"/><line nr="15" mi="0" ci="6" mb="0" cb="0"/><line nr="16" mi="0" ci="6" mb="0" cb="0"/><line nr="17" mi="0" ci="6" mb="0" cb="0"/><line nr="18" mi="0" ci="6" mb="0" cb="0"/><line nr="19" mi="0" ci="6" mb="0" cb="0"/><line nr="20" mi="0" ci="6" mb="0" cb="0"/><line nr="21" mi="0" ci="6" mb="0" cb="0"/><line nr="22" mi="0" ci="6" mb="0" cb="0"/><line nr="23" mi="0" ci="6" mb="0" cb="0"/><line nr="24" mi="0" ci="6" mb="0" cb="0"/><line nr="25" mi="0" ci="6" mb="0" cb="0"/><line nr="26" mi="0" ci="6" mb="0" cb="0"/><line nr="27" mi="0" ci="17" mb="0" cb="0"/><line nr="28" mi="0" ci="1" mb="0" cb="0"/><line nr="38" mi="0" ci="16" mb="0" cb="0"/><line nr="39" mi="0" ci="42" mb="0" cb="0"/><counter type="INSTRUCTION" missed="0" covered="182"/><counter type="LINE" missed="0" covered="20"/><counter type="COMPLEXITY" missed="0" covered="8"/><counter type="METHOD" missed="0" covered="8"/><counter type="CLASS" missed="0" covered="4"/></sourcefile><sourcefile name="ExecutorNode.kt"><line nr="5" mi="0" ci="16" mb="0" cb="0"/><line nr="6" mi="0" ci="36" mb="0" cb="0"/><line nr="8" mi="0" ci="16" mb="0" cb="0"/><line nr="9" mi="0" ci="30" mb="0" cb="0"/><line nr="11" mi="0" ci="16" mb="0" cb="0"/><line nr="12" mi="0" ci="36" mb="0" cb="0"/><line nr="24" mi="20" ci="194" mb="9" cb="9"/><line nr="25" mi="0" ci="20" mb="0" cb="0"/><line nr="26" mi="0" ci="6" mb="0" cb="0"/><line nr="27" mi="3" ci="3" mb="0" cb="0"/><line nr="28" mi="0" ci="6" mb="0" cb="0"/><line nr="29" mi="0" ci="6" mb="0" cb="0"/><line nr="30" mi="0" ci="6" mb="0" cb="0"/><line nr="31" mi="0" ci="6" mb="0" cb="0"/><line nr="32" mi="0" ci="6" mb="0" cb="0"/><line nr="33" mi="1" ci="8" mb="0" cb="0"/><line nr="34" mi="1" ci="8" mb="0" cb="0"/><line nr="35" mi="0" ci="1" mb="0" cb="0"/><line nr="39" mi="0" ci="2" mb="0" cb="0"/><line nr="40" mi="0" ci="5" mb="0" cb="0"/><line nr="41" mi="0" ci="1" mb="0" cb="0"/><line nr="42" mi="0" ci="1" mb="0" cb="0"/><line nr="43" mi="0" ci="1" mb="0" cb="0"/><line nr="44" mi="0" ci="1" mb="0" cb="0"/><line nr="45" mi="0" ci="1" mb="0" cb="0"/><line nr="46" mi="0" ci="1" mb="0" cb="0"/><line nr="47" mi="0" ci="2" mb="0" cb="0"/><line nr="48" mi="0" ci="1" mb="0" cb="0"/><line nr="49" mi="0" ci="1" mb="0" cb="0"/><counter type="INSTRUCTION" missed="25" covered="437"/><counter type="BRANCH" missed="9" covered="9"/><counter type="LINE" missed="0" covered="29"/><counter type="COMPLEXITY" missed="11" covered="30"/><counter type="METHOD" missed="2" covered="30"/><counter type="CLASS" missed="1" covered="8"/></sourcefile><sourcefile name="CapabilityProfile.kt"><line nr="9" mi="11" ci="41" mb="5" cb="5"/><line nr="10" mi="0" ci="9" mb="0" cb="0"/><line nr="11" mi="4" ci="6" mb="0" cb="0"/><line nr="12" mi="0" ci="1" mb="0" cb="0"/><line nr="13" mi="0" ci="10" mb="0" cb="2"/><line nr="16" mi="0" ci="6" mb="0" cb="0"/><line nr="19" mi="3" ci="11" mb="0" cb="0"/><line nr="20" mi="0" ci="14" mb="0" cb="0"/><line nr="22" mi="0" ci="2" mb="0" cb="0"/><line nr="23" mi="0" ci="5" mb="0" cb="0"/><line nr="24" mi="0" ci="1" mb="0" cb="0"/><line nr="25" mi="0" ci="40" mb="0" cb="0"/><line nr="26" mi="0" ci="4" mb="0" cb="0"/><line nr="27" mi="0" ci="4" mb="0" cb="0"/><line nr="28" mi="0" ci="4" mb="0" cb="0"/><line nr="29" mi="0" ci="4" mb="0" cb="0"/><line nr="30" mi="0" ci="4" mb="0" cb="0"/><line nr="31" mi="0" ci="4" mb="0" cb="0"/><line nr="32" mi="0" ci="4" mb="0" cb="0"/><line nr="33" mi="0" ci="4" mb="0" cb="0"/><line nr="34" mi="0" ci="4" mb="0" cb="0"/><line nr="35" mi="0" ci="4" mb="0" cb="0"/><line nr="36" mi="0" ci="4" mb="0" cb="0"/><line nr="37" mi="0" ci="4" mb="0" cb="0"/><line nr="38" mi="0" ci="4" mb="0" cb="0"/><line nr="39" mi="0" ci="4" mb="0" cb="0"/><line nr="40" mi="0" ci="4" mb="0" cb="0"/><counter type="INSTRUCTION" missed="18" covered="206"/><counter type="BRANCH" missed="5" covered="7"/><counter type="LINE" missed="0" covered="27"/><counter type="COMPLEXITY" missed="7" covered="10"/><counter type="METHOD" missed="2" covered="9"/><counter type="CLASS" missed="0" covered="2"/></sourcefile><counter type="INSTRUCTION" missed="43" covered="825"/><counter type="BRANCH" missed="14" covered="16"/><counter type="LINE" missed="0" covered="76"/><counter type="COMPLEXITY" missed="18" covered="48"/><counter type="METHOD" missed="4" covered="47"/><counter type="CLASS" missed="1" covered="14"/></package><counter type="INSTRUCTION" missed="350" covered="4079"/><counter type="BRANCH" missed="77" covered="209"/><counter type="LINE" missed="8" covered="458"/><counter type="COMPLEXITY" missed="109" covered="271"/><counter type="METHOD" missed="34" covered="203"/><counter type="CLASS" missed="9" covered="60"/></report>
+--- engine jacoco report ---
+(none)
+
+--- app lint text report ---
+/home/runner/work/Nmap-for-android-REMAKE/Nmap-for-android-REMAKE/app/src/main/res/mipmap-anydpi-v26: Error: This folder configuration (v26) is unnecessary; minSdkVersion is 26. Merge all the resources in this folder into mipmap-anydpi. [ObsoleteSdkInt]
+
+   Explanation for issues of type "ObsoleteSdkInt":
+   This check flags version checks that are not necessary, because the
+   minSdkVersion (or surrounding known API level) is already at least as high
+   as the version checked for.
+
+   Similarly, it also looks for resources in -vNN folders, such as values-v14
+   where the version qualifier is less than or equal to the minSdkVersion,
+   where the contents should be merged into the best folder.
+
+/home/runner/work/Nmap-for-android-REMAKE/Nmap-for-android-REMAKE/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml:2: Error: The application adaptive icon is missing a monochrome tag [MonochromeLauncherIcon]
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+^
+/home/runner/work/Nmap-for-android-REMAKE/Nmap-for-android-REMAKE/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml:2: Error: The application adaptive roundIcon is missing a monochrome tag [MonochromeLauncherIcon]
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+^
+
+   Explanation for issues of type "MonochromeLauncherIcon":
+   The system may use the coloring of the user's chosen wallpaper and theme to
+   tint app icons. Providing a <monochrome> layer (which will be used for
+   tinting) for every adaptive icon is strongly recommended, otherwise Android
+   16 QPR 2 and above will simply tint the color version of the icon, which
+   may look unusual. Devices running earlier Android versions will (with no
+   monochrome layer) show the untinted color icon for your app, which will
+   look inconsistent.
+
+3 errors
