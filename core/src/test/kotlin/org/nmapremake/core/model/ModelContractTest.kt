@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test
 import org.nmapremake.core.capability.Availability
 import org.nmapremake.core.capability.Capability
 import org.nmapremake.core.capability.CapabilityProfile
-import org.nmapremake.core.capability.ExecutorNode
 import org.nmapremake.core.capability.ExecutorReachability
 import org.nmapremake.core.capability.ExecutorType
 import org.nmapremake.core.capability.Executors
@@ -37,7 +36,13 @@ class ModelContractTest {
         for (code in ErrorCode.entries) {
             assertEquals(code, ErrorCode.fromWire(code.wire), "wire mismatch for $code")
         }
-        assertEquals(ErrorCode.entries.size, ErrorCode.entries.map { it.wire }.toSet().size)
+        assertEquals(
+            ErrorCode.entries.size,
+            ErrorCode.entries
+                .map { it.wire }
+                .toSet()
+                .size,
+        )
     }
 
     @Test
@@ -100,14 +105,15 @@ class ModelContractTest {
             )
         assertNull(open.error)
         assertEquals(12L, open.latencyMs)
-        val closed = PortResult(
-            port = 81,
-            protocol = TransportProtocol.TCP,
-            state = PortState.CLOSED,
-            latencyMs = 3,
-            error = ScanError(ErrorCode.CONNECTION_REFUSED, "Connection refused"),
-            evidence = "Connection refused (ECONNREFUSED)",
-        )
+        val closed =
+            PortResult(
+                port = 81,
+                protocol = TransportProtocol.TCP,
+                state = PortState.CLOSED,
+                latencyMs = 3,
+                error = ScanError(ErrorCode.CONNECTION_REFUSED, "Connection refused"),
+                evidence = "Connection refused (ECONNREFUSED)",
+            )
         assertEquals(ErrorCode.CONNECTION_REFUSED, closed.error?.errorCode())
         assertEquals(PortState.TIMEOUT, PortState.valueOf("TIMEOUT"))
         assertEquals(TransportProtocol.UDP, TransportProtocol.valueOf("UDP"))
@@ -250,7 +256,11 @@ class ModelContractTest {
         val text = json.encodeToString(ScanReport.serializer(), sampleReport())
         val withExtra = text.replaceFirst("\"hosts\": [", "\"futureField\": {\"x\": 1}, \"hosts\": [")
         val decoded = json.decodeFromString(ScanReport.serializer(), withExtra)
-        val closed = decoded.hosts.single().portResults.first { it.port == 81 }
+        val closed =
+            decoded.hosts
+                .single()
+                .portResults
+                .first { it.port == 81 }
         assertEquals("Connection refused (ECONNREFUSED)", closed.evidence)
     }
 
