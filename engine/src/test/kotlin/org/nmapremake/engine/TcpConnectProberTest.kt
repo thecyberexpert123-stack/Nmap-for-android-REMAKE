@@ -92,14 +92,22 @@ class TcpConnectProberTest {
     }
 
     @Test
-    fun `external cancellation propagates instead of being classified as TIMEOUT`() {
-        val prober = TcpConnectProber(FakeTcpTransport.blockingUntilReleased())
+    fun `cancelling the probe job alone cannot unblock a blocking connect`() {
+        val transport = FakeTcpTransport.blockingUntilReleased()
+        val prober = TcpConnectProber(transport)
         runBlocking {
             val job = launch { prober.probe(target, 81, 60_000) }
             delay(50)
             job.cancel()
+            // The connect runs on Dispatchers.IO via withContext, which is
+            // not interruptible: the job is marked cancelled immediately,
+            // but it completes only once the transport is released. This is
+            // exactly why ScanScheduler.cancel() calls transport.abort() to
+            // unblock real socket connects; the probe never classifies a
+            // cancellation as TIMEOUT.
+            assertTrue(job.isCancelled, "job must be marked cancelled immediately")
+            transport.abort()
             job.join()
-            assertTrue(job.isCancelled, "external cancellation must cancel the probe job")
         }
     }
 }

@@ -48,6 +48,12 @@ android {
     }
 }
 
+// JUnit4 has no per-test timeout property; bound the whole unit-test task so
+// a hanging test fails the build instead of stalling the CI pipeline.
+tasks.withType<Test>().configureEach {
+    timeout = java.time.Duration.ofMinutes(5)
+}
+
 kotlin {
     compilerOptions {
         jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)

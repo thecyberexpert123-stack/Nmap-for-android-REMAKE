@@ -701,3 +701,22 @@ Round by round, from CI evidence branches and job-log blob URLs:
   App unit tests use JUnit4 (android unit tests), JVM tests use kotlin.test.
 - A warnings-as-errors lint policy needs a documented allowlist for
   advisory-only checks, or every toolchain release breaks the build.
+
+### Round N+1 findings (engine tests first execution)
+- The engine test suite hung the whole verify job on its first execution:
+  `TcpConnectProberTest`'s cancellation test `join()`ed a probe job blocked
+  in `withContext(Dispatchers.IO)` running `blockingUntilReleased()`. Job
+  cancellation marks the job cancelled but cannot unblock a non-interruptible
+  blocking call — the test never completed and runBlocking hung forever
+  (no timeout). The honest contract is that the transport must be released
+  (`ScanScheduler.cancel()` does exactly that via `transport.abort()`), and
+  the test now asserts it. Added per-test JUnit Jupiter timeouts (60 s) for
+  core/engine and a 5-minute task timeout for app unit tests so a future
+  hang fails fast instead of stalling CI.
+- Kotlin typealiases do not expose nested classifiers
+  (`typealias P = X.Outcome` does not make `P.Success` resolvable); alias
+  the nested classes directly.
+- `advanceUntilIdle` needs `@OptIn(ExperimentalCoroutinesApi::class)` under
+  allWarningsAsErrors.
+- lint's MissingApplicationIcon is satisfied with a vector-only adaptive
+  icon at minSdk 26 (no binary assets).

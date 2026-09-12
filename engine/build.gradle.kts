@@ -32,6 +32,9 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
 
 tasks.test {
     useJUnitPlatform()
+    // Fail individual tests that hang instead of stalling the CI pipeline
+    // (JUnit Jupiter per-test timeout).
+    systemProperty("junit.jupiter.execution.timeout.default", "60000")
     testLogging {
         events("failed", "skipped")
         exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL

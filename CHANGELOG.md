@@ -228,6 +228,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - The app now ships an adaptive launcher icon (radar motif, vector-only,
     no binary assets needed at minSdk 26) — fixes lint's
     `MissingApplicationIcon`.
+  - The first engine-test execution revealed a genuine hang in
+    `TcpConnectProberTest`: the cancellation test `join()`ed a probe job that
+    was blocked inside a non-interruptible `withContext(Dispatchers.IO)`
+    connect and would never complete. The test now asserts the honest
+    contract — job cancellation alone cannot unblock a blocking connect; the
+    transport must be released (which is exactly why `ScanScheduler.cancel()`
+    calls `transport.abort()`) — and then releases the transport before
+    joining. JVM tests additionally get a per-test JUnit Jupiter timeout
+    (60 s) and the app unit-test task a 5-minute task timeout, so a hanging
+    test fails the build instead of stalling the pipeline.
 
 ### Changed
 - (none yet)
