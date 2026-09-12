@@ -70,7 +70,8 @@ jobs:
           --stacktrace
           2>&1 | tee /tmp/gradle-jvm.log
 
-      - name: Verify Android app (assemble, lint, ktlint, detekt)
+      - name: Verify Android app (assemble, lint, ktlint, detekt, unit tests)
+        if: always()  # run even when the JVM step failed, so one run reports everything
         shell: bash
         run: >
           ./gradlew
@@ -78,6 +79,7 @@ jobs:
           :app:lintDebug
           :app:ktlintCheck
           :app:detekt
+          :app:testDebugUnitTest
           --continue
           --stacktrace
           2>&1 | tee /tmp/gradle-app.log
@@ -109,6 +111,12 @@ jobs:
             echo ""
             echo "--- gradle-app tail ---"
             tail -c 30000 /tmp/gradle-app.log 2>/dev/null || echo "(none)"
+            echo ""
+            echo "--- core jacoco report ---"
+            tail -c 15000 core/build/reports/jacoco/test/jacocoTestReport.xml 2>/dev/null || echo "(none)"
+            echo ""
+            echo "--- engine jacoco report ---"
+            tail -c 15000 engine/build/reports/jacoco/test/jacocoTestReport.xml 2>/dev/null || echo "(none)"
           } > ci-evidence/evidence.txt
           git add -f ci-evidence
           if git -c user.name="CI evidence bot" -c user.email="ci-evidence@arena.local" \

@@ -10,7 +10,6 @@ import org.nmapremake.core.model.ScanError
 import org.nmapremake.core.model.Target
 import org.nmapremake.engine.testutil.FakeTcpTransport
 import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
@@ -100,7 +99,7 @@ class TcpConnectProberTest {
             delay(50)
             job.cancel()
             job.join()
-            assertNotNull(job.getCancellationException())
+            assertTrue(job.isCancelled, "external cancellation must cancel the probe job")
         }
     }
 }

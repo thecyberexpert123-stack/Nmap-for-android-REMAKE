@@ -9,9 +9,13 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class PlanInputParserTest {
-    private fun success(input: PlanInputParser.Input): PlanInputParser.ParseOutcome.Success = assertIs(PlanInputParser.parse(input))
+    private fun success(input: PlanInputParser.Input): PlanInputParser.ParseOutcome.Success {
+        return assertIs(PlanInputParser.parse(input))
+    }
 
-    private fun failure(input: PlanInputParser.Input): PlanInputParser.ParseOutcome.Failure = assertIs(PlanInputParser.parse(input))
+    private fun failure(input: PlanInputParser.Input): PlanInputParser.ParseOutcome.Failure {
+        return assertIs(PlanInputParser.parse(input))
+    }
 
     @Test
     fun `happy path with top-100`() {

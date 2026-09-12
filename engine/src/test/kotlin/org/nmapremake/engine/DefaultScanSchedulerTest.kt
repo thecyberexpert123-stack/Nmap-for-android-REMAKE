@@ -62,8 +62,8 @@ class DefaultScanSchedulerTest {
             when (event) {
                 is ProgressEvent.PortStarted -> seenStart += event.port
                 is ProgressEvent.PortFinished -> {
-                    assertTrue(event.port in seenStart, "PortFinished(${event.port}) before PortStarted")
-                    assertTrue(seenFinish.add(event.port), "duplicate PortFinished(${event.port})")
+                    assertTrue(event.result.port in seenStart, "PortFinished(${event.result.port}) before PortStarted")
+                    assertTrue(seenFinish.add(event.result.port), "duplicate PortFinished(${event.result.port})")
                 }
                 else -> Unit
             }
@@ -189,7 +189,7 @@ class DefaultScanSchedulerTest {
                 delay(30)
                 scheduler.cancel()
                 collector.join()
-                collector.getCompleted()
+                collector.await()
             }
         val failed = events.filterIsInstance<ProgressEvent.ScanFailed>()
         assertEquals(1, failed.size)
