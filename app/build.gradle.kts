@@ -1,3 +1,5 @@
+import java.time.Duration
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.serialization)
@@ -50,8 +52,10 @@ android {
 
 // JUnit4 has no per-test timeout property; bound the whole unit-test task so
 // a hanging test fails the build instead of stalling the CI pipeline.
+// Note: `java` here would resolve to the java extension, so the type is
+// imported explicitly.
 tasks.withType<Test>().configureEach {
-    timeout = java.time.Duration.ofMinutes(5)
+    timeout = Duration.ofMinutes(5)
 }
 
 kotlin {
