@@ -37,6 +37,14 @@ android {
     lint {
         warningsAsErrors = true
         abortOnError = true
+        // OldTargetApi: compileSdk/targetSdk 36 is pinned by ADR-0003; the
+        // installed lint knows a newer API level, but bumping the toolchain
+        // is a deliberate, separately-recorded decision (see RECOMMENDATIONS),
+        // not a per-build warning. GradleDependency: dependency versions are
+        // pinned and reviewed (guideline: dependency discipline) instead of
+        // chasing 'newer version available' advisories on every CI run.
+        disable += "OldTargetApi"
+        disable += "GradleDependency"
     }
 }
 

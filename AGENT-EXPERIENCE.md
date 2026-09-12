@@ -678,3 +678,26 @@ Round by round, from CI evidence branches and job-log blob URLs:
   (the JVM step failed first); it runs once the JVM step passes.
 - `:app:testDebugUnitTest` (ScanViewModelTest, ProfileBannerTest) is still
   not wired into CI; wire it after the current loop is green.
+
+### Round-by-round fixes (continued)
+- Core unit tests (76) are now genuinely green and the core jacoco gate
+  (0.80 instructions) passes via ModelContractTest.
+- Engine tests still had compile defects that only surfaced now that the
+  tests compile in CI: `launch` vs `async` (Job has no await()),
+  `PortFinished.result.port`, and an internal-API `getCancellationException`.
+- App gates ran for the first time: ktlint's function-naming fights Compose
+  conventions (fixed via the editorconfig exemption), the `filename` rule
+  demanded the ProfileBanner.kt -> CapabilityRow.kt rename, JUnit4's
+  message-first assertTrue bit the app unit test, and lint's
+  warnings-as-errors policy needed documented advisory exemptions
+  (OldTargetApi, GradleDependency).
+
+### Learnings (this round)
+- ktlint's `function-naming` has an editorconfig escape hatch
+  (`ignore_when_annotated_with`) that must be used for Compose; detekt's
+  equivalent (`ignoreAnnotated`) was already configured.
+- `launch` returns `Job`; only `async` gives a `Deferred` with `await()`.
+- JUnit4 asserts are message-first; kotlin.test asserts are message-last.
+  App unit tests use JUnit4 (android unit tests), JVM tests use kotlin.test.
+- A warnings-as-errors lint policy needs a documented allowlist for
+  advisory-only checks, or every toolchain release breaks the build.

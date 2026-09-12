@@ -190,6 +190,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     affected lines were restructured to satisfy both.
   - Verify gradle invocations run with `--continue` so one round reports
     every failing task instead of stopping at the first layer.
+  - Engine test sources now compile and the app sources pass their gates:
+    - `DefaultScanSchedulerTest` used `launch` (a `Job`) where a `Deferred`
+      was needed for `await()`; switched to `async`, and corrected
+      `event.port` to `event.result.port` on `PortFinished`.
+    - `TcpConnectProberTest` dropped the `@InternalCoroutinesApi`
+      `getCancellationException()` in favor of `job.isCancelled`.
+    - `PlanInputParserTest`/`PortSpecParserTest`/`TargetParserTest` used the
+      non-existent two-argument `kotlin.test.assertIs(KClass, value)`; they
+      now use the reified form (a `typealias` keeps the helpers inside the
+      120-column limit while ktlint keeps them as expression bodies).
+    - App unit tests compile: `ProfileBannerTest` passed JUnit4's
+      `assertTrue(condition, message)` the kotlin-test way; arguments are
+      now in JUnit4's message-first order.
+    - ktlint app gate: `@Composable` functions are exempted from ktlint's
+      function-naming rule via `.editorconfig`
+      (`ktlint_function_naming_ignore_when_annotated_with`), and
+      `ProfileBanner.kt` was renamed to `CapabilityRow.kt` to match its
+      single top-level class (also fixes detekt `MatchingDeclarationName`).
+    - App lint runs as a hard gate for the first time: `OldTargetApi`
+      (compileSdk/targetSdk 36 is pinned by ADR-0003) and
+      `GradleDependency` (dependency versions are pinned and reviewed) are
+      disabled with documented rationale; all other lint warnings remain
+      errors.
+  - The verify job now also runs `:app:testDebugUnitTest`; the app verify
+    step runs even when the JVM step fails (one run reports everything);
+    the evidence relay embeds the core/engine jacoco XMLs and the app lint
+    text report.
+  - Core coverage: `ModelContractTest` pins the model contracts (wire-stable
+    error codes, JSON schema v1 envelope round-trips, capability-matrix
+    invariants) and lifted `:core:jacocoTestCoverageVerification` past its
+    0.80 instruction gate.
 
 ### Changed
 - (none yet)

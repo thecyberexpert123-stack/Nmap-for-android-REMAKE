@@ -117,6 +117,9 @@ jobs:
             echo ""
             echo "--- engine jacoco report ---"
             tail -c 15000 engine/build/reports/jacoco/test/jacocoTestReport.xml 2>/dev/null || echo "(none)"
+            echo ""
+            echo "--- app lint text report ---"
+            tail -c 12000 app/build/intermediates/lint_intermediate_text_report/debug/lintReportDebug/lint-results-debug.txt 2>/dev/null || echo "(none)"
           } > ci-evidence/evidence.txt
           git add -f ci-evidence
           if git -c user.name="CI evidence bot" -c user.email="ci-evidence@arena.local" \

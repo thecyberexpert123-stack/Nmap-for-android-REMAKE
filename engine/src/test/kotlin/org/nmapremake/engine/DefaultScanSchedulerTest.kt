@@ -1,8 +1,8 @@
 package org.nmapremake.engine
 
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import org.nmapremake.core.capability.Executors
@@ -181,7 +181,7 @@ class DefaultScanSchedulerTest {
             runBlocking {
                 val flow = scheduler.scan(plan((1..200).toList(), concurrency = 32), executor, transport)
                 val collector =
-                    launch {
+                    async {
                         val list = mutableListOf<ProgressEvent>()
                         flow.toList(list)
                         list

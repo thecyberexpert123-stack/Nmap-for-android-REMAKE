@@ -27,8 +27,8 @@ class ProfileBannerTest {
         val rows = profileToBanner(CapabilityProfile.ANDROID_LOCAL_M1)
         assertTrue(rows.isNotEmpty())
         for (row in rows) {
-            assertTrue(row.title.isNotBlank(), "blank title for ${row.capability}")
-            assertTrue(row.rationale.isNotBlank(), "blank rationale for ${row.capability}")
+            assertTrue("blank title for ${row.capability}", row.title.isNotBlank())
+            assertTrue("blank rationale for ${row.capability}", row.rationale.isNotBlank())
         }
     }
 

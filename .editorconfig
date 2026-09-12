@@ -11,5 +11,10 @@ trim_trailing_whitespace = true
 [*.{yml,yaml}]
 indent_size = 2
 
+[*.kt]
+# Compose composables are PascalCase by convention; ktlint's
+# function-naming rule exempts functions annotated @Composable.
+ktlint_function_naming_ignore_when_annotated_with = Composable
+
 [*.md]
 trim_trailing_whitespace = false
