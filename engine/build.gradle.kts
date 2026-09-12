@@ -1,3 +1,5 @@
+import java.time.Duration
+
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.serialization)
@@ -35,8 +37,12 @@ tasks.test {
     // Fail individual tests that hang instead of stalling the CI pipeline
     // (JUnit Jupiter per-test timeout).
     systemProperty("junit.jupiter.execution.timeout.default", "60000")
+    // Backstop: fail the whole task instead of hanging the pipeline. On
+    // failure the evidence relay publishes the log tail, which includes the
+    // per-test STARTED events below, so a hung test is identifiable.
+    timeout = Duration.ofMinutes(8)
     testLogging {
-        events("failed", "skipped")
+        events("started", "failed", "skipped")
         exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
     }
     finalizedBy(tasks.jacocoTestReport)
