@@ -1,5 +1,6 @@
 package org.nmapremake.engine
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.toList
@@ -20,6 +21,9 @@ import kotlin.test.assertEquals
 import kotlin.test.assertIs
 import kotlin.test.assertTrue
 
+// advanceUntilIdle is @ExperimentalCoroutinesApi; the opt-in is local to
+// this test class and its single use in `cancel delegates to the scheduler`.
+@OptIn(ExperimentalCoroutinesApi::class)
 class ScanEngineTest {
     private val target = Target("example.com")
 

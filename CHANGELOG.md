@@ -221,6 +221,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     error codes, JSON schema v1 envelope round-trips, capability-matrix
     invariants) and lifted `:core:jacocoTestCoverageVerification` past its
     0.80 instruction gate.
+  - Typealiases cannot expose nested classes (`typealias P = X.Outcome` does
+    not make `P.Success` resolvable); the parser-test helpers now alias the
+    nested classes directly. `ScanEngineTest` opts into
+    `ExperimentalCoroutinesApi` for its single `advanceUntilIdle()` use.
+  - The app now ships an adaptive launcher icon (radar motif, vector-only,
+    no binary assets needed at minSdk 26) — fixes lint's
+    `MissingApplicationIcon`.
 
 ### Changed
 - (none yet)
